@@ -33,7 +33,7 @@ void ADaPlayerController::BeginPlay()
 void ADaPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-	check(InputConfig);
+	checkf(InputConfig, TEXT("DaPlayerController requires a reference to a DaInputConfig DataAsset mapping input actions to their respective Input GameplayTag."));
 	
 	UDaInputComponent* IC = CastChecked<UDaInputComponent>(InputComponent);
 	IC->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);

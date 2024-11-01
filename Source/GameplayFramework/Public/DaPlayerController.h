@@ -41,10 +41,10 @@ protected:
 	virtual void SetupInputComponent() override;
 	void AnyKeyInput(FKey PressedKey);
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Input Setup")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input Setup")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<UDaInputConfig> InputConfig;
 
 	void AbilityInputTagPressed(const FInputActionValue& Value, FGameplayTag InputTag);
