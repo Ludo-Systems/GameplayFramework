@@ -45,6 +45,22 @@ void ADaItemChest::OnActorLoaded_Implementation()
 	OnRep_LidOpened();
 }
 
+void ADaItemChest::HighlightActor_Implementation()
+{
+	bHighlighted = true;
+	BaseMesh->SetRenderCustomDepth(true);
+	BaseMesh->SetCustomDepthStencilValue(250.f);
+	LidMesh->SetRenderCustomDepth(true);
+	LidMesh->SetCustomDepthStencilValue(250.f);
+}
+
+void ADaItemChest::UnHighlightActor_Implementation()
+{
+	bHighlighted = false;
+	BaseMesh->SetRenderCustomDepth(false);
+	LidMesh->SetRenderCustomDepth(false);
+}
+
 void ADaItemChest::OnRep_LidOpened()
 {
 	float CurrentPitch = bLidOpened ? TargetPitch : 0.0f;

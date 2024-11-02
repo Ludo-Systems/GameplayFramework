@@ -22,9 +22,11 @@ public:
 	// Sets default values for this actor's properties
 	ADaPickupItem();
 
+	// Interactable interface
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
-
 	virtual FText GetInteractText_Implementation(APawn* InstigatorPawn) override;
+	virtual void HighlightActor_Implementation() override;
+	virtual void UnHighlightActor_Implementation() override;
 
 	UFUNCTION(BlueprintCallable, Category="PickupItem")
 	void HideAndCooldownItem(APawn* InstigatorPawn);
@@ -87,4 +89,7 @@ protected:
 	void SetItemState(APawn* InstigatorPawn, bool bNewIsActive);
 
 	virtual void BeginPlay() override;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bHighlighted = false;
 };

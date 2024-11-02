@@ -49,6 +49,16 @@ FText ADaPickupItem::GetInteractText_Implementation(APawn* InstigatorPawn)
 	return FText::GetEmpty();
 }
 
+void ADaPickupItem::HighlightActor_Implementation()
+{
+	bHighlighted = true;
+}
+
+void ADaPickupItem::UnHighlightActor_Implementation()
+{
+	bHighlighted = false;
+}
+
 UAbilitySystemComponent* ADaPickupItem::GetAbilitySystemComponent() const
 {
 	return Cast<UAbilitySystemComponent>(AbilitySystemComponent);

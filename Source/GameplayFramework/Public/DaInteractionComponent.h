@@ -8,6 +8,23 @@
 
 class UDaWorldUserWidget;
 
+UENUM()
+enum class EInteractionType : uint8
+{
+	NoInteraction,
+	SphereTrace,
+	MouseCursor
+};
+
+UENUM()
+enum class EInteractionHighlightType : uint8
+{
+	NoHighlight,
+	PostProcessStencilOutlineOnly,
+	TextWidgetOnly,
+	TextWidgetAndPPStencilOutline
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GAMEPLAYFRAMEWORK_API UDaInteractionComponent : public UActorComponent
 {
@@ -28,11 +45,22 @@ protected:
 	void ServerInteract(AActor* InFocus);
 
 	void FindBestInteractable();
+
+	void CursorTrace();
 	
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UPROPERTY()
 	TObjectPtr<AActor> FocusedActor;
+
+	UPROPERTY()
+	TObjectPtr<AActor> PreviousFocusedActor;
+	
+	UPROPERTY(EditAnywhere, Category="DA|Trace")
+	EInteractionType InteractionType;
+
+	UPROPERTY(EditAnywhere, Category="DA|Trace")
+	EInteractionHighlightType HighlightType;
 	
 	UPROPERTY(EditDefaultsOnly, Category="DA|Trace")
 	float TraceDistance;
@@ -50,6 +78,10 @@ protected:
 	TObjectPtr<UDaWorldUserWidget> DefaultWidgetInstance;
 
 	void RemoveWidget();
+
+	void HighlightFocusedActor(bool bDebugDraw);
+	void ToggleWidgetOnFocusedActor(bool bDebugDraw);
+
 	
 public:	
 	// Called every frame

@@ -14,7 +14,10 @@ static TAutoConsoleVariable<bool> CVarDebugDrawInteraction(TEXT("da.InteractionD
 UDaInteractionComponent::UDaInteractionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	
+
+	InteractionType = EInteractionType::MouseCursor;
+	HighlightType = EInteractionHighlightType::TextWidgetAndPPStencilOutline;
+		
 	TraceRadius = 30.0f;
 	TraceDistance = 500.0f;
 
@@ -42,7 +45,6 @@ void UDaInteractionComponent::RemoveWidget()
 	}
 }
 
-
 // Called every frame
 void UDaInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -51,8 +53,41 @@ void UDaInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	APawn* MyPawn = CastChecked<APawn>(GetOwner());
 	if(MyPawn->IsLocallyControlled())
 	{
-		FindBestInteractable();
+		if (InteractionType == EInteractionType::SphereTrace)
+		{
+			FindBestInteractable();
+		}
+		else if (InteractionType == EInteractionType::MouseCursor)
+		{
+			CursorTrace();
+		}
 	}
+}
+
+void UDaInteractionComponent::CursorTrace()
+{
+	bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
+
+	FHitResult CursorHit;
+
+	APawn* MyPawn = CastChecked<APawn>(GetOwner());
+	APlayerController* PlayerController = CastChecked<APlayerController>(MyPawn->Controller);
+	PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	if (!CursorHit.bBlockingHit) return;
+
+	// Clear Focused Actor before hit
+	PreviousFocusedActor = FocusedActor;
+	FocusedActor = nullptr;
+	
+	AActor* HitActor = CursorHit.GetActor();
+	if (HitActor && HitActor->Implements<UDaInteractableInterface>())
+	{
+		FocusedActor = HitActor;
+	}
+
+	HighlightFocusedActor(bDebugDraw);
+
+	ToggleWidgetOnFocusedActor(bDebugDraw);
 }
 
 void UDaInteractionComponent::FindBestInteractable()
@@ -79,6 +114,7 @@ void UDaInteractionComponent::FindBestInteractable()
 	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
 
 	// Clear Focused Actor before hit
+	PreviousFocusedActor = FocusedActor;
 	FocusedActor = nullptr;
 	
 	for (FHitResult Hit : Hits)
@@ -102,39 +138,76 @@ void UDaInteractionComponent::FindBestInteractable()
 		}
 	}
 
-	// focus effect - loads a custom widget onto interactable
-	if (FocusedActor)
-	{
-		// Lazily load the widget when its first needed
-		if (DefaultWidgetInstance == nullptr && ensure(DefaultWidgetClass))
-		{
-			DefaultWidgetInstance = CreateWidget<UDaWorldUserWidget>(GetWorld(), DefaultWidgetClass);
-		}
-
-		if (DefaultWidgetInstance)
-		{
-			DefaultWidgetInstance->AttachedActor = FocusedActor;
-
-			if (!DefaultWidgetInstance->IsInViewport())
-			{
-				DefaultWidgetInstance->AddToViewport();
-				if (bDebugDraw)
-				{
-					LogOnScreen(this,"DaInteractionComponent: Added Widget to Viewport.", true, FColor::Yellow);
-				}
-			}
-		}
-	}
-	else
-	{
-		RemoveWidget();
-	}
+	HighlightFocusedActor(bDebugDraw);
+	
+	ToggleWidgetOnFocusedActor(bDebugDraw);
 	
 	if (bDebugDraw)
 	{
 		DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 1.0f, 0, 2.0f);
 	}
 }
+
+void UDaInteractionComponent::HighlightFocusedActor(bool bDebugDraw)
+{
+	if (HighlightType == EInteractionHighlightType::PostProcessStencilOutlineOnly || HighlightType == EInteractionHighlightType::TextWidgetAndPPStencilOutline)
+	{
+		if (FocusedActor)
+		{
+			if (FocusedActor != PreviousFocusedActor)
+			{
+				IDaInteractableInterface::Execute_HighlightActor(FocusedActor);
+				if (PreviousFocusedActor != nullptr)
+				{
+					IDaInteractableInterface::Execute_UnHighlightActor(PreviousFocusedActor);
+					PreviousFocusedActor = nullptr;
+				}
+			}
+		} else
+		{
+			if (PreviousFocusedActor != nullptr)
+			{
+				IDaInteractableInterface::Execute_UnHighlightActor(PreviousFocusedActor);
+				PreviousFocusedActor = nullptr;
+			}
+		}
+	}
+}
+
+void UDaInteractionComponent::ToggleWidgetOnFocusedActor(bool bDebugDraw)
+{
+	if (HighlightType == EInteractionHighlightType::TextWidgetOnly ||  HighlightType == EInteractionHighlightType::TextWidgetAndPPStencilOutline)
+	{
+		// focus effect - loads a custom widget onto interactable
+		if (FocusedActor)
+		{
+			// Lazily load the widget when its first needed
+			if (DefaultWidgetInstance == nullptr && ensure(DefaultWidgetClass))
+			{
+				DefaultWidgetInstance = CreateWidget<UDaWorldUserWidget>(GetWorld(), DefaultWidgetClass);
+			}
+
+			if (DefaultWidgetInstance)
+			{
+				DefaultWidgetInstance->AttachedActor = FocusedActor;
+
+				if (!DefaultWidgetInstance->IsInViewport())
+				{
+					DefaultWidgetInstance->AddToViewport();
+					if (bDebugDraw)
+					{
+						LogOnScreen(this,"DaInteractionComponent: Added Widget to Viewport.", true, FColor::Yellow);
+					}
+				}
+			}
+		}
+		else
+		{
+			RemoveWidget();
+		}
+	}
+}
+
 
 void UDaInteractionComponent::PrimaryInteract()
 {

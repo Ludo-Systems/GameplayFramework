@@ -31,4 +31,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	FText GetInteractText(APawn* InstigatorPawn);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void HighlightActor();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void UnHighlightActor();
 };
