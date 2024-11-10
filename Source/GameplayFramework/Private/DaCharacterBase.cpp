@@ -3,7 +3,9 @@
 
 #include "DaCharacterBase.h"
 
+#include "AbilitySystemComponent.h"
 #include "CoreGameplayTags.h"
+#include "DaAttributeComponent.h"
 #include "GameplayFramework.h"
 #include "Blueprint/UserWidget.h"
 #include "UI/DaDamageWidget.h"
@@ -17,9 +19,57 @@ ADaCharacterBase::ADaCharacterBase()
 	CharacterIDGameplayTag = CoreGameplayTags::TAG_Character_ID;
 	CharacterTypeGameplayTag = CoreGameplayTags::TAG_Character_Type;
 
+	AttributeComp = CreateDefaultSubobject<UDaAttributeComponent>("AttributeComp");
+
+	GetMesh()->SetGenerateOverlapEvents(true);
+	
 	bUseDefaultHitFlash = true;
 	HitFlashTimeParamName = "HitFlashTime";
 	HitFlashColorParamName = "HitFlashColor";
+}
+
+UAbilitySystemComponent* ADaCharacterBase::GetAbilitySystemComponent() const
+{
+	return Cast<UAbilitySystemComponent>(AbilitySystemComponent);
+}
+
+void ADaCharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (CharacterIDGameplayTag.MatchesAny(FGameplayTagContainer(CoreGameplayTags::TAG_Character_Type_AI)))
+	{
+		InitAbilitySystem();
+	}
+}
+
+void ADaCharacterBase::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (CharacterIDGameplayTag.MatchesAny(FGameplayTagContainer(CoreGameplayTags::TAG_Character_Type_Player)))
+	{
+		//server
+		InitAbilitySystem();
+	}
+
+}
+
+void ADaCharacterBase::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	if (CharacterIDGameplayTag.MatchesAny(FGameplayTagContainer(CoreGameplayTags::TAG_Character_Type_Player)))
+	{
+		//client
+		InitAbilitySystem();
+	}
+}
+
+void ADaCharacterBase::InitAbilitySystem()
+{
+	// must be implemented by sub classes
+	checkf(0, TEXT("ADaCharacterBase::InitAbilitySystem must be implemented by sub classes. Do not call super"));
 }
 
 void ADaCharacterBase::ShowSetHealthBarWidget()

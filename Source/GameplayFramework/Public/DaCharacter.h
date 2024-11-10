@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystemInterface.h"
 #include "DaCharacterBase.h"
 #include "DaCharacter.generated.h"
 
@@ -12,7 +11,7 @@ class UDaAttributeComponent;
 class UDaAbilitySystemComponent;
 
 UCLASS()
-class GAMEPLAYFRAMEWORK_API ADaCharacter : public ADaCharacterBase, public IAbilitySystemInterface
+class GAMEPLAYFRAMEWORK_API ADaCharacter : public ADaCharacterBase
 {
 	GENERATED_BODY()
 
@@ -21,13 +20,8 @@ public:
 	ADaCharacter();
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ability System", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UDaAbilitySystemComponent> AbilityComp;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ability System", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UDaAttributeComponent> AttributeComp;
 	
-	void InitAbilitySystem();
+	virtual void InitAbilitySystem() override;
 	
 	UFUNCTION()
 	void OnHealthChanged(UDaAttributeComponent* HealthComponent, float OldHealth, float NewHealth, AActor* InstigatorActor);
@@ -40,12 +34,10 @@ protected:
 
 public:	
 	// setup for server and client
-	virtual void PossessedBy(AController* NewController) override;
-	virtual void UnPossessed() override;
-	virtual void OnRep_PlayerState() override;
-
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
+	// virtual void PossessedBy(AController* NewController) override;
+	// virtual void UnPossessed() override;
+	// virtual void OnRep_PlayerState() override;
+	
 	void InitPlayerHUD() const;
 	
 };

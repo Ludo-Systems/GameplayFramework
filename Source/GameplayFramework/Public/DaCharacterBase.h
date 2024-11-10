@@ -3,14 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
 #include "GameFramework/Character.h"
 #include "DaCharacterBase.generated.h"
 
+class UDaAbilitySystemComponent;
+class UDaAttributeComponent;
 class UDaWorldUserWidget;
 
 UCLASS()
-class GAMEPLAYFRAMEWORK_API ADaCharacterBase : public ACharacter
+class GAMEPLAYFRAMEWORK_API ADaCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -18,7 +21,25 @@ public:
 	// Sets default values for this character's properties
 	ADaCharacterBase();
 
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	virtual void InitAbilitySystem();
+
 protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UDaAttributeComponent> AttributeComp;
+
+	// Player Characters will get this from Player State, NPC subclasses *MUST* create it in their constructors
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UDaAbilitySystemComponent> AbilitySystemComponent;
+
+	// Calls InitAbilitySystem for setup of player characters on server and client
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+
+	// Calls InitAbilitySystem for setup of non-player characters (like AI NPCs) on server only
+	virtual void BeginPlay() override;
 
 	/* Can be used to identify the type of character. Defaults to Character.Type, but subclass such as AI or Player bases classes can set Character.Type.AI, or Character.Type.Player,
 	 * subclasses could get more specific like Character.Type.Player.Spaceship or Character.Type.AI.Enemy but these tags will need to be defined as needed.
@@ -35,9 +56,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="DA|UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
-
-	//UPROPERTY(VisibleDefaultsOnly, Category="DA|UI")
-	//TObjectPtr<UDaWorldUserWidget> DamagePopUpWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category="DA|UI")
 	TSubclassOf<UUserWidget> DamagePopUpWidgetClass;

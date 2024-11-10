@@ -26,7 +26,6 @@ ADaAICharacter::ADaAICharacter()
 	CharacterTypeGameplayTag = CoreGameplayTags::TAG_Character_Type_AI;
 	
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
-	AttributeComp = CreateDefaultSubobject<UDaAttributeComponent>("AttributeComp");
 	
 	AbilitySystemComponent = CreateDefaultSubobject<UDaAbilitySystemComponent>(TEXT("AbilityComp"));
 	AbilitySystemComponent->SetIsReplicated(true);
@@ -38,7 +37,7 @@ ADaAICharacter::ADaAICharacter()
 	
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	GetMesh()->SetGenerateOverlapEvents(true);
+	//GetMesh()->SetGenerateOverlapEvents(true);
 
 	TargetActorKey = "TargetActor";
 	
@@ -50,13 +49,6 @@ void ADaAICharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &ADaAICharacter::OnPawnSeen);
-}
-
-void ADaAICharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
-	InitAbilitySystem();
 }
 
 void ADaAICharacter::InitAbilitySystem()
@@ -167,11 +159,6 @@ void ADaAICharacter::OnDeathFinished(AActor* OwningActor)
 {
 	// Lifespan
 	SetLifeSpan(5.0f);
-}
-
-UAbilitySystemComponent* ADaAICharacter::GetAbilitySystemComponent() const
-{
-	return Cast<UAbilitySystemComponent>(AbilitySystemComponent);
 }
 
 void ADaAICharacter::SetTargetActor(AActor* NewTarget)
