@@ -40,9 +40,8 @@ void ADaCharacter::InitAbilitySystem()
 		PS->InitializePlayerPawnData();
 
 		// Attribute Component set in PlayerState after loading pawn data
-		AttributeComponent->OnHealthChanged.AddDynamic(this, &ADaCharacter::OnHealthChanged);
-		AttributeComponent->OnDeathStarted.AddDynamic(this, &ADaCharacter::OnDeathStarted);
-		AttributeComponent->OnDeathFinished.AddDynamic(this, &ADaCharacter::OnDeathFinished);
+		Super::InitAbilitySystem();
+
 	}
 }
 

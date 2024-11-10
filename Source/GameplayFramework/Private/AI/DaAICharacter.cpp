@@ -50,9 +50,7 @@ void ADaAICharacter::InitAbilitySystem()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 
-	AttributeComponent->OnHealthChanged.AddDynamic(this, &ADaAICharacter::OnHealthChanged);
-	AttributeComponent->OnDeathStarted.AddDynamic(this, &ADaAICharacter::OnDeathStarted);
-	AttributeComponent->OnDeathFinished.AddDynamic(this, &ADaAICharacter::OnDeathFinished);
+	Super::InitAbilitySystem();
 	
 	// read from data asset and set up abilities, attributes, and effects
 	AttributeComponent->InitializeWithAbilitySystem(AbilitySystemComponent);
