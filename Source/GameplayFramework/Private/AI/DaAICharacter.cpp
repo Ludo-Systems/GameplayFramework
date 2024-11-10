@@ -12,12 +12,9 @@
 #include "AbilitySystem/Attributes/DaCombatAttributeSet.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/CapsuleComponent.h"
 #include "DaAttributeComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/PawnSensingComponent.h"
 #include "UI/DaWorldUserWidget.h"
-#include "Util/ColorConstants.h"
 
 
 // Sets default values
@@ -53,12 +50,12 @@ void ADaAICharacter::InitAbilitySystem()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 
-	AttributeComp->OnHealthChanged.AddDynamic(this, &ADaAICharacter::OnHealthChanged);
-	AttributeComp->OnDeathStarted.AddDynamic(this, &ADaAICharacter::OnDeathStarted);
-	AttributeComp->OnDeathFinished.AddDynamic(this, &ADaAICharacter::OnDeathFinished);
+	AttributeComponent->OnHealthChanged.AddDynamic(this, &ADaAICharacter::OnHealthChanged);
+	AttributeComponent->OnDeathStarted.AddDynamic(this, &ADaAICharacter::OnDeathStarted);
+	AttributeComponent->OnDeathFinished.AddDynamic(this, &ADaAICharacter::OnDeathFinished);
 	
 	// read from data asset and set up abilities, attributes, and effects
-	AttributeComp->InitializeWithAbilitySystem(AbilitySystemComponent);
+	AttributeComponent->InitializeWithAbilitySystem(AbilitySystemComponent);
 }
 
 void ADaAICharacter::OnPawnSeen(APawn* Pawn)

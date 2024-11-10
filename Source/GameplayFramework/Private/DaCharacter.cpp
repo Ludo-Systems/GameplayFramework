@@ -7,14 +7,10 @@
 #include "AbilitySystem/DaAbilitySystemComponent.h"
 #include "DaAttributeComponent.h"
 #include "DaPlayerState.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "CoreGameplayTags.h"
 #include "DaInteractionComponent.h"
 #include "DaPlayerController.h"
-#include "Blueprint/UserWidget.h"
 #include "UI/DaHUD.h"
-#include "UI/DaWorldUserWidget.h"
-#include "Util/ColorConstants.h"
 
 // Sets default values
 ADaCharacter::ADaCharacter()
@@ -44,9 +40,9 @@ void ADaCharacter::InitAbilitySystem()
 		PS->InitializePlayerPawnData();
 
 		// Attribute Component set in PlayerState after loading pawn data
-		AttributeComp->OnHealthChanged.AddDynamic(this, &ADaCharacter::OnHealthChanged);
-		AttributeComp->OnDeathStarted.AddDynamic(this, &ADaCharacter::OnDeathStarted);
-		AttributeComp->OnDeathFinished.AddDynamic(this, &ADaCharacter::OnDeathFinished);
+		AttributeComponent->OnHealthChanged.AddDynamic(this, &ADaCharacter::OnHealthChanged);
+		AttributeComponent->OnDeathStarted.AddDynamic(this, &ADaCharacter::OnDeathStarted);
+		AttributeComponent->OnDeathFinished.AddDynamic(this, &ADaCharacter::OnDeathFinished);
 	}
 }
 
@@ -66,7 +62,7 @@ void ADaCharacter::InitPlayerHUD() const
 		if (ADaHUD* HUD = Cast<ADaHUD>(PlayerController->GetHUD()))
 		{
 			HUD->RemoveOverlay();
-			HUD->InitOverlay(PlayerController, PS, AbilitySystemComponent, AttributeComp);
+			HUD->InitOverlay(PlayerController, PS, AbilitySystemComponent, AttributeComponent);
 		}
 	}
 }

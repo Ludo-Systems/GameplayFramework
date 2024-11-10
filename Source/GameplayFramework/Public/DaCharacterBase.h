@@ -28,7 +28,7 @@ public:
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UDaAttributeComponent> AttributeComp;
+	TObjectPtr<UDaAttributeComponent> AttributeComponent;
 
 	// Player Characters will get this from Player State, NPC subclasses *MUST* create it in their constructors
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))

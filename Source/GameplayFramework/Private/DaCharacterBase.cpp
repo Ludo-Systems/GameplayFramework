@@ -6,14 +6,12 @@
 #include "AbilitySystemComponent.h"
 #include "CoreGameplayTags.h"
 #include "DaAttributeComponent.h"
-#include "GameplayFramework.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UI/DaDamageWidget.h"
 #include "UI/DaWorldUserWidget.h"
 #include "Util/ColorConstants.h"
-#include "WorldPartition/ContentBundle/ContentBundleLog.h"
 
 
 // Sets default values
@@ -22,7 +20,7 @@ ADaCharacterBase::ADaCharacterBase()
 	CharacterIDGameplayTag = CoreGameplayTags::TAG_Character_ID;
 	CharacterTypeGameplayTag = CoreGameplayTags::TAG_Character_Type;
 
-	AttributeComp = CreateDefaultSubobject<UDaAttributeComponent>("AttributeComp");
+	AttributeComponent = CreateDefaultSubobject<UDaAttributeComponent>("AttributeComponent");
 
 	GetMesh()->SetGenerateOverlapEvents(true);
 	
@@ -40,7 +38,7 @@ void ADaCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (CharacterIDGameplayTag.MatchesAny(FGameplayTagContainer(CoreGameplayTags::TAG_Character_Type_AI)))
+	if (CharacterTypeGameplayTag.MatchesAny(FGameplayTagContainer(CoreGameplayTags::TAG_Character_Type_AI)))
 	{
 		InitAbilitySystem();
 	}
@@ -89,7 +87,7 @@ void ADaCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	if (CharacterIDGameplayTag.MatchesAny(FGameplayTagContainer(CoreGameplayTags::TAG_Character_Type_Player)))
+	if (CharacterTypeGameplayTag.MatchesAny(FGameplayTagContainer(CoreGameplayTags::TAG_Character_Type_Player)))
 	{
 		//server
 		InitAbilitySystem();
@@ -101,7 +99,7 @@ void ADaCharacterBase::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
-	if (CharacterIDGameplayTag.MatchesAny(FGameplayTagContainer(CoreGameplayTags::TAG_Character_Type_Player)))
+	if (CharacterTypeGameplayTag.MatchesAny(FGameplayTagContainer(CoreGameplayTags::TAG_Character_Type_Player)))
 	{
 		//client
 		InitAbilitySystem();
