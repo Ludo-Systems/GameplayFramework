@@ -36,9 +36,7 @@ ADaAICharacter::ADaAICharacter()
 	CombatSet = CreateDefaultSubobject<UDaCombatAttributeSet>(TEXT("CombatSet"));
 	
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
-	//GetMesh()->SetGenerateOverlapEvents(true);
-
+	
 	TargetActorKey = "TargetActor";
 	
 	PlayerSeenEmoteTime = 6.0f;
@@ -90,8 +88,8 @@ void ADaAICharacter::MulticastOnPawnSeen_Implementation(APawn* Pawn)
 			GetWorldTimerManager().SetTimer(TimerHandle_PlayerSeenElapsed, this, &ADaAICharacter::PlayerSeenWidgetTimeExpired, PlayerSeenEmoteTime );
 		}
 
-		FString Msg = FString::Printf(TEXT("%s SPOTTED"), *GetNameSafe(Pawn));
-		DrawDebugString(GetWorld(), GetActorLocation(), Msg, nullptr, FColor::White, PlayerSeenEmoteTime, true);
+		//FString Msg = FString::Printf(TEXT("%s SPOTTED"), *GetNameSafe(Pawn));
+		//DrawDebugString(GetWorld(), GetActorLocation(), Msg, nullptr, FColor::White, PlayerSeenEmoteTime, true);
 	}
 }
 
@@ -104,35 +102,16 @@ void ADaAICharacter::PlayerSeenWidgetTimeExpired()
 
 void ADaAICharacter::OnHealthChanged(UDaAttributeComponent* OwningComp, float OldHealth, float NewHealth, AActor* InstigatorActor)
 {
-	//LogOnScreen(this, FString::Printf(TEXT("ADaAICharacter::ONHealthChanged: %f, Owner:%s Instigator: %s"), NewHealth, *GetNameSafe(this), *GetNameSafe(InstigatorActor)));
-	
+	Super::OnHealthChanged(OwningComp, OldHealth, NewHealth, InstigatorActor);
+
+	// subclass this to set TargetActor Blackboard key to instigator that hit us
+	// TODO: Make better decisions on wether or not to attack other non player NPCs
 	if (NewHealth < OldHealth)
 	{
 		// Took Damage
 		if (InstigatorActor != this)
 		{
 			SetTargetActor(InstigatorActor);
-		}
-
-		if (UDaAttributeComponent::IsActorAlive(this))
-		{
-			ShowSetHealthBarWidget();
-			ShowDamagePopupWidget(NewHealth-OldHealth);
-		}
-		
-		if (bUseDefaultHitFlash)
-		{
-			GetMesh()->SetScalarParameterValueOnMaterials(HitFlashTimeParamName, GetWorld()->TimeSeconds);
-			GetMesh()->SetVectorParameterValueOnMaterials(HitFlashColorParamName, FVector(UE::Geometry::LinearColors::Red3f()));
-		}
-	}
-	else if (NewHealth > OldHealth)
-	{
-		// Healing
-		if (bUseDefaultHitFlash)
-		{
-			GetMesh()->SetScalarParameterValueOnMaterials(HitFlashTimeParamName, GetWorld()->TimeSeconds);
-			GetMesh()->SetVectorParameterValueOnMaterials(HitFlashColorParamName, FVector(UE::Geometry::LinearColors::Green3f()));
 		}
 	}
 }
@@ -145,20 +124,9 @@ void ADaAICharacter::OnDeathStarted(AActor* OwningActor, AActor* InstigatorActor
 	{
 		AIController->GetBrainComponent()->StopLogic("Killed");
 	}
-		
-	// Ragdoll
-	// could also use anim bp, but will code it here.
-	GetMesh()->SetAllBodiesSimulatePhysics(true);
-	GetMesh()->SetCollisionProfileName("Ragdoll");
 
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetCharacterMovement()->DisableMovement();
-}
-
-void ADaAICharacter::OnDeathFinished(AActor* OwningActor)
-{
-	// Lifespan
-	SetLifeSpan(5.0f);
+	// Call super to ragdoll
+	Super::OnDeathStarted(OwningActor, InstigatorActor);
 }
 
 void ADaAICharacter::SetTargetActor(AActor* NewTarget)

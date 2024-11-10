@@ -9,6 +9,7 @@
 #include "DaPlayerState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "CoreGameplayTags.h"
+#include "DaInteractionComponent.h"
 #include "DaPlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "UI/DaHUD.h"
@@ -20,11 +21,13 @@ ADaCharacter::ADaCharacter()
 {
 	CharacterTypeGameplayTag = CoreGameplayTags::TAG_Character_Type_Player;
 
+	InteractionComp = CreateDefaultSubobject<UDaInteractionComponent>(TEXT("InteractionComp"));
+
 	PrimaryActorTick.bCanEverTick = false;
 	
 	// Collision settings. We are only interested in handling specific overlap events on the character mesh and not the capsule and not after any animations.
 	GetMesh()->bUpdateOverlapsOnAnimationFinalize = false;
-	//GetMesh()->SetGenerateOverlapEvents(true);
+	//GetMesh()->SetGenerateOverlapEvents(true); <-- set in superclass
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 }
 
@@ -47,6 +50,11 @@ void ADaCharacter::InitAbilitySystem()
 	}
 }
 
+void ADaCharacter::PrimaryInteraction() const
+{
+	if (InteractionComp) InteractionComp->PrimaryInteract();
+}
+
 void ADaCharacter::InitPlayerHUD() const
 {
 	ADaPlayerState* PS = GetPlayerState<ADaPlayerState>();
@@ -63,28 +71,6 @@ void ADaCharacter::InitPlayerHUD() const
 	}
 }
 
-void ADaCharacter::OnHealthChanged(UDaAttributeComponent* HealthComponent, float OldHealth, float NewHealth,
-	AActor* InstigatorActor)
-{
-	float Delta = NewHealth - OldHealth;
-	if (Delta != 0.0f)
-	{
-
-		if (UDaAttributeComponent::IsActorAlive(this))
-		{
-			ShowSetHealthBarWidget();
-			ShowDamagePopupWidget(Delta);
-		}
-		
-		if (bUseDefaultHitFlash)
-		{
-			// If using our Material function, set delta time to trigger the hit flash, then Green if healing or red if damaged
-			GetMesh()->SetScalarParameterValueOnMaterials(HitFlashTimeParamName, GetWorld()->TimeSeconds);
-			GetMesh()->SetVectorParameterValueOnMaterials(HitFlashColorParamName, Delta > 0 ? FVector(UE::Geometry::LinearColors::Green3f()) : FVector(UE::Geometry::LinearColors::Red3f()));
-		}
-	}
-}
-
 void ADaCharacter::OnDeathStarted(AActor* OwningActor, AActor* InstigatorActor)
 {
 	// Death
@@ -92,19 +78,9 @@ void ADaCharacter::OnDeathStarted(AActor* OwningActor, AActor* InstigatorActor)
 	{
 		DisableInput(PC);
 	}
-	
-	// Ragdoll
-	// could also use anim bp, but will code it here.
-	GetMesh()->SetAllBodiesSimulatePhysics(true);
-	GetMesh()->SetCollisionProfileName("Ragdoll");
 
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetCharacterMovement()->DisableMovement();
-}
-
-void ADaCharacter::OnDeathFinished(AActor* OwningActor)
-{
-	SetLifeSpan(3.0f);
+	// Call super to ragdoll
+	Super::OnDeathStarted(OwningActor, InstigatorActor);
 }
 
 

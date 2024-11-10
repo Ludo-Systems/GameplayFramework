@@ -41,6 +41,15 @@ protected:
 	// Calls InitAbilitySystem for setup of non-player characters (like AI NPCs) on server only
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	virtual void OnHealthChanged(UDaAttributeComponent* HealthComponent, float OldHealth, float NewHealth, AActor* InstigatorActor);
+	
+	UFUNCTION()
+	virtual void OnDeathStarted(AActor* OwningActor, AActor* InstigatorActor);
+	
+	UFUNCTION()
+	virtual void OnDeathFinished(AActor* OwningActor);
+	
 	/* Can be used to identify the type of character. Defaults to Character.Type, but subclass such as AI or Player bases classes can set Character.Type.AI, or Character.Type.Player,
 	 * subclasses could get more specific like Character.Type.Player.Spaceship or Character.Type.AI.Enemy but these tags will need to be defined as needed.
 	 */

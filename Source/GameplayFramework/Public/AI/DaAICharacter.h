@@ -60,15 +60,10 @@ protected:
 	
 	virtual void PostInitializeComponents() override;
 
-	//virtual void BeginPlay() override;
-	
-	UFUNCTION()
-	void OnHealthChanged(UDaAttributeComponent* HealthComponent, float OldHealth, float NewHealth, AActor* InstigatorActor);
+	// override so AI character can set blackboard keys, still calls super to handle health change
+	virtual void OnHealthChanged(UDaAttributeComponent* HealthComponent, float OldHealth, float NewHealth, AActor* InstigatorActor) override;
 
-	UFUNCTION()
-	void OnDeathStarted(AActor* OwningActor, AActor* InstigatorActor);
-
-	UFUNCTION()
-	void OnDeathFinished(AActor* OwningActor);
+	// override so AI character can set blackboard keys, still calls super to handle death
+	virtual void OnDeathStarted(AActor* OwningActor, AActor* InstigatorActor) override;
 
 };

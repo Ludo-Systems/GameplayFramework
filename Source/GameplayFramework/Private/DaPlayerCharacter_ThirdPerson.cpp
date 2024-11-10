@@ -25,9 +25,7 @@ ADaPlayerCharacter_ThirdPerson::ADaPlayerCharacter_ThirdPerson()
 	
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
-
-	InteractionComp = CreateDefaultSubobject<UDaInteractionComponent>(TEXT("InteractionComp"));
-
+	
 	// Spring Arm follows pawn rotation
 	SpringArmComp->bUsePawnControlRotation = true;
 	SpringArmComp->SetUsingAbsoluteRotation(true);
@@ -48,11 +46,6 @@ ADaPlayerCharacter_ThirdPerson::ADaPlayerCharacter_ThirdPerson()
 FVector ADaPlayerCharacter_ThirdPerson::GetPawnViewLocation() const
 {
 	return CameraComp->GetComponentLocation();
-}
-
-void ADaPlayerCharacter_ThirdPerson::PrimaryInteraction() const
-{
-	if (InteractionComp) InteractionComp->PrimaryInteract();
 }
 
 void ADaPlayerCharacter_ThirdPerson::Tick(float DeltaTime)

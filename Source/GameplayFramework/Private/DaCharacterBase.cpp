@@ -8,8 +8,11 @@
 #include "DaAttributeComponent.h"
 #include "GameplayFramework.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "UI/DaDamageWidget.h"
 #include "UI/DaWorldUserWidget.h"
+#include "Util/ColorConstants.h"
 #include "WorldPartition/ContentBundle/ContentBundleLog.h"
 
 
@@ -43,6 +46,45 @@ void ADaCharacterBase::BeginPlay()
 	}
 }
 
+void ADaCharacterBase::OnHealthChanged(UDaAttributeComponent* HealthComponent, float OldHealth, float NewHealth,
+	AActor* InstigatorActor)
+{
+	//LogOnScreen(this, FString::Printf(TEXT("ADCharacterBase::ONHealthChanged: %f, Owner:%s Instigator: %s"), NewHealth, *GetNameSafe(this), *GetNameSafe(InstigatorActor)));
+	float Delta = NewHealth - OldHealth;
+	if (Delta != 0.0f)
+	{
+
+		if (UDaAttributeComponent::IsActorAlive(this))
+		{
+			ShowSetHealthBarWidget();
+			ShowDamagePopupWidget(Delta);
+		}
+		
+		if (bUseDefaultHitFlash)
+		{
+			// If using our Material function, set delta time to trigger the hit flash, then Green if healing or red if damaged
+			GetMesh()->SetScalarParameterValueOnMaterials(HitFlashTimeParamName, GetWorld()->TimeSeconds);
+			GetMesh()->SetVectorParameterValueOnMaterials(HitFlashColorParamName, Delta > 0 ? FVector(UE::Geometry::LinearColors::Green3f()) : FVector(UE::Geometry::LinearColors::Red3f()));
+		}
+	}
+}
+
+void ADaCharacterBase::OnDeathStarted(AActor* OwningActor, AActor* InstigatorActor)
+{
+	// Ragdoll
+	// could also use anim bp, but will code it here.
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->SetCollisionProfileName("Ragdoll");
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCharacterMovement()->DisableMovement();
+}
+
+void ADaCharacterBase::OnDeathFinished(AActor* OwningActor)
+{
+	SetLifeSpan(3.0f);
+}
+
 void ADaCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -69,7 +111,7 @@ void ADaCharacterBase::OnRep_PlayerState()
 void ADaCharacterBase::InitAbilitySystem()
 {
 	// must be implemented by sub classes
-	checkf(0, TEXT("ADaCharacterBase::InitAbilitySystem must be implemented by sub classes. Do not call super"));
+	//checkf(0, TEXT("ADaCharacterBase::InitAbilitySystem must be implemented by sub classes. Do not call super"));
 }
 
 void ADaCharacterBase::ShowSetHealthBarWidget()
