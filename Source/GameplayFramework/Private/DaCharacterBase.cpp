@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "CoreGameplayTags.h"
 #include "DaAttributeComponent.h"
+#include "AbilitySystem/DaAbilitySystemComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -108,8 +109,8 @@ void ADaCharacterBase::OnRep_PlayerState()
 
 void ADaCharacterBase::InitAbilitySystem()
 {
-	// must be implemented by sub classes
-	//checkf(0, TEXT("ADaCharacterBase::InitAbilitySystem must be implemented by sub classes. Do not call super"));
+	// setup must be implemented by sub classes
+	
 	AttributeComponent->OnHealthChanged.AddDynamic(this, &ThisClass::OnHealthChanged);
 	AttributeComponent->OnDeathStarted.AddDynamic(this, &ThisClass::OnDeathStarted);
 	AttributeComponent->OnDeathFinished.AddDynamic(this, &ThisClass::OnDeathFinished);

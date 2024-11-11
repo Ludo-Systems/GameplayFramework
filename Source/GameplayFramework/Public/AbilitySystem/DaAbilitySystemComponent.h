@@ -12,6 +12,7 @@ class UDaInputConfig;
 struct FDaAbilitySet_GrantedHandles;
 class UDaPawnData;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /*AssetTags*/)
 /**
  * 
  */
@@ -26,9 +27,13 @@ protected:
 	TArray<FDaAbilitySet_GrantedHandles> OutGrantedAbilityHandlesArray;
 	// TODO: Make this a map so we can remove individual AbilitySets later ex. TSet<FDaAbilitySet_GrantedHandles, FGameplayTag> AbilitySets;
 
+	void EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
+	
 public:
 	UFUNCTION(BlueprintPure, Category = "DA|AbilitySystem")
 	static UDaAbilitySystemComponent* FindAbilitySystemComponent(const AActor* Actor) { return (Actor ? Actor->FindComponentByClass<UDaAbilitySystemComponent>() : nullptr); }
+
+	FEffectAssetTags EffectAssetTags;
 	
 	void InitAbilitiesWithPawnData(const UDaPawnData* DataAsset);
 	void ClearAbilitySets();
@@ -38,5 +43,6 @@ public:
 	void AbilityInputTagPressed(const FInputActionValue& Value, const FGameplayTag& InputTag);
 	void AbilityInputTagHeld(const FGameplayTag InputTag);
 	void AbilityInputTagReleased(const FGameplayTag InputTag);
-	
+
+	void AbilityActorInfoSet();
 };

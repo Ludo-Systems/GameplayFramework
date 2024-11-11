@@ -33,6 +33,7 @@ void ADaCharacter::InitAbilitySystem()
 	if (PS)
 	{
 		PS->GetAbilitySystemComponent()->InitAbilityActorInfo(PS, this);
+		Cast<UDaAbilitySystemComponent>(PS->GetAbilitySystemComponent())->AbilityActorInfoSet();
 		AbilitySystemComponent = PS->GetDaAbilitySystemComponent();
 
 		// Load AbilitySet and any other pawn data for this character

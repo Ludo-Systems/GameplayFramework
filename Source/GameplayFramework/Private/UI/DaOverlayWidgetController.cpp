@@ -4,6 +4,7 @@
 #include "UI/DaOverlayWidgetController.h"
 
 #include "DaAttributeComponent.h"
+#include "AbilitySystem/DaAbilitySystemComponent.h"
 
 void UDaOverlayWidgetController::BroadcastInitialValues()
 {
@@ -28,6 +29,17 @@ void UDaOverlayWidgetController::BindCallbacksToDependencies()
 		AttributeComponent->OnManaChanged.AddDynamic(this, &UDaOverlayWidgetController::ManaChanged);
 		AttributeComponent->OnMaxManaChanged.AddDynamic(this, &UDaOverlayWidgetController::MaxManaChanged);
 	}
+
+	Cast<UDaAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
+		[](const FGameplayTagContainer& AssetTags)
+	{
+			for (auto Tag: AssetTags)
+			{
+				// Broadcast
+				const FString Msg = FString::Printf(TEXT("Effect Tag: %s"), *Tag.ToString());
+				GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Blue, Msg);
+			}
+	});
 }
 
 void UDaOverlayWidgetController::HealthChanged(UDaAttributeComponent* HealthComponent, float OldHealth, float NewHealth,

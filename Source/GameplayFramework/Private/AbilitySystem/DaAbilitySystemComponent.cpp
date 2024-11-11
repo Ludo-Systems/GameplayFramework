@@ -88,3 +88,17 @@ void UDaAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag Input
 		}
 	}
 }
+
+void UDaAbilitySystemComponent::AbilityActorInfoSet()
+{
+	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UDaAbilitySystemComponent::EffectApplied);
+}
+
+void UDaAbilitySystemComponent::EffectApplied(UAbilitySystemComponent* AbilitySystemComponent,
+	const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
+{
+	FGameplayTagContainer TagContainer;
+	EffectSpec.GetAllAssetTags(TagContainer);
+
+	EffectAssetTags.Broadcast(TagContainer);
+}
