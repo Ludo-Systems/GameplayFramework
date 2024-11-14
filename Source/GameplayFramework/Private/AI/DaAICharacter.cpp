@@ -54,7 +54,7 @@ void ADaAICharacter::InitAbilitySystem()
 	// read from data asset and set up abilities, attributes, and effects
 	AttributeComponent->InitializeWithAbilitySystem(AbilitySystemComponent);
 	
-	InitializePrimaryAttributes();
+	InitDefaultAttributes();
 	
 	Super::InitAbilitySystem();
 }

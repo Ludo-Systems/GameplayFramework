@@ -116,15 +116,21 @@ void ADaCharacterBase::InitAbilitySystem()
 	AttributeComponent->OnDeathFinished.AddDynamic(this, &ThisClass::OnDeathFinished);
 }
 
-void ADaCharacterBase::InitializePrimaryAttributes() const
+void ADaCharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level) const
 {
-	check(GetAbilitySystemComponent());
-	if (DefaultPrimaryAttributes)
+	check(IsValid(GetAbilitySystemComponent()));
+	if (GameplayEffectClass)
 	{
 		const FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
-		const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(DefaultPrimaryAttributes, 1.f, ContextHandle);
+		const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffectClass, Level, ContextHandle);
 		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
 	}
+}
+
+void ADaCharacterBase::InitDefaultAttributes() const
+{
+	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
+	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
 }
 
 void ADaCharacterBase::ShowSetHealthBarWidget()

@@ -28,20 +28,25 @@ public:
 	virtual void InitAbilitySystem();
 
 	// Fires off the DefaultPrimaryAttributes GameplayEffect which should be setup to initialize any attributes passed in to the character's pawn data AbilitySet
-	void InitializePrimaryAttributes() const;
-
+	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level) const;
+	void InitDefaultAttributes() const;
+	
 protected:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UDaAttributeComponent> AttributeComponent;
 
 	// Player Characters will get this from Player State, NPC subclasses *MUST* create it in their constructors
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UDaAbilitySystemComponent> AbilitySystemComponent;
 
 	// Gameplay effect used to set all (non-vital) attributes (provided in an AbilitySet) to default.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DA|Attributes", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DA|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+
+	// Gameplay effect used to set all (non-vital) attributes (provided in an AbilitySet) to default.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DA|Attributes")
+	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
 	
 	// Calls InitAbilitySystem for setup of player characters on server and client
 	virtual void PossessedBy(AController* NewController) override;

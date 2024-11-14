@@ -125,7 +125,7 @@ void ADaPlayerState::InitCharacterAttributes(bool bReset) const
 	if(ADaCharacter* Character = Cast<ADaCharacter>(GetPawn()))
 	{
 		Character->InitPlayerHUD();
-		Character->InitializePrimaryAttributes();
+		Character->InitDefaultAttributes();
 	}
 	
 }
