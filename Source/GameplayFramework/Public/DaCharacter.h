@@ -22,6 +22,8 @@ public:
 	void PrimaryInteraction() const;
 
 	void InitPlayerHUD() const;
+
+	virtual int32 GetCharacterLevel() override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")

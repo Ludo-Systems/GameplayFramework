@@ -46,6 +46,11 @@ protected:
 	// Combat attribute set used by this actor.
 	UPROPERTY()
 	TObjectPtr<const class UDaCombatAttributeSet> CombatSet;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character Setup")
+	int32 Level = 1;
+
+	virtual int32 GetCharacterLevel() override;
 	
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);

@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AbilitySystem/Attributes/DaAttribCalc_Health.h"
+#include "AbilitySystem/Modifiers/DaMMC_Health.h"
 
 #include "AbilitySystem/Attributes/DaCharacterAttributeSet.h"
 
-UDaAttribCalc_Health::UDaAttribCalc_Health()
+UDaMMC_Health::UDaMMC_Health()
 {
 	HealthDef.AttributeToCapture = UDaCharacterAttributeSet::GetHealthAttribute();
 	HealthDef.AttributeSource = EGameplayEffectAttributeCaptureSource::Target;
@@ -19,7 +19,7 @@ UDaAttribCalc_Health::UDaAttribCalc_Health()
 	RelevantAttributesToCapture.Add(MaxHealthDef);
 }
 
-float UDaAttribCalc_Health::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
+float UDaMMC_Health::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
 	const FGameplayTagContainer* TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();

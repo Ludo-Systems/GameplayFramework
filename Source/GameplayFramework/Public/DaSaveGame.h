@@ -39,6 +39,9 @@ public:
 	UPROPERTY()
 	int32 Credits;
 
+	UPROPERTY()
+	int32 Level;
+	
 	/* Longest survival time */
 	UPROPERTY()
 	float PersonalRecordTime;
@@ -58,6 +61,7 @@ public:
 	FPlayerSaveData()
 	{
 		Credits = 0;
+		Level = 0;
 		PersonalRecordTime = 0.0f;
 		Location = FVector::ZeroVector;
 		Rotation = FRotator::ZeroRotator;

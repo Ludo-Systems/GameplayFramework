@@ -13,6 +13,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "DaAttributeComponent.h"
+#include "TimerManager.h"
 #include "Perception/PawnSensingComponent.h"
 #include "UI/DaWorldUserWidget.h"
 
@@ -57,6 +58,11 @@ void ADaAICharacter::InitAbilitySystem()
 	InitDefaultAttributes();
 	
 	Super::InitAbilitySystem();
+}
+
+int32 ADaAICharacter::GetCharacterLevel()
+{
+	return Level;
 }
 
 void ADaAICharacter::OnPawnSeen(APawn* Pawn)

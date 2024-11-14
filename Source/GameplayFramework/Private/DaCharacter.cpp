@@ -67,6 +67,14 @@ void ADaCharacter::InitPlayerHUD() const
 	}
 }
 
+int32 ADaCharacter::GetCharacterLevel()
+{
+	ADaPlayerState* PS = GetPlayerState<ADaPlayerState>();
+	check(PS);
+
+	return PS->GetPlayerLevel();
+}
+
 void ADaCharacter::OnDeathStarted(AActor* OwningActor, AActor* InstigatorActor)
 {
 	// Death

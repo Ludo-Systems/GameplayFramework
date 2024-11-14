@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "CoreGameplayTags.h"
 #include "DaAttributeComponent.h"
+#include "GameplayFramework.h"
 #include "AbilitySystem/DaAbilitySystemComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/CapsuleComponent.h"
@@ -121,7 +122,8 @@ void ADaCharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& Gam
 	check(IsValid(GetAbilitySystemComponent()));
 	if (GameplayEffectClass)
 	{
-		const FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+		FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+		ContextHandle.AddSourceObject(this);
 		const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffectClass, Level, ContextHandle);
 		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
 	}
@@ -129,8 +131,14 @@ void ADaCharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& Gam
 
 void ADaCharacterBase::InitDefaultAttributes() const
 {
+	if (!DefaultVitalAttributes)
+	{
+		LOG_WARNING("No DefaultVitalAttributes GameplayEffect set on Character: %s", *GetNameSafe(this));	
+	}
+	
 	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
 	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
+	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
 }
 
 void ADaCharacterBase::ShowSetHealthBarWidget()

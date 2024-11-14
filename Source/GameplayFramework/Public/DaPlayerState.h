@@ -20,6 +20,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCreditsChanged, AActor*, Insti
 // Event Handler for Personal Record Time
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnRecordTimeChanged, ADaPlayerState*, PlayerState, float, NewTime, float, OldRecord);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnLevelChanged, ADaPlayerState*, PlayerState, int32, NewLevel, int32, OldLevel);
+
 USTRUCT(BlueprintType)
 struct GAMEPLAYFRAMEWORK_API FPlayerCharacterInfoRow : public FTableRowBase
 {
@@ -72,6 +74,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Credits")
 	void AdjustCredits(int32 Delta);
 
+	UFUNCTION(BlueprintCallable, Category="Level")
+	void AdjustLevel(int32 NewLevel);
+
+	FORCEINLINE int32 GetPlayerLevel() const { return Level; }
+	
 	/* Checks current record and only sets if better time was passed in. */
 	UFUNCTION(BlueprintCallable)
 	bool UpdatePersonalRecord(float NewTime);
@@ -81,6 +88,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnRecordTimeChanged OnRecordTimeChanged;
+
+	UPROPERTY(BlueprintAssignable, Category="Events")
+	FOnLevelChanged OnLevelChanged;
 	
 protected:
 
@@ -94,13 +104,18 @@ protected:
 	// Combat attribute set used by this actor.
 	UPROPERTY(Transient)
 	TObjectPtr<const class UDaCombatAttributeSet> CombatSet;
-
-	UPROPERTY(EditDefaultsOnly, Category="Player Setup")
-	TSubclassOf<class UGameplayEffect> ResetCharacterAttributesEffect;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Player Setup")
 	TObjectPtr<UDataTable> PlayerPawnDataTable;
 
+	// Starting Credits, note, this will be overrided by loading save game data
+	UPROPERTY(ReplicatedUsing="OnRep_Credits", EditDefaultsOnly, BlueprintReadOnly, Category="Player Setup")
+	int32 Credits = 0;
+
+	// Player's level, this will be overrided by loading save game data
+	UPROPERTY(ReplicatedUsing="OnRep_Level", EditDefaultsOnly, BlueprintReadOnly, Category="Player Setup")
+	int32 Level = 1;
+	
 	UPROPERTY()
 	TObjectPtr<UDaPlayerPawnData> LoadedPawnData;
 	
@@ -108,15 +123,12 @@ protected:
 
 	void InitCharacterAttributes(bool bReset = false) const;
 	
-	//@TODO: PLAYER CREDITS should be part of an attribute set
-
-	// Starting Credits, note, this will be overrided by loading save game data
-	UPROPERTY(ReplicatedUsing="OnRep_Credits", EditDefaultsOnly, BlueprintReadOnly, Category="Player Setup")
-	int32 Credits;
-
 	UPROPERTY(BlueprintReadOnly)
 	float PersonalRecordTime;
 	
 	UFUNCTION()
 	void OnRep_Credits(int32 OldCredits);
+
+	UFUNCTION()
+	void OnRep_Level(int32 OldLevel);
 };

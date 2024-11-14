@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "DaCharacterInterface.h"
 #include "GameplayTagContainer.h"
 #include "GameFramework/Character.h"
 #include "DaCharacterBase.generated.h"
@@ -14,7 +15,7 @@ class UDaAttributeComponent;
 class UDaWorldUserWidget;
 
 UCLASS()
-class GAMEPLAYFRAMEWORK_API ADaCharacterBase : public ACharacter, public IAbilitySystemInterface
+class GAMEPLAYFRAMEWORK_API ADaCharacterBase : public ACharacter, public IAbilitySystemInterface, public IDaCharacterInterface
 {
 	GENERATED_BODY()
 
@@ -40,6 +41,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UDaAbilitySystemComponent> AbilitySystemComponent;
 
+	// Gameplay effect used to set all Vital attributes in CharacterAttributeSet which are used by the AttributeComponent on a Character.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DA|Attributes")
+	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
+	
 	// Gameplay effect used to set all (non-vital) attributes (provided in an AbilitySet) to default.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DA|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
