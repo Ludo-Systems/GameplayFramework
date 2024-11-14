@@ -121,10 +121,11 @@ void ADaPlayerState::InitCharacterAttributes(bool bReset) const
 		}
 	}
 
-	// Ask possessed character to setup HUD now that ASC and AttributeComponent are setup, Character can teardown HUD when it dies.
+	// ASC and AttributeComponent are initialized, setup hud and any primary attributes defaults
 	if(ADaCharacter* Character = Cast<ADaCharacter>(GetPawn()))
 	{
 		Character->InitPlayerHUD();
+		Character->InitializePrimaryAttributes();
 	}
 	
 }

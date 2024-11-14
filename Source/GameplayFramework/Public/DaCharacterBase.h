@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "DaCharacterBase.generated.h"
 
+class UGameplayEffect;
 class UDaAbilitySystemComponent;
 class UDaAttributeComponent;
 class UDaWorldUserWidget;
@@ -23,7 +24,11 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	// Set up Ability system component and attribute component which contains this characters Vital attributes
 	virtual void InitAbilitySystem();
+
+	// Fires off the DefaultPrimaryAttributes GameplayEffect which should be setup to initialize any attributes passed in to the character's pawn data AbilitySet
+	void InitializePrimaryAttributes() const;
 
 protected:
 
@@ -34,6 +39,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDaAbilitySystemComponent> AbilitySystemComponent;
 
+	// Gameplay effect used to set all (non-vital) attributes (provided in an AbilitySet) to default.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DA|Attributes", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+	
 	// Calls InitAbilitySystem for setup of player characters on server and client
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;

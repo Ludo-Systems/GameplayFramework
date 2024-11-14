@@ -50,11 +50,13 @@ void ADaAICharacter::InitAbilitySystem()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UDaAbilitySystemComponent>(GetAbilitySystemComponent())->AbilityActorInfoSet();
-
-	Super::InitAbilitySystem();
 	
 	// read from data asset and set up abilities, attributes, and effects
 	AttributeComponent->InitializeWithAbilitySystem(AbilitySystemComponent);
+	
+	InitializePrimaryAttributes();
+	
+	Super::InitAbilitySystem();
 }
 
 void ADaAICharacter::OnPawnSeen(APawn* Pawn)
