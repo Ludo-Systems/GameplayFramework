@@ -22,7 +22,7 @@ void ADaHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystem
 	checkf(OverlayWidgetClass, TEXT("UDaOverlayWidgetClass uninitialized, fill out DaHud."));
 	checkf(OverlayWidgetControllerClass, TEXT("UDaOverlayWidgetController Class uninitialized, fill out DaHud."));
 
-	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), OverlayWidgetClass);
+	UUserWidget* Widget = CreateWidget<UUserWidget>(PC, OverlayWidgetClass);
 	OverlayWidget = Cast<UDaUserWidgetBase>(Widget);
 
 	const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AC);
