@@ -27,7 +27,8 @@ protected:
 	TArray<FDaAbilitySet_GrantedHandles> OutGrantedAbilityHandlesArray;
 	// TODO: Make this a map so we can remove individual AbilitySets later ex. TSet<FDaAbilitySet_GrantedHandles, FGameplayTag> AbilitySets;
 
-	void EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
+	UFUNCTION(Client, Reliable)
+	void ClientEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
 	
 public:
 	UFUNCTION(BlueprintPure, Category = "DA|AbilitySystem")
