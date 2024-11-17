@@ -35,11 +35,13 @@ void UDaOverlayWidgetController::BindCallbacksToDependencies()
 	{
 			for (const FGameplayTag& Tag: AssetTags)
 			{
-				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(MessageParentTag);
 				if (Tag.MatchesTag(MessageTag))
 				{
-					const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag);
-					MessageWidgetRowDelegate.Broadcast(*Row);
+					if (const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag))
+					{
+						MessageWidgetRowDelegate.Broadcast(*Row);
+					}
 				}
 			}
 	});

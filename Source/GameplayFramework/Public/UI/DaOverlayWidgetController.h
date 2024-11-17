@@ -66,6 +66,9 @@ protected:
 	// TODO: Replace with Data Asset and load with asset manager
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="UI Data")
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="UI Data")
+	FName MessageParentTag = "Message";
 	
 	UFUNCTION()
 	void HealthChanged(UDaAttributeComponent* HealthComponent, float OldHealth, float NewHealth,
