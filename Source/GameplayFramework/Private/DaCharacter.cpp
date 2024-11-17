@@ -69,10 +69,13 @@ void ADaCharacter::InitPlayerHUD() const
 
 int32 ADaCharacter::GetCharacterLevel()
 {
-	ADaPlayerState* PS = GetPlayerState<ADaPlayerState>();
-	check(PS);
-
-	return PS->GetPlayerLevel();
+	// Fallback to Level 1 as default  if player state isn't set
+	int32 PlayerLevel = 1;
+	if (ADaPlayerState* PS = GetPlayerState<ADaPlayerState>())
+	{
+		PlayerLevel = PS->GetPlayerLevel();
+	}
+	return PlayerLevel;
 }
 
 void ADaCharacter::OnDeathStarted(AActor* OwningActor, AActor* InstigatorActor)
