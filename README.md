@@ -2,15 +2,25 @@
 
 The modular gameplay framework is an Unreal 5 C++ plugin that simplifies creating a fully replicated data-driven Gameplay Ability System (GAS) based game rapidly. Classes can be overriden in C++ or Blueprints but often will expect Data Tables or Data Assets to set them up.
 
-## Features
+## Overview
 
-The plugin utilizes the Gameplay Ability System (GAS) and is heavily influenced by the Epic Games Lyra example such as data driven ability set creation and an attribute component that is responsible for handling all the various attributes such as Health, Mana, etc.
+The plugin utilizes the Gameplay Ability System (GAS) and is heavily influenced by the Epic Games Lyra example such as data driven ability set creation and an attribute component that is responsible for handling vital attributes like Health and Death of an actor. 
 
-It provides core base player character classes set up with an ability system component and an attribute component. Game mode and Game state are also set up for use with GAS as well as a modular UI system that responds to a given controller connected to the GAS system. 
+It provides core base character classes and player state set up with an ability system component and an attribute component, and subclasses for players and NPCs. Characters are granted attribute sets, gameplay effects, and gameplay abilities set up with AbilitySets defined as DataAssets. 
+
+For player stats or attributes (strength, intelligence, armor, etc), define a subclass of DaAttributeSet, define each attribute using the parent GameplayTag: Attributes.Stat, and setup event handlers in blueprints. Attributes.Stat.Primary are meant to be set directly while those with Attributes.Stat.Secondary are derived from Primary (through a gameplay effect).
+
+The UI is based on an event driven MVC design pattern with AttributeSet subclasses (model), WidgetControllers listening and broadcasting changes to UserWidgets (controller->view), all driven via GameplayTags. 
+
+The game using this plugin is responsible for creating its own DaAttributeSet subclass for things like Stats and DaAttributeInfo DataAsset to define things associated (like its widgets), defines images and text for each widget type (like for buttons: borders, button background images and text) and connects attributes to widgets via its gameplay tag.  
+
+Some Gameplay effects are required by default (and are available in the plugin's content folder) as they are responsible for important things like handling death or setting an attribute set's default values. 
 
 There is a GAS based projectile system, an item pickup system to create abilities on the fly, a data driven enhanced input system that can either be set up using GAS abilities or directly in a player character or controller.
 
-There are a few assets in the content folder that can be used for things like AI or UI, but they are not required and can be replaced with custom assets.
+Replicated Actors can be continuously spawned on the server via game mode by setting a Spawner subclass in its blueprint which will spawn actors defined via data asset. Currently there is an Item spawner and an AI Character spawner which can be activated via game mode.
+
+The AICharacters predefined in the engine can run around, find a TargetActor using pawn sensing and try to attack it (via gameplay ability), and run away and heal (via gameplay ability) if damaged. 
 
 ## Setup
 
