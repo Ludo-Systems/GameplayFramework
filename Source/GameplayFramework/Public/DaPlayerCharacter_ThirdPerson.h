@@ -7,7 +7,6 @@
 #include "DaPlayerCharacter_ThirdPerson.generated.h"
 
 struct FInputActionValue;
-class UDaInteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
 
@@ -23,17 +22,12 @@ public:
 	// Override GetPawnViewLocation for ThirdPerson since this is setup by default for first person
 	virtual FVector GetPawnViewLocation() const override;
 
-	void PrimaryInteraction() const;
-	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<USpringArmComponent> SpringArmComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UCameraComponent> CameraComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
-	TObjectPtr<UDaInteractionComponent> InteractionComp;
 
 	void FindCrosshairTarget();
 

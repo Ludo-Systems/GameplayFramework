@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/DaAbilitySet.h"
 #include "DaPawnData.h"
+#include "AbilitySystem/Attributes/DaBaseAttributeSet.h"
 
 void UDaAbilitySystemComponent::InitAbilitiesWithPawnData(const UDaPawnData* DataAsset)
 {
@@ -87,4 +88,38 @@ void UDaAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag Input
 			InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputReleased, AbilitySpec.Handle, AbilitySpec.ActivationInfo.GetActivationPredictionKey());
 		}
 	}
+}
+
+void UDaAbilitySystemComponent::AbilityActorInfoSet()
+{
+	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UDaAbilitySystemComponent::ClientEffectApplied);
+}
+
+UDaBaseAttributeSet* UDaAbilitySystemComponent::GetAttributeSetForTag(const FGameplayTag& SetIdentifierTag) const
+{
+	TArray<UAttributeSet*> AttributeSets = GetSpawnedAttributes();
+	for (UAttributeSet* Set : AttributeSets)
+	{
+		if(UDaBaseAttributeSet* DaAttributeSet = Cast<UDaBaseAttributeSet>(Set))
+		{
+			// (A.1).MatchesTag(A) Check if Attributes.Stats.ANYTHING matches Attributes.Stats
+			FGameplayTag SetAssignedTag = DaAttributeSet->GetSetIdentifierTag();
+			if (SetAssignedTag.IsValid() && SetAssignedTag.MatchesTag(SetIdentifierTag))
+			{
+				return DaAttributeSet;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+void UDaAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent,
+                                                                   const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
+{
+	FGameplayTagContainer TagContainer;
+	EffectSpec.GetAllAssetTags(TagContainer);
+
+	if (TagContainer.IsValid())
+		EffectAssetTags.Broadcast(TagContainer);
 }

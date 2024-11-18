@@ -4,6 +4,7 @@
 #include "UI/DaHUD.h"
 
 #include "UI/DaOverlayWidgetController.h"
+#include "UI/DaStatMenuWidgetController.h"
 #include "UI/DaUserWidgetBase.h"
 
 UDaOverlayWidgetController* ADaHUD::GetOverlayWidgetController(const FWidgetControllerParams& WCParams)
@@ -17,15 +18,26 @@ UDaOverlayWidgetController* ADaHUD::GetOverlayWidgetController(const FWidgetCont
 	return OverlayWidgetController;
 }
 
-void ADaHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UDaAttributeComponent* AC)
+UDaStatMenuWidgetController* ADaHUD::GetStatMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (StatMenuWidgetController == nullptr)
+	{
+		StatMenuWidgetController = NewObject<UDaStatMenuWidgetController>(this, StatMenuWidgetControllerClass);
+		StatMenuWidgetController->SetWidgetControllerParams(WCParams);
+		StatMenuWidgetController->BindCallbacksToDependencies();
+	}
+	return StatMenuWidgetController;
+}
+
+void ADaHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UDaBaseAttributeSet* AS)
 {
 	checkf(OverlayWidgetClass, TEXT("UDaOverlayWidgetClass uninitialized, fill out DaHud."));
 	checkf(OverlayWidgetControllerClass, TEXT("UDaOverlayWidgetController Class uninitialized, fill out DaHud."));
 
-	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), OverlayWidgetClass);
+	UUserWidget* Widget = CreateWidget<UUserWidget>(PC, OverlayWidgetClass);
 	OverlayWidget = Cast<UDaUserWidgetBase>(Widget);
 
-	const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AC);
+	const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
 	UDaOverlayWidgetController* WidgetController = GetOverlayWidgetController(WidgetControllerParams);
 
 	OverlayWidget->SetWidgetController(WidgetController);

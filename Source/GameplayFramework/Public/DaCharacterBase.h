@@ -3,14 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
+#include "DaCharacterInterface.h"
 #include "GameplayTagContainer.h"
 #include "GameFramework/Character.h"
 #include "DaCharacterBase.generated.h"
 
+class UGameplayEffect;
+class UDaAbilitySystemComponent;
+class UDaAttributeComponent;
 class UDaWorldUserWidget;
 
 UCLASS()
-class GAMEPLAYFRAMEWORK_API ADaCharacterBase : public ACharacter
+class GAMEPLAYFRAMEWORK_API ADaCharacterBase : public ACharacter, public IAbilitySystemInterface, public IDaCharacterInterface
 {
 	GENERATED_BODY()
 
@@ -18,8 +23,52 @@ public:
 	// Sets default values for this character's properties
 	ADaCharacterBase();
 
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	// Set up Ability system component and attribute component which contains this characters Vital attributes
+	virtual void InitAbilitySystem();
+
+	// Fires off the DefaultPrimaryAttributes GameplayEffect which should be setup to initialize any attributes passed in to the character's pawn data AbilitySet
+	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level) const;
+	void InitDefaultAttributes() const;
+	
 protected:
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	TObjectPtr<UDaAttributeComponent> AttributeComponent;
+
+	// Player Characters will get this from Player State, NPC subclasses *MUST* create it in their constructors
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	TObjectPtr<UDaAbilitySystemComponent> AbilitySystemComponent;
+
+	// Gameplay effect used to set all Vital attributes in CharacterAttributeSet which are used by the AttributeComponent on a Character.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DA|Attributes")
+	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
+	
+	// Gameplay effect used to set all (non-vital) attributes (provided in an AbilitySet) to default.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DA|Attributes")
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+
+	// Gameplay effect used to set all (non-vital) attributes (provided in an AbilitySet) to default.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DA|Attributes")
+	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
+	
+	// Calls InitAbilitySystem for setup of player characters on server and client
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+
+	// Calls InitAbilitySystem for setup of non-player characters (like AI NPCs) on server only
+	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	virtual void OnHealthChanged(UDaAttributeComponent* HealthComponent, float OldHealth, float NewHealth, AActor* InstigatorActor);
+	
+	UFUNCTION()
+	virtual void OnDeathStarted(AActor* OwningActor, AActor* InstigatorActor);
+	
+	UFUNCTION()
+	virtual void OnDeathFinished(AActor* OwningActor);
+	
 	/* Can be used to identify the type of character. Defaults to Character.Type, but subclass such as AI or Player bases classes can set Character.Type.AI, or Character.Type.Player,
 	 * subclasses could get more specific like Character.Type.Player.Spaceship or Character.Type.AI.Enemy but these tags will need to be defined as needed.
 	 */
@@ -35,9 +84,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="DA|UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
-
-	//UPROPERTY(VisibleDefaultsOnly, Category="DA|UI")
-	//TObjectPtr<UDaWorldUserWidget> DamagePopUpWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category="DA|UI")
 	TSubclassOf<UUserWidget> DamagePopUpWidgetClass;

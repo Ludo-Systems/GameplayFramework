@@ -31,7 +31,6 @@ ADaPlayerState::ADaPlayerState(const FObjectInitializer& ObjectInitializer)
 	// AbilitySystemComponent needs to be updated at a high frequency.
 	NetUpdateFrequency = 100.0f;
 
-	Credits = 0;
 	bReplicates = true;
 
 	LoadedPawnData = nullptr;
@@ -42,6 +41,8 @@ void ADaPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ADaPlayerState, Credits);
+	DOREPLIFETIME(ADaPlayerState, Level);
+
 }
 
 ADaPlayerController* ADaPlayerState::GetDaPlayerController() const
@@ -100,31 +101,14 @@ void ADaPlayerState::InitCharacterAttributes(bool bReset) const
 {
 	UDaAttributeComponent* AttributeComp = GetPawn()->GetComponentByClass<UDaAttributeComponent>();
 	AttributeComp->InitializeWithAbilitySystem(AbilitySystemComponent);
-
-	if (bReset)
-	{
-		// run a gameplay effect to reset character attribute set
-		// Can run on Server and Client
-		if (!ResetCharacterAttributesEffect)
-		{
-			LOG_ERROR("%s() Missing ResetCharacterAttributesEffect for %s. Please fill in the character's Blueprint.", *FString(__FUNCTION__), *GetName());
-			return;
-		}
-		
-		FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-		EffectContext.AddSourceObject(this);
-
-		FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(ResetCharacterAttributesEffect, 0, EffectContext);
-		if (NewHandle.IsValid())
-		{
-			FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*NewHandle.Data.Get());
-		}
-	}
-
-	// Ask possessed character to setup HUD now that ASC and AttributeComponent are setup, Character can teardown HUD when it dies.
+	
+	// ASC and AttributeComponent are initialized, setup hud and any primary attributes defaults
 	if(ADaCharacter* Character = Cast<ADaCharacter>(GetPawn()))
 	{
 		Character->InitPlayerHUD();
+
+		if (bReset)
+			Character->InitDefaultAttributes();
 	}
 	
 }
@@ -138,6 +122,7 @@ void ADaPlayerState::LoadPlayerState_Implementation(UDaSaveGame* SaveObject)
 		{
 			// Makes sure we trigger credits changed event
 			AdjustCredits(FoundData->Credits);
+			AdjustLevel(FoundData->Level);
 			PersonalRecordTime = FoundData->PersonalRecordTime;
 		}
 		else
@@ -153,6 +138,7 @@ void ADaPlayerState::SavePlayerState_Implementation(UDaSaveGame* SaveObject)
 	{
 		FPlayerSaveData SaveData;
 		SaveData.Credits = Credits;
+		SaveData.Level = Level;
 		SaveData.PersonalRecordTime = PersonalRecordTime;
 
 		// Stored as FString for simplicity (original Steam ID is uint64)
@@ -209,4 +195,21 @@ void ADaPlayerState::OnRep_Credits(int32 OldCredits)
 	// LogOnScreen(this, Msg, HasAuthority() ? FColor::Green : FColor::Red);
 	
 	OnCreditsChanged.Broadcast(this, Credits, Delta);
+}
+
+void ADaPlayerState::OnRep_Level(int32 OldLevel)
+{
+	OnLevelChanged.Broadcast(this, Level, OldLevel);
+}
+
+void ADaPlayerState::AdjustLevel(int32 NewLevel)
+{
+	if (HasAuthority())
+	{
+		// Just override the level here
+		int32 OldLevel = Level;
+		Level = NewLevel;
+
+		OnLevelChanged.Broadcast(this, Level, OldLevel);
+	}
 }

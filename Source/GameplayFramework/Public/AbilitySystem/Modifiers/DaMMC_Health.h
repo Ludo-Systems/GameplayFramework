@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameplayModMagnitudeCalculation.h"
-#include "DaAttribCalc_Health.generated.h"
+#include "DaMMC_Health.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GAMEPLAYFRAMEWORK_API UDaAttribCalc_Health : public UGameplayModMagnitudeCalculation
+class GAMEPLAYFRAMEWORK_API UDaMMC_Health : public UGameplayModMagnitudeCalculation
 {
 	GENERATED_BODY()
 
-	UDaAttribCalc_Health();
+	UDaMMC_Health();
 	
 	virtual float CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const override;
 

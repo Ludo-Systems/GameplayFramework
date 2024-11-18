@@ -20,6 +20,13 @@ UDaCharacterAttributeSet::UDaCharacterAttributeSet()
 	HealthBeforeAttributeChange = 0.0f;
 	MaxManaBeforeAttributeChange = 0.0f;
 	ManaBeforeAttributeChange = 0.0f;
+
+	TagsToAttributes.Add(CoreGameplayTags::AttributesVitalCoreHealth, GetHealthAttribute);
+	TagsToAttributes.Add(CoreGameplayTags::AttributesVitalCoreMana, GetManaAttribute);
+	TagsToAttributes.Add(CoreGameplayTags::AttributesVitalCoreMaxHealth, GetMaxHealthAttribute);
+	TagsToAttributes.Add(CoreGameplayTags::AttributesVitalCoreMaxMana, GetMaxManaAttribute);
+
+	SetIdentifierTag = CoreGameplayTags::AttributesVitalCore;
 }
 
 void UDaCharacterAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

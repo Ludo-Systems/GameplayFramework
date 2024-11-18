@@ -7,7 +7,7 @@
 #include "UObject/Object.h"
 #include "DaWidgetController.generated.h"
 
-class UDaAttributeComponent;
+class UDaBaseAttributeSet;
 class UAttributeSet;
 class UAbilitySystemComponent;
 
@@ -17,8 +17,8 @@ struct FWidgetControllerParams
 	GENERATED_BODY()
 
 	FWidgetControllerParams() {}
-	FWidgetControllerParams(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UDaAttributeComponent* AC)
-		: PlayerController(PC), PlayerState(PS), AbilitySystemComponent(ASC), AttributeComponent(AC) {}
+	FWidgetControllerParams(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UDaBaseAttributeSet* AS)
+		: PlayerController(PC), PlayerState(PS), AbilitySystemComponent(ASC), AttributeSet(AS) {}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<APlayerController> PlayerController = nullptr;
@@ -30,7 +30,7 @@ struct FWidgetControllerParams
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UDaAttributeComponent> AttributeComponent;
+	TObjectPtr<UDaBaseAttributeSet> AttributeSet;
 };
 
 /**
@@ -44,8 +44,11 @@ class GAMEPLAYFRAMEWORK_API UDaWidgetController : public UObject
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void SetWidgetControllerParams(const FWidgetControllerParams& WCParams); 
+	void SetWidgetControllerParams(const FWidgetControllerParams& WCParams);
+
+	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues();
+
 	virtual void BindCallbacksToDependencies();
 	
 protected:
@@ -60,5 +63,5 @@ protected:
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
-	TObjectPtr<UDaAttributeComponent> AttributeComponent;
+	TObjectPtr<UDaBaseAttributeSet> AttributeSet;
 };

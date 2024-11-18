@@ -3,6 +3,8 @@
 #pragma once
 
 #include "AttributeSet.h"
+#include "GameplayFramework.h"
+#include "GameplayTagContainer.h"
 #include "DaBaseAttributeSet.generated.h"
 
 class UDaAbilitySystemComponent;
@@ -56,5 +58,15 @@ public:
  UWorld* GetWorld() const override;
 
  UDaAbilitySystemComponent* GetDaAbilitySystemComponent() const;
+
+ FORCEINLINE FGameplayTag GetSetIdentifierTag() const { return SetIdentifierTag; }
+
+ // maps gameplay tags to static attribute getter functions for convenience
+ TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
+ 
+protected:
+ 
+ UPROPERTY(VisibleAnywhere)
+ FGameplayTag SetIdentifierTag;
  
 };

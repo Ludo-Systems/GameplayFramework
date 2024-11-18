@@ -78,6 +78,13 @@ UDaAbilitySystemComponent* ADaPlayerController::GetAbilitySystemComponent()
 	return AbilitySystemComponent;
 }
 
+void ADaPlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+
+	OnPawnChanged.Broadcast(InPawn);
+}
+
 void ADaPlayerController::BeginPlayingState()
 {
 	Super::BeginPlayingState();

@@ -8,7 +8,7 @@ void UDaWidgetController::SetWidgetControllerParams(const FWidgetControllerParam
 	PlayerController = WCParams.PlayerController;
 	PlayerState = WCParams.PlayerState;
 	AbilitySystemComponent = WCParams.AbilitySystemComponent;
-	AttributeComponent = WCParams.AttributeComponent;
+	AttributeSet = WCParams.AttributeSet;
 }
 
 void UDaWidgetController::BroadcastInitialValues()
