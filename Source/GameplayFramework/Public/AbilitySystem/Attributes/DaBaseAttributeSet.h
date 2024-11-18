@@ -3,6 +3,7 @@
 #pragma once
 
 #include "AttributeSet.h"
+#include "GameplayTagContainer.h"
 #include "DaBaseAttributeSet.generated.h"
 
 class UDaAbilitySystemComponent;
@@ -56,5 +57,12 @@ public:
  UWorld* GetWorld() const override;
 
  UDaAbilitySystemComponent* GetDaAbilitySystemComponent() const;
+
+ FORCEINLINE FGameplayTag GetSetIdentifierTag() const { return SetIdentifierTag; }
+ 
+protected:
+ 
+ UPROPERTY(VisibleAnywhere)
+ FGameplayTag SetIdentifierTag;
  
 };

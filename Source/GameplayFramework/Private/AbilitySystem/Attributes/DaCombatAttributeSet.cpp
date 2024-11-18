@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/Attributes/DaCombatAttributeSet.h"
 
+#include "CoreGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
 UDaCombatAttributeSet::UDaCombatAttributeSet()
@@ -10,6 +11,7 @@ UDaCombatAttributeSet::UDaCombatAttributeSet()
 	, BaseHeal(0.0f)
 	, BaseManaPerCast(0.0f)
 {
+	SetIdentifierTag = CoreGameplayTags::AttributesVitalMeta;
 }
 
 void UDaCombatAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

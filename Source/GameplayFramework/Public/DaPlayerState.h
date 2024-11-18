@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerState.h"
 #include "DaPlayerState.generated.h"
 
+class UDaBaseAttributeSet;
 class UGameplayEffect;
 class UDaAbilitySystemComponent;
 class UDaPlayerPawnData;
@@ -91,7 +92,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Events")
 	FOnLevelChanged OnLevelChanged;
-	
+
 protected:
 
 	// The ability system component sub-object used by player characters.
@@ -107,7 +108,7 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Player Setup")
 	TObjectPtr<UDataTable> PlayerPawnDataTable;
-
+	
 	// Starting Credits, note, this will be overrided by loading save game data
 	UPROPERTY(ReplicatedUsing="OnRep_Credits", EditDefaultsOnly, BlueprintReadOnly, Category="Player Setup")
 	int32 Credits = 0;

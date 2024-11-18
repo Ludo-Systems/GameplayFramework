@@ -7,6 +7,7 @@
 #include "GameFramework/HUD.h"
 #include "DaHUD.generated.h"
 
+class UDaBaseAttributeSet;
 class UDaAttributeComponent;
 class UAbilitySystemComponent;
 class UDaOverlayWidgetController;
@@ -28,7 +29,7 @@ public:
 
 	UDaOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
 
-	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UDaAttributeComponent* AC);
+	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UDaBaseAttributeSet* AS);
 
 	void RemoveOverlay();
 	

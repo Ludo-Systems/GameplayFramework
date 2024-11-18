@@ -101,7 +101,7 @@ void ADaPlayerState::InitCharacterAttributes(bool bReset) const
 {
 	UDaAttributeComponent* AttributeComp = GetPawn()->GetComponentByClass<UDaAttributeComponent>();
 	AttributeComp->InitializeWithAbilitySystem(AbilitySystemComponent);
-
+	
 	// ASC and AttributeComponent are initialized, setup hud and any primary attributes defaults
 	if(ADaCharacter* Character = Cast<ADaCharacter>(GetPawn()))
 	{

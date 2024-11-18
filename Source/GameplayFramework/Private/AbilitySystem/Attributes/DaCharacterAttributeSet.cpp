@@ -20,6 +20,8 @@ UDaCharacterAttributeSet::UDaCharacterAttributeSet()
 	HealthBeforeAttributeChange = 0.0f;
 	MaxManaBeforeAttributeChange = 0.0f;
 	ManaBeforeAttributeChange = 0.0f;
+
+	SetIdentifierTag = CoreGameplayTags::AttributesVitalCore;
 }
 
 void UDaCharacterAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "DaAbilitySystemComponent.generated.h"
 
+class UDaBaseAttributeSet;
 class UDaAbilitySet;
 struct FInputActionValue;
 class UDaInputConfig;
@@ -46,4 +47,6 @@ public:
 	void AbilityInputTagReleased(const FGameplayTag InputTag);
 
 	void AbilityActorInfoSet();
+	
+	UDaBaseAttributeSet* GetAttributeSetForTag(const FGameplayTag& SetIdentifierTag) const;
 };

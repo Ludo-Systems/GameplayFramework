@@ -26,12 +26,8 @@ struct FUIWidgetRow : public FTableRowBase
 	UTexture2D* Image = nullptr;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float, NewHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChangedSignature, float, NewMaxHealth);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnManaChangedSignature, float, NewMana);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxManaChangedSignature, float, NewMaxMana);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow, Row);
 
 
@@ -47,16 +43,16 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 	
 	UPROPERTY(BlueprintAssignable, Category="Character Attributes")
-	FOnHealthChangedSignature OnHealthChanged;
+	FOnAttributeChangedSignature OnHealthChanged;
 
 	UPROPERTY(BlueprintAssignable, Category="Character Attributes")
-	FOnMaxHealthChangedSignature OnMaxHealthChanged;
+	FOnAttributeChangedSignature OnMaxHealthChanged;
 
 	UPROPERTY(BlueprintAssignable, Category="Character Attributes")
-	FOnManaChangedSignature OnManaChanged;
+	FOnAttributeChangedSignature OnManaChanged;
 
 	UPROPERTY(BlueprintAssignable, Category="Character Attributes")
-	FOnMaxManaChangedSignature OnMaxManaChanged;
+	FOnAttributeChangedSignature OnMaxManaChanged;
 
 	UPROPERTY(BlueprintAssignable, Category="UI Messages")
 	FMessageWidgetRowSignature MessageWidgetRowDelegate;
@@ -69,22 +65,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="UI Data")
 	FName MessageParentTag = "Message";
-	
-	UFUNCTION()
-	void HealthChanged(UDaAttributeComponent* HealthComponent, float OldHealth, float NewHealth,
-	AActor* InstigatorActor);
-
-	UFUNCTION()
-	void MaxHealthChanged(UDaAttributeComponent* HealthComponent, float OldMaxHealth, float NewMaxHealth,
-	AActor* InstigatorActor);
-
-	UFUNCTION()
-	void ManaChanged(UDaAttributeComponent* HealthComponent, float OldMana, float NewMana,
-	AActor* InstigatorActor);
-
-	UFUNCTION()
-	void MaxManaChanged(UDaAttributeComponent* HealthComponent, float OldMaxMana, float NewMaxMana,
-	AActor* InstigatorActor);
 
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);

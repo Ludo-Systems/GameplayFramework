@@ -5,31 +5,50 @@
 
 #include "DaAttributeComponent.h"
 #include "AbilitySystem/DaAbilitySystemComponent.h"
+#include "AbilitySystem/Attributes/DaCharacterAttributeSet.h"
 
 void UDaOverlayWidgetController::BroadcastInitialValues()
 {
-	if (AttributeComponent)
-	{
-		OnHealthChanged.Broadcast(AttributeComponent->GetHealth());
-		OnMaxHealthChanged.Broadcast(AttributeComponent->GetMaxHealth());
+	UDaCharacterAttributeSet* HealthSet = CastChecked<UDaCharacterAttributeSet>(AttributeSet);
 
-		OnManaChanged.Broadcast(AttributeComponent->GetMana());
-		OnMaxManaChanged.Broadcast(AttributeComponent->GetMaxMana());
-	}
+	OnHealthChanged.Broadcast(HealthSet->GetHealth());
+	OnMaxHealthChanged.Broadcast(HealthSet->GetMaxHealth());
+	OnManaChanged.Broadcast(HealthSet->GetMana());
+	OnMaxManaChanged.Broadcast(HealthSet->GetMaxMana());
 }
 
 void UDaOverlayWidgetController::BindCallbacksToDependencies()
 {
-	// Bind to our AttributeComponent Instead of directly using ASC->GetGameplayAttributeValueChangedDelegate(AttributeSet->GetHealthAttribute().AddUObject(this, ...))
-	// It manages a lot more data derived from health and mana including death, damage, healing, shield buffs, etc...
-	if (AttributeComponent)
-	{
-		AttributeComponent->OnHealthChanged.AddDynamic(this, &UDaOverlayWidgetController::HealthChanged);
-		AttributeComponent->OnMaxHealthChanged.AddDynamic(this, &UDaOverlayWidgetController::MaxHealthChanged);
-		AttributeComponent->OnManaChanged.AddDynamic(this, &UDaOverlayWidgetController::ManaChanged);
-		AttributeComponent->OnMaxManaChanged.AddDynamic(this, &UDaOverlayWidgetController::MaxManaChanged);
-	}
+	UDaCharacterAttributeSet* HealthSet = CastChecked<UDaCharacterAttributeSet>(AttributeSet);
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(HealthSet->GetHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnHealthChanged.Broadcast(Data.NewValue);
+		}
+	);
 
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(HealthSet->GetMaxHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnMaxHealthChanged.Broadcast(Data.NewValue);
+		}
+	);
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(HealthSet->GetManaAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnManaChanged.Broadcast(Data.NewValue);
+		}
+	);
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(HealthSet->GetMaxManaAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnMaxManaChanged.Broadcast(Data.NewValue);
+		}
+	);
+	
 	Cast<UDaAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
 		[this](const FGameplayTagContainer& AssetTags)
 	{
@@ -45,28 +64,4 @@ void UDaOverlayWidgetController::BindCallbacksToDependencies()
 				}
 			}
 	});
-}
-
-void UDaOverlayWidgetController::HealthChanged(UDaAttributeComponent* HealthComponent, float OldHealth, float NewHealth,
-	AActor* InstigatorActor)
-{
-	OnHealthChanged.Broadcast(NewHealth);
-}
-
-void UDaOverlayWidgetController::MaxHealthChanged(UDaAttributeComponent* HealthComponent, float OldMaxHealth,
-	float NewMaxHealth, AActor* InstigatorActor)
-{
-	OnMaxHealthChanged.Broadcast(NewMaxHealth);
-}
-
-void UDaOverlayWidgetController::ManaChanged(UDaAttributeComponent* HealthComponent, float OldMana, float NewMana,
-	AActor* InstigatorActor)
-{
-	OnManaChanged.Broadcast(NewMana);
-}
-
-void UDaOverlayWidgetController::MaxManaChanged(UDaAttributeComponent* HealthComponent, float OldMaxMana,
-	float NewMaxMana, AActor* InstigatorActor)
-{
-	OnMaxManaChanged.Broadcast(NewMaxMana);
 }

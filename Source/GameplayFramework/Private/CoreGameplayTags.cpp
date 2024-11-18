@@ -21,6 +21,20 @@ namespace CoreGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_Player, "Character.Type.Player", "Base Player Character Type");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_Player_ThirdPerson, "Character.Type.Player.ThirdPerson", "Third person perspective player character type");
 
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attributes, "Attributes", "Core Attributes Group");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVital, "Attributes.Vital", "Vital Attributes base group for handling things like Health, Mana, death, damage, etc");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVitalCore, "Attributes.Vital.Core", "Vital Attributes like Health or Mana.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVitalCoreHealth, "Attributes.Vital.Core.Health", "Health Attribute");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVitalCoreMaxHealth, "Attributes.Vital.Core.MaxHealth", "Max Health Attribute");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVitalCoreMana, "Attributes.Vital.Core.Mana", "Mana Attribute");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVitalCoreMaxMana, "Attributes.Vital.Core.MaxMana", "Max Mana Attribute");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVitalMeta, "Attributes.Vital.Meta", "Meta attribute set for dealing with damage or other things that may not be stored directly but applied to core vitals like health");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVitalMetaDamage, "Attributes.Vital.Meta.Damage", "Damage Meta Attribute");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVitalMetaHealing, "Attributes.Vital.Meta.Healing", "healing Meta Attribute");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStats, "Attributes.Stats", "Game specific Stats defined in game code. Should have Primary and Secondary");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsPrimary, "Attributes.Stats.Primary", "Primary attributes specific player stats/buff attributes that can be modified directly");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsSecondary, "Attributes.Stats.Secondary", "Secondary Attributes adjust or modified via calculations or modifications based on primary attribute values");
+	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status, "Status", "Base Status Tag");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_Death, "Status.Death", "Target has the death status.");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_Death_Dying, "Status.Death.Dying", "Target has begun the death process.");
