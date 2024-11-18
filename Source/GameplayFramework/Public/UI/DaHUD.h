@@ -7,6 +7,7 @@
 #include "GameFramework/HUD.h"
 #include "DaHUD.generated.h"
 
+class UDaStatMenuWidgetController;
 class UDaBaseAttributeSet;
 class UDaAttributeComponent;
 class UAbilitySystemComponent;
@@ -24,17 +25,19 @@ class GAMEPLAYFRAMEWORK_API ADaHUD : public AHUD
 
 public:
 
-	UPROPERTY()
-	TObjectPtr<UDaUserWidgetBase> OverlayWidget;
-
 	UDaOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
-
+	
+	UDaStatMenuWidgetController* GetStatMenuWidgetController(const FWidgetControllerParams& WCParams);
+	
 	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UDaBaseAttributeSet* AS);
 
 	void RemoveOverlay();
 	
 private:
 
+	UPROPERTY()
+	TObjectPtr<UDaUserWidgetBase> OverlayWidget;
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UDaUserWidgetBase> OverlayWidgetClass;
 
@@ -43,5 +46,11 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UDaOverlayWidgetController> OverlayWidgetControllerClass;
+
+	UPROPERTY()
+	TObjectPtr<UDaStatMenuWidgetController> StatMenuWidgetController;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UDaStatMenuWidgetController> StatMenuWidgetControllerClass;
 	
 };

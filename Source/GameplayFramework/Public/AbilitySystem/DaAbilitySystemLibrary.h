@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "DaAbilitySystemLibrary.generated.h"
 
+class UDaStatMenuWidgetController;
 class UDaOverlayWidgetController;
 /**
  * 
@@ -18,4 +19,7 @@ class GAMEPLAYFRAMEWORK_API UDaAbilitySystemLibrary : public UBlueprintFunctionL
 public:
 	UFUNCTION(BlueprintPure, Category="DaAbilitySystemLibrary|WidgetController")
 	static UDaOverlayWidgetController* GetOverlayWidgetController(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure, Category="DaAbilitySystemLibrary|WidgetController")
+	static UDaStatMenuWidgetController* GetStatMenuWidgetController(const UObject* WorldContextObject);
 };

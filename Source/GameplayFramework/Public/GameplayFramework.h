@@ -17,6 +17,14 @@ GAMEPLAYFRAMEWORK_API DECLARE_LOG_CATEGORY_EXTERN(DA_GameplayFramework, Log, All
 #define LOG_WARNING(x, ...) UE_LOG(DA_GameplayFramework, Warning, TEXT(x), ##__VA_ARGS__)
 #define LOG_ERROR(x, ...) UE_LOG(DA_GameplayFramework, Error, TEXT(x), ##__VA_ARGS__)
 
+// maps static delegates or functions to a static C++ function pointers.
+// example: TStaticFuncPtr<float(int32, float)> FuncPtr;
+//			static float Foo(int32 i, float f) { return i*f; }
+//			FuncPtr = Foo;
+//			float val = FuncPtr(4.f, 3.14f);
+template<class T>
+using TStaticFuncPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
+
 static void LogOnScreen(UObject* WorldContext, FString Msg, bool ConsoleLogAlso = true, FColor Color = FColor::White, float Duration = 5.0f, int32 Key = -1)
 {
 	if (!ensure(WorldContext))

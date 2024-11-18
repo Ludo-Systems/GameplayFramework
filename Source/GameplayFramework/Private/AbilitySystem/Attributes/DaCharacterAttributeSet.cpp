@@ -21,6 +21,11 @@ UDaCharacterAttributeSet::UDaCharacterAttributeSet()
 	MaxManaBeforeAttributeChange = 0.0f;
 	ManaBeforeAttributeChange = 0.0f;
 
+	TagsToAttributes.Add(CoreGameplayTags::AttributesVitalCoreHealth, GetHealthAttribute);
+	TagsToAttributes.Add(CoreGameplayTags::AttributesVitalCoreMana, GetManaAttribute);
+	TagsToAttributes.Add(CoreGameplayTags::AttributesVitalCoreMaxHealth, GetMaxHealthAttribute);
+	TagsToAttributes.Add(CoreGameplayTags::AttributesVitalCoreMaxMana, GetMaxManaAttribute);
+
 	SetIdentifierTag = CoreGameplayTags::AttributesVitalCore;
 }
 

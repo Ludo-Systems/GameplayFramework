@@ -26,3 +26,19 @@ UDaOverlayWidgetController* UDaAbilitySystemLibrary::GetOverlayWidgetController(
 	}
 	return nullptr;
 }
+
+UDaStatMenuWidgetController* UDaAbilitySystemLibrary::GetStatMenuWidgetController(const UObject* WorldContextObject)
+{
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
+	{
+		if (ADaHUD* HUD = Cast<ADaHUD>(PC->GetHUD()))
+		{
+			ADaPlayerState* PS = PC->GetPlayerState<ADaPlayerState>();
+			UDaAbilitySystemComponent* ASC = Cast<UDaAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+			UDaBaseAttributeSet* AS = ASC->GetAttributeSetForTag(CoreGameplayTags::AttributesStats);
+			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
+			return HUD->GetStatMenuWidgetController(WidgetControllerParams);
+		}
+	}
+	return nullptr;
+}

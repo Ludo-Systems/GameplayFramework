@@ -11,6 +11,10 @@ UDaCombatAttributeSet::UDaCombatAttributeSet()
 	, BaseHeal(0.0f)
 	, BaseManaPerCast(0.0f)
 {
+
+	TagsToAttributes.Add(CoreGameplayTags::AttributesVitalMetaDamage, GetBaseDamageAttribute);
+	TagsToAttributes.Add(CoreGameplayTags::AttributesVitalMetaHealing, GetBaseHealAttribute);
+	
 	SetIdentifierTag = CoreGameplayTags::AttributesVitalMeta;
 }
 
