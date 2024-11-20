@@ -48,24 +48,19 @@ void ADaPlayerController::AnyKeyInput(FKey PressedKey)
 void ADaPlayerController::AbilityInputTagPressed(const FInputActionValue& Value, FGameplayTag InputTag)
 {
 	//LogOnScreen(this, FString::Printf(TEXT("Input Pressed: %s"), *InputTag.ToString()), true, FColor::Red, 1.f, 1 );
-	//bIsUsingGamepad = PressedKey.IsGamepadKey();
-
-	if (GetAbilitySystemComponent() == nullptr) return;
-	GetAbilitySystemComponent()->AbilityInputTagPressed(Value, InputTag);
+	if (GetAbilitySystemComponent()) GetAbilitySystemComponent()->AbilityInputTagPressed(Value, InputTag);
 }
 
 void ADaPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
 	//LogOnScreen(this, FString::Printf(TEXT("Input Released: %s"), *InputTag.ToString()), true, FColor::Blue, 1.f, 2 );
-	if (GetAbilitySystemComponent() == nullptr) return;
-	GetAbilitySystemComponent()->AbilityInputTagReleased(InputTag);
+	if (GetAbilitySystemComponent()) GetAbilitySystemComponent()->AbilityInputTagReleased(InputTag);
 }
 
 void ADaPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
 	//LogOnScreen(this, FString::Printf(TEXT("Input Held: %s"), *InputTag.ToString()), true, FColor::Green, 1.f, 3 );
-	if (GetAbilitySystemComponent() == nullptr) return;
-	GetAbilitySystemComponent()->AbilityInputTagHeld(InputTag);
+	if (GetAbilitySystemComponent()) GetAbilitySystemComponent()->AbilityInputTagHeld(InputTag);
 }
 
 UDaAbilitySystemComponent* ADaPlayerController::GetAbilitySystemComponent()

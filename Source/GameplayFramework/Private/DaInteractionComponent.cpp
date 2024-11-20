@@ -67,9 +67,7 @@ void UDaInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType
 void UDaInteractionComponent::CursorTrace()
 {
 	bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
-
-	FHitResult CursorHit;
-
+	
 	APawn* MyPawn = CastChecked<APawn>(GetOwner());
 	APlayerController* PlayerController = CastChecked<APlayerController>(MyPawn->Controller);
 	PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);

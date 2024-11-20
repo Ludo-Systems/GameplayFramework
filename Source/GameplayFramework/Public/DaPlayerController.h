@@ -49,9 +49,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<UDaInputConfig> InputConfig;
 
-	void AbilityInputTagPressed(const FInputActionValue& Value, FGameplayTag InputTag);
-	void AbilityInputTagReleased(FGameplayTag InputTag);
-	void AbilityInputTagHeld(FGameplayTag InputTag);
+	virtual void AbilityInputTagPressed(const FInputActionValue& Value, FGameplayTag InputTag);
+	virtual void AbilityInputTagReleased(FGameplayTag InputTag);
+	virtual void AbilityInputTagHeld(FGameplayTag InputTag);
 
 	UPROPERTY()
 	TObjectPtr<UDaAbilitySystemComponent> AbilitySystemComponent;

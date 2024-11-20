@@ -94,8 +94,12 @@ void UDaAbilitySet::GiveToAbilitySystem(UDaAbilitySystemComponent* DaASC,
 
 		FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityToGrant.AbilityLevel);
 		AbilitySpec.SourceObject = SourceObject;
-		AbilitySpec.DynamicAbilityTags.AddTag(AbilityToGrant.InputTag);
 
+		if (AbilityToGrant.InputTag.IsValid())
+		{
+			AbilitySpec.DynamicAbilityTags.AddTag(AbilityToGrant.InputTag);
+		}
+		
 		const FGameplayAbilitySpecHandle AbilitySpecHandle = DaASC->GiveAbility(AbilitySpec);
 
 		if (OutGrantedHandles)

@@ -38,6 +38,7 @@ public class GameplayFramework : ModuleRules
 				"SlateCore",
 				"UMG", 
 				"Niagara",
+				"NavigationSystem",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

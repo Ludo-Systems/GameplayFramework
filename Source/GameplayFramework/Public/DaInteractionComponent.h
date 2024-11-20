@@ -40,6 +40,12 @@ public:
 	
 	UDaInteractionComponent();
 
+	// Will return resulting actor if trace resulted in an actor that responds to the Interactable Interface, otherwise returns nullPtr
+	FORCEINLINE TObjectPtr<AActor> GetFocusedActor() {return FocusedActor;}
+
+	// If using EInteractionType::MouseCursor, will return the most current HitResult
+	FORCEINLINE FHitResult GetCursorHitResult() {return CursorHit;}
+	
 protected:
 	UFUNCTION(Server, Reliable)
 	void ServerInteract(AActor* InFocus);
@@ -81,7 +87,8 @@ protected:
 
 	void HighlightFocusedActor(bool bDebugDraw);
 	void ToggleWidgetOnFocusedActor(bool bDebugDraw);
-
+	
+	FHitResult CursorHit;
 	
 public:	
 	// Called every frame
