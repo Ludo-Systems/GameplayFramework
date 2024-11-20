@@ -31,7 +31,12 @@ public:
 	// Fires off the DefaultPrimaryAttributes GameplayEffect which should be setup to initialize any attributes passed in to the character's pawn data AbilitySet
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level) const;
 	void InitDefaultAttributes() const;
+
+	virtual UAnimMontage* GetAttackMontage_Implementation() override;
 	
+	// Will check the default mesh for ProjectileSocketName and return that. Subclasses can override and use their own mesh like a weapon if they have one.
+	virtual FVector GetProjectileSocketLocation_Implementation() override;
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
@@ -52,6 +57,13 @@ protected:
 	// Gameplay effect used to set all (non-vital) attributes (provided in an AbilitySet) to default.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DA|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
+
+	// If using projectile abilities, subclasses will use this to find the location to spawn a projectile from
+	UPROPERTY(EditAnywhere, Category = "DA|Combat")
+	FName ProjectileSocketName;
+
+	UPROPERTY(EditAnywhere, Category = "DA|Combat")
+	TObjectPtr<UAnimMontage> AttackMontage;
 	
 	// Calls InitAbilitySystem for setup of player characters on server and client
 	virtual void PossessedBy(AController* NewController) override;

@@ -29,6 +29,8 @@ ADaCharacterBase::ADaCharacterBase()
 	bUseDefaultHitFlash = true;
 	HitFlashTimeParamName = "HitFlashTime";
 	HitFlashColorParamName = "HitFlashColor";
+
+	ProjectileSocketName = "ProjectileSocket";
 }
 
 UAbilitySystemComponent* ADaCharacterBase::GetAbilitySystemComponent() const
@@ -83,6 +85,16 @@ void ADaCharacterBase::OnDeathStarted(AActor* OwningActor, AActor* InstigatorAct
 void ADaCharacterBase::OnDeathFinished(AActor* OwningActor)
 {
 	SetLifeSpan(3.0f);
+}
+
+FVector ADaCharacterBase::GetProjectileSocketLocation_Implementation()
+{
+	return GetMesh()->GetSocketLocation(ProjectileSocketName);
+}
+
+UAnimMontage* ADaCharacterBase::GetAttackMontage_Implementation()
+{
+	return AttackMontage;
 }
 
 void ADaCharacterBase::PossessedBy(AController* NewController)

@@ -69,7 +69,9 @@ namespace CoreGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Event_Damage, "Event.Damage", "Damage Gameplay Event");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Event_Heal, "Event.Heal", "Dealing Gameplay Event");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Event_Death, "Event.Dying", "Dying Gameplay Event");
-	
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Event_Montage, "Event.Montage", "Base tag for montage gameplay events");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Event_Montage_Projectile, "Event.Montage.Projectile", "Projectile launch montage gameplay events");
+
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Gameplay_Damage, "Gameplay.Damage", "Tag to identify damage values dealt to damage gameplay attribute");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Gameplay_DamageImmunity, "Gameplay.DamageImmunity", "Give this tag to actors with Attribute components to not take damage");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Gameplay_DamageSelfDestruct, "Gameplay.Damage.SelfDestruct", "Set this to kill an actor manually, like with a cheat");
