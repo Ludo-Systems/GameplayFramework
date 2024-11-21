@@ -7,7 +7,7 @@
 #include "DaCharacterInterface.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI, BlueprintType)
 class UDaCharacterInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -16,12 +16,22 @@ class UDaCharacterInterface : public UInterface
 /**
  * 
  */
+
 class GAMEPLAYFRAMEWORK_API IDaCharacterInterface
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+
 	virtual int32 GetCharacterLevel();
-	
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FVector GetProjectileSocketLocation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UAnimMontage* GetAttackMontage();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UpdateFacingTarget(const FVector& Target);
 };
