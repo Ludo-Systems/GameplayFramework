@@ -8,6 +8,8 @@ namespace CoreGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_LookStick, "Input.LookStick");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_PrimaryAttack, "Input.PrimaryAttack");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_SecondaryAttack, "Input.SecondaryAttack");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_PrimaryInteract, "Input.PrimaryInteract");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_SecondaryInteract, "Input.SecondaryInteract");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_Use, "Input.Use");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_Jump, "Input.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_Run, "Input.Run");
