@@ -23,15 +23,21 @@ void UDaOverlayWidgetController::BindCallbacksToDependencies()
 			{
 				if (Tag.MatchesTag(MessageParentTag))
 				{
-					FDaUIWidgetMessageData Data = MessageDataAsset->FindMessageDataForTag(Tag);
-					if (Data.IsValid())
+					if (MessageDataAsset)
 					{
-						MessageWidgetDataDelegate.Broadcast(Data);
+						FDaUIWidgetMessageData Data = MessageDataAsset->FindMessageDataForTag(Tag);
+						if (Data.IsValid())
+						{
+							MessageWidgetDataDelegate.Broadcast(Data);
+						}
 					}
-					
-					if (const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag))
+
+					if (MessageWidgetDataTable)
 					{
-						MessageWidgetRowDelegate.Broadcast(*Row);
+						if (const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag))
+						{
+							MessageWidgetRowDelegate.Broadcast(*Row);
+						}
 					}
 				}
 			}
