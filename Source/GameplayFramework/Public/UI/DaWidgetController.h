@@ -4,12 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
+#include "GameplayTagContainer.h"
 #include "UObject/Object.h"
 #include "DaWidgetController.generated.h"
 
+class UDaAbilitySystemComponent;
+class UDaAttributeInfo;
 class UDaBaseAttributeSet;
 class UAttributeSet;
-class UAbilitySystemComponent;
+
+// Use to broadcast a full attribute info struct for a given attribute. Note AttributeInfo DataAsset must contain an entry for the attribute for this to fire
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributeInfoSignature, const FDaAttributeData&, Info);
 
 USTRUCT(BlueprintType)
 struct FWidgetControllerParams
@@ -17,8 +22,8 @@ struct FWidgetControllerParams
 	GENERATED_BODY()
 
 	FWidgetControllerParams() {}
-	FWidgetControllerParams(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UDaBaseAttributeSet* AS)
-		: PlayerController(PC), PlayerState(PS), AbilitySystemComponent(ASC), AttributeSet(AS) {}
+	FWidgetControllerParams(APlayerController* PC, APlayerState* PS, UDaAbilitySystemComponent* ASC, const FGameplayTagContainer& AsTags)
+		: PlayerController(PC), PlayerState(PS), AbilitySystemComponent(ASC), AttributeSetTags(AsTags) {}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<APlayerController> PlayerController = nullptr;
@@ -27,16 +32,16 @@ struct FWidgetControllerParams
 	TObjectPtr<APlayerState> PlayerState = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
+	TObjectPtr<UDaAbilitySystemComponent> AbilitySystemComponent = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UDaBaseAttributeSet> AttributeSet;
+	UPROPERTY (EditAnywhere, BlueprintReadWrite)
+	FGameplayTagContainer AttributeSetTags;
 };
 
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class GAMEPLAYFRAMEWORK_API UDaWidgetController : public UObject
 {
 	GENERATED_BODY()
@@ -50,6 +55,9 @@ public:
 	virtual void BroadcastInitialValues();
 
 	virtual void BindCallbacksToDependencies();
+
+	UPROPERTY(BlueprintAssignable, Category="Attributes")
+	FAttributeInfoSignature AttributeInfoDelegate;
 	
 protected:
 
@@ -60,8 +68,14 @@ protected:
 	TObjectPtr<APlayerState> PlayerState;
 
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UDaAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
-	TObjectPtr<UDaBaseAttributeSet> AttributeSet;
+	FGameplayTagContainer AttributeSetTags;
+
+	UPROPERTY(EditDefaultsOnly, Category="Attributes")
+	TObjectPtr<UDaAttributeInfo> AttributeInfo;
+
+	virtual void BroadcastAttributeInfo(const FGameplayTag& AttributeTag, const FGameplayAttribute& Attribute, UDaBaseAttributeSet* AttributeSet) const;
+	
 };

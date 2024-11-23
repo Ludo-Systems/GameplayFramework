@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "DaWidgetController.h"
 #include "GameplayTagContainer.h"
-#include "DaOverlayWidgetController.generated.h"
 
+#include "DaOverlayWidgetController.generated.h"
 
 USTRUCT(BlueprintType)
 struct FUIWidgetRow : public FTableRowBase
@@ -26,10 +26,10 @@ struct FUIWidgetRow : public FTableRowBase
 	UTexture2D* Image = nullptr;
 };
 
+class UDaWidgetMessageData;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetDataSignature, const FDaUIWidgetMessageData&, Data);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow, Row);
-
 
 /**
  * 
@@ -38,25 +38,18 @@ UCLASS(BlueprintType, Blueprintable)
 class GAMEPLAYFRAMEWORK_API UDaOverlayWidgetController : public UDaWidgetController
 {
 	GENERATED_BODY()
-public:
-	virtual void BroadcastInitialValues() override;
-	virtual void BindCallbacksToDependencies() override;
 	
-	UPROPERTY(BlueprintAssignable, Category="Character Attributes")
-	FOnAttributeChangedSignature OnHealthChanged;
-
-	UPROPERTY(BlueprintAssignable, Category="Character Attributes")
-	FOnAttributeChangedSignature OnMaxHealthChanged;
-
-	UPROPERTY(BlueprintAssignable, Category="Character Attributes")
-	FOnAttributeChangedSignature OnManaChanged;
-
-	UPROPERTY(BlueprintAssignable, Category="Character Attributes")
-	FOnAttributeChangedSignature OnMaxManaChanged;
-
 	UPROPERTY(BlueprintAssignable, Category="UI Messages")
 	FMessageWidgetRowSignature MessageWidgetRowDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category="UI Messages")
+	FMessageWidgetDataSignature MessageWidgetDataDelegate;
 	
+public:
+	UDaOverlayWidgetController();
+	
+	virtual void BindCallbacksToDependencies() override;
+
 protected:
 
 	// TODO: Replace with Data Asset and load with asset manager
@@ -64,8 +57,11 @@ protected:
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="UI Data")
-	FName MessageParentTag = "Message";
+	FGameplayTag MessageParentTag;
 
+	UPROPERTY(EditDefaultsOnly, Category="UI Data")
+	TObjectPtr<UDaWidgetMessageData> MessageDataAsset;
+	
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
 	

@@ -36,6 +36,12 @@ namespace CoreGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStats, "Attributes.Stats", "Game specific Stats defined in game code. Should have Primary and Secondary");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsPrimary, "Attributes.Stats.Primary", "Primary attributes specific player stats/buff attributes that can be modified directly");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsSecondary, "Attributes.Stats.Secondary", "Secondary Attributes adjust or modified via calculations or modifications based on primary attribute values");
+
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Message, "Message", "Base Message Type");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Message_Info, "Message.Info", "Base Info Message Type");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Message_StatusUpdate, "Message.StatusUpdate", "Base Status Update Message Type");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Message_Notification, "Message.Notification", "Base Notification Message Type");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Message_Warning, "Message.Warning", "Base Warning Message Type");
 	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status, "Status", "Base Status Tag");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_Death, "Status.Death", "Target has the death status.");

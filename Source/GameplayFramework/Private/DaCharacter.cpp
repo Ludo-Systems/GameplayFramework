@@ -61,10 +61,8 @@ void ADaCharacter::InitPlayerHUD() const
 	{
 		if (ADaHUD* HUD = Cast<ADaHUD>(PlayerController->GetHUD()))
 		{
-			UDaBaseAttributeSet* AS = AbilitySystemComponent->GetAttributeSetForTag(CoreGameplayTags::AttributesVitalCore);
-
 			HUD->RemoveOverlay();
-			HUD->InitOverlay(PlayerController, PS, AbilitySystemComponent, AS);
+			HUD->InitOverlay(PlayerController, PS, AbilitySystemComponent);
 		}
 	}
 }

@@ -19,8 +19,8 @@ UDaOverlayWidgetController* UDaAbilitySystemLibrary::GetOverlayWidgetController(
 		{
 			ADaPlayerState* PS = PC->GetPlayerState<ADaPlayerState>();
 			UDaAbilitySystemComponent* ASC = Cast<UDaAbilitySystemComponent>(PS->GetAbilitySystemComponent());
-			UDaBaseAttributeSet* AS = ASC->GetAttributeSetForTag(CoreGameplayTags::AttributesVitalCore);
-			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
+			const FGameplayTagContainer SetTags = HUD->GetOverlayAttributeSetTags();
+			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, SetTags);
 			return HUD->GetOverlayWidgetController(WidgetControllerParams);
 		}
 	}
@@ -35,8 +35,8 @@ UDaStatMenuWidgetController* UDaAbilitySystemLibrary::GetStatMenuWidgetControlle
 		{
 			ADaPlayerState* PS = PC->GetPlayerState<ADaPlayerState>();
 			UDaAbilitySystemComponent* ASC = Cast<UDaAbilitySystemComponent>(PS->GetAbilitySystemComponent());
-			UDaBaseAttributeSet* AS = ASC->GetAttributeSetForTag(CoreGameplayTags::AttributesStats);
-			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
+			const FGameplayTagContainer SetTags = HUD->GetStatMenuAttributeSetTags();
+			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, SetTags);
 			return HUD->GetStatMenuWidgetController(WidgetControllerParams);
 		}
 	}

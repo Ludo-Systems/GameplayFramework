@@ -29,15 +29,16 @@ UDaStatMenuWidgetController* ADaHUD::GetStatMenuWidgetController(const FWidgetCo
 	return StatMenuWidgetController;
 }
 
-void ADaHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UDaBaseAttributeSet* AS)
+void ADaHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UDaAbilitySystemComponent* ASC)
 {
-	checkf(OverlayWidgetClass, TEXT("UDaOverlayWidgetClass uninitialized, fill out DaHud."));
-	checkf(OverlayWidgetControllerClass, TEXT("UDaOverlayWidgetController Class uninitialized, fill out DaHud."));
-
+	checkf(OverlayWidgetClass, TEXT("OverlayWidgetClass uninitialized, fill out in HUD blueprint class defaults."));
+	checkf(OverlayWidgetControllerClass, TEXT("OverlayWidgetControllerClass uninitialized, fill out in HUD blueprint class defaults."));
+	checkf(OverlayWidgetAttributeSetTags.IsValid(), TEXT("OverlayWidgetAttributeSetTags empty, Fill out AttributeSet Tags in HUD blueprint class defaults."));
+	
 	UUserWidget* Widget = CreateWidget<UUserWidget>(PC, OverlayWidgetClass);
 	OverlayWidget = Cast<UDaUserWidgetBase>(Widget);
 
-	const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
+	const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, OverlayWidgetAttributeSetTags);
 	UDaOverlayWidgetController* WidgetController = GetOverlayWidgetController(WidgetControllerParams);
 
 	OverlayWidget->SetWidgetController(WidgetController);
