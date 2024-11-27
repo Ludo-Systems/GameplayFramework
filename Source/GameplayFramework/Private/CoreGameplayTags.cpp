@@ -23,6 +23,12 @@ namespace CoreGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_Player, "Character.Type.Player", "Base Player Character Type");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_Player_ThirdPerson, "Character.Type.Player.ThirdPerson", "Third person perspective player character type");
 
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilitySet, "AbilitySet", "Base tag for ability sets");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilitySetPlayer, "AbilitySet.Player", "Base tag for player ability sets");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilitySetNPC, "AbilitySet.NPC", "Base tag for NPC ability sets");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilitySetItem, "AbilitySet.Item", "Base tag for ability sets granted to item actors with ability components");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilitySetGameState, "AbilitySet.GameState", "Base tag for ability sets granted to DaGameStateBase subclasses which have an ability component");
+	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attributes, "Attributes", "Core Attributes Group");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVital, "Attributes.Vital", "Vital Attributes base group for handling things like Health, Mana, death, damage, etc");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVitalCore, "Attributes.Vital.Core", "Vital Attributes like Health or Mana.");
