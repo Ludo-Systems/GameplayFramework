@@ -11,7 +11,7 @@
 
 #include "EngineUtils.h"
 #include "AbilitySystem/DaAbilitySystemComponent.h"
-#include "AI/DaMinionPawnData.h"
+#include "DaPawnData.h"
 #include "Engine/AssetManager.h"
 #include "Engine/StreamableManager.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
@@ -119,7 +119,7 @@ void UDaAISpawnManager::OnMonsterLoaded(FPrimaryAssetId LoadedId, FVector SpawnL
 {
 	UAssetManager& AssMan = UAssetManager::Get();
 
-	if (const UDaMinionPawnData* PawnData = Cast<UDaMinionPawnData>(AssMan.GetPrimaryAssetObject(LoadedId)))
+	if (const UDaPawnData* PawnData = Cast<UDaPawnData>(AssMan.GetPrimaryAssetObject(LoadedId)))
 	{
 		if (const AActor* Monster = GetWorld()->SpawnActor<AActor>(PawnData->PawnClass, SpawnLocation, FRotator::ZeroRotator))
 		{

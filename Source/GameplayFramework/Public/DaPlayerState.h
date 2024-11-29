@@ -10,7 +10,7 @@
 class UDaBaseAttributeSet;
 class UGameplayEffect;
 class UDaAbilitySystemComponent;
-class UDaPlayerPawnData;
+class UDaPawnData;
 class UDaSaveGame;
 class ADaPlayerState;
 class UDaCombatAttributeSet;
@@ -118,7 +118,7 @@ protected:
 	int32 Level = 1;
 	
 	UPROPERTY()
-	TObjectPtr<UDaPlayerPawnData> LoadedPawnData;
+	TObjectPtr<UDaPawnData> LoadedPawnData;
 	
 	void OnPlayerPawnDataLoaded(FPrimaryAssetId LoadedId);
 

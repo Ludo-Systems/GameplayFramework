@@ -17,11 +17,14 @@ class GAMEPLAYFRAMEWORK_API UDaPawnData : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character|Pawn")
+	TSubclassOf<AActor> PawnClass;
+	
 	// Ability sets to grant to this pawn's ability system.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DA|Abilities")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character|Abilities")
 	TArray<TObjectPtr<UDaAbilitySet>> AbilitySets;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DA|UI")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character|UI")
 	TObjectPtr<UTexture2D> Icon;
 
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override

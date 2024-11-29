@@ -9,7 +9,6 @@
 #include "DaAttributeComponent.h"
 #include "DaPawnData.h"
 #include "DaPlayerController.h"
-#include "DaPlayerPawnData.h"
 #include "DaSaveGame.h"
 #include "Engine/AssetManager.h"
 #include "CoreGameplayTags.h"
@@ -89,7 +88,7 @@ void ADaPlayerState::OnPlayerPawnDataLoaded(FPrimaryAssetId LoadedId)
 {
 	UAssetManager& AssMan = UAssetManager::Get();
 
-	LoadedPawnData = Cast<UDaPlayerPawnData>(AssMan.GetPrimaryAssetObject(LoadedId));
+	LoadedPawnData = Cast<UDaPawnData>(AssMan.GetPrimaryAssetObject(LoadedId));
 	if (LoadedPawnData)
 	{
 		AbilitySystemComponent->InitAbilitiesWithPawnData(LoadedPawnData);

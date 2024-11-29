@@ -15,9 +15,6 @@ class GAMEPLAYFRAMEWORK_API UDaMinionPawnData : public UDaPawnData
 	GENERATED_BODY()
 
 public:
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Minion")
-	TSubclassOf<AActor> PawnClass;
 	
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override
 	{
