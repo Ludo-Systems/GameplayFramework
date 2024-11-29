@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Dream Awake Solutions LLC
 
 
 #include "AI/DaBTService_CheckAttackRange.h"
