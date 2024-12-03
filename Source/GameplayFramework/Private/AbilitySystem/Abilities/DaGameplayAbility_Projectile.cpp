@@ -107,7 +107,7 @@ FVector UDaGameplayAbility_Projectile::GetTargetLocation_SphereTrace()
 	if (HitType != ETargetLocationHitType::SphereTrace)
 	{
 		LOG_ERROR("Invalid GetTargetLocation_SphereTrace Calculation. Must set HitType==ETargetLocationHitType::SphereTrace to use GetTargetLocation_SphereTrace.")
-		return AdjustedTraceEnd;
+		return FVector();
 	}
 	
 	FActorSpawnParameters SpawnParams;
