@@ -28,7 +28,7 @@ ADaPlayerState::ADaPlayerState(const FObjectInitializer& ObjectInitializer)
 	CombatSet = CreateDefaultSubobject<UDaCombatAttributeSet>(TEXT("CombatSet"));
 	
 	// AbilitySystemComponent needs to be updated at a high frequency.
-	NetUpdateFrequency = 100.0f;
+	SetNetUpdateFrequency(100.0f);
 
 	bReplicates = true;
 
