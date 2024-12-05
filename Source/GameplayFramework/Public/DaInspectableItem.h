@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "DaInspectableItem.generated.h"
 
+class USphereComponent;
 struct FStreamableHandle;
 
 UENUM(BlueprintType)
@@ -29,71 +30,70 @@ public:
 	// Interactable interface
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 	virtual FText GetInteractText_Implementation(APawn* InstigatorPawn) override;
-	virtual void HighlightActor_Implementation() override;
-	virtual void UnHighlightActor_Implementation() override;
 
 	// Inspectable
 	UFUNCTION(BlueprintCallable, Category = "Inspect")
-	void Inspect(float ViewportPercentage = 0.6f, EInspectAlignment Alignment = EInspectAlignment::Center);
+	void Inspect(APawn* InstigatorPawn, float ViewportPercentage = 0.5f, EInspectAlignment Alignment = EInspectAlignment::Center);
 
 	UFUNCTION(BlueprintCallable, Category = "Inspect")
 	void HideDetailedMesh();
 	
 protected:
 	
-	virtual void BeginPlay() override;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Components")
+	TObjectPtr<USphereComponent> SphereComp;
 
-	// Preview and detailed mesh references
-	UPROPERTY(EditAnywhere, Category = "Inspect")
-	TSoftObjectPtr<UStaticMesh> PreviewMeshPtr;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Components")
+	TObjectPtr<UStaticMeshComponent> PreviewMeshComponent;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Components")
+	TObjectPtr<UStaticMeshComponent> InspectMeshComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Inspect")
 	TSoftObjectPtr<UStaticMesh> DetailedMeshPtr;
 
-	// Preview location in world space
-	UPROPERTY(EditAnywhere, Category = "Inspect")
-	FVector PreviewLocation;
-
 	// Viewport configuration
 	UPROPERTY(EditAnywhere, Category = "Inspect")
-	float ViewportPercentage = 0.6f;
+	float ViewportPercentage = 0.5f;
 
 	UPROPERTY(EditAnywhere, Category = "Inspect")
-	float DistanceInFrontOfCamera = 200.0f;
+	float CameraDistanceMultiplier = 2.5f;
+
+	UPROPERTY(EditAnywhere, Category = "Inspect")
+	float MinCameraDistance = 300.0f;
 	
 	UPROPERTY(EditAnywhere, Category = "Inspect")
 	EInspectAlignment InspectAlignment = EInspectAlignment::Center;
 
 	UPROPERTY(EditAnywhere, Category = "Inspect")
-	FName Name;
+	float AlignmentShiftMultiplier = 0.2f;
 	
-	UPROPERTY(BlueprintReadOnly)
-	bool bHighlighted = false;
+	UPROPERTY(EditAnywhere, Category = "Inspect")
+	FName Name;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Inspect")
+	void PlaceDetailMeshInView();
+
+	virtual void Tick(float DeltaSeconds) override;
 
 private:
 
-	void OnDetailedMeshLoaded();
-	void OnPreviewMeshLoaded();
-	
-	// Cached components
-	UPROPERTY()
-	UStaticMeshComponent* InspectMeshComponent;
-
-	UPROPERTY()
-	UStaticMeshComponent* PreviewMeshComponent;
-
-	// Cached meshes
-	UPROPERTY()
-	UStaticMesh* LoadedPreviewMesh;
-
 	UPROPERTY()
 	UStaticMesh* LoadedDetailedMesh;
-
+	
+	void LoadDetailMesh();
+	void OnDetailedMeshLoaded();
+	
 	// Asset loading handles
 	TSharedPtr<FStreamableHandle> DetailedMeshHandle;
-	TSharedPtr<FStreamableHandle> PreviewMeshHandle;
 
 	// Current
 	float CurrentViewportPercentage;
 	EInspectAlignment CurrentAlignment;
+
+	bool bIsInspecting = false;
+
+	UPROPERTY()
+	APawn* InspectingPawn;
+	
 };
