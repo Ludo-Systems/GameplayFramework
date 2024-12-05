@@ -37,6 +37,7 @@ protected:
 	virtual void InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
 	
 	// Subclasses should override this
-	virtual void OnTriggeredInputAction(const FInputActionValue& Value);
+	UFUNCTION(BlueprintNativeEvent)
+	void OnTriggeredInputAction(const FInputActionValue& Value);
 	
 };

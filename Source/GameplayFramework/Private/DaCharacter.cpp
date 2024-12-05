@@ -8,8 +8,10 @@
 #include "DaAttributeComponent.h"
 #include "DaPlayerState.h"
 #include "CoreGameplayTags.h"
+#include "DaInspectableItem.h"
 #include "DaInteractionComponent.h"
 #include "DaPlayerController.h"
+#include "GameplayFramework.h"
 #include "UI/DaHUD.h"
 
 // Sets default values
@@ -90,6 +92,29 @@ void ADaCharacter::OnDeathStarted(AActor* OwningActor, AActor* InstigatorActor)
 	Super::OnDeathStarted(OwningActor, InstigatorActor);
 }
 
+void ADaCharacter::SetInspectedItem(ADaInspectableItem* Item)
+{
+	if (InspectedItem != nullptr)
+	{
+		LOG_WARNING("Inspected Item is being set but is already set previously.")
+
+		InspectedItem->OnInspectStateChanged.RemoveDynamic(this, &ThisClass::InspectedItemStateChanged);
+		InspectedItem = nullptr;
+	}
+
+	InspectedItem = Item;
+	InspectedItem->OnInspectStateChanged.AddDynamic(this, &ThisClass::InspectedItemStateChanged);
+}
+
+void ADaCharacter::InspectedItemStateChanged(ADaInspectableItem* Item, AActor* InspectingActor,
+	bool IsInspecting)
+{
+	if (!IsInspecting && InspectedItem == Item)
+	{
+		InspectedItem->OnInspectStateChanged.RemoveDynamic(this, &ThisClass::ADaCharacter::InspectedItemStateChanged);
+		InspectedItem = nullptr;
+	}
+}
 
 
 

@@ -2,6 +2,7 @@
 
 #include "DaInspectableItem.h"
 
+#include "DaCharacter.h"
 #include "GameplayFramework.h"
 #include "Components/SphereComponent.h"
 #include "Engine/AssetManager.h"
@@ -45,9 +46,11 @@ void ADaInspectableItem::Inspect(APawn* InstigatorPawn, float ViewportPct,
 	InspectingPawn = InstigatorPawn;
 	CurrentViewportPercentage = ViewportPct;
 	CurrentAlignment = Alignment;
-	bIsInspecting = true;
 	InspectMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
+	bIsInspecting = true;
+	OnInspectStateChanged.Broadcast(this, InspectingPawn, true);
+	
 	if (LoadedDetailedMesh == nullptr)
 	{
 		LoadDetailMesh();
@@ -67,6 +70,7 @@ void ADaInspectableItem::Tick(float DeltaSeconds)
 
 	if (bIsInspecting && LoadedDetailedMesh)
 	{
+		// TODO: Do this based on player movement events or anything that marks dirty and update needed, rather than tick
 		PlaceDetailMeshInView();
 	}
 }
@@ -127,10 +131,10 @@ void ADaInspectableItem::PlaceDetailMeshInView_Implementation()
 		float CameraDistance = (MeshDiameter / 2.0f) / FOVHalfHeight;
 
 		// Add a multiplier to slightly increase the distance for a better fit
-		CameraDistance *= CameraDistanceMultiplier; // Adjust multiplier as needed
+		CameraDistance *= CurrentCameraDistance/100.0f; // Adjust multiplier as needed
 
-		// Ensure a minimum distance to avoid clipping
-		CameraDistance = FMath::Max(CameraDistance, MinCameraDistance);
+		// clamp to avoid clipping
+		CameraDistance = FMath::Clamp(CameraDistance, MinCameraDistance, MaxCameraDistance);
 		
 		// Calculate the viewport height in world units using the dynamic CameraDistance
 		float ViewportHeightWorldUnits = CameraDistance * FOVHalfHeight * 2.0f;
@@ -198,20 +202,45 @@ void ADaInspectableItem::PlaceDetailMeshInView_Implementation()
 
 void ADaInspectableItem::HideDetailedMesh()
 {
-	bIsInspecting = false;
-	
-	// Hide the detailed mesh
-	InspectMeshComponent->SetVisibility(false);
+	// Show preview mesh
 	PreviewMeshComponent->SetVisibility(true);
 
-	// Reset Transform
+	// Hide reset and disable collision on detailed mesh
+	InspectMeshComponent->SetVisibility(false);
 	InspectMeshComponent->SetRelativeTransform(FTransform());
-
 	InspectMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// Disables calling updates on detail mesh in Tick function 
+	bIsInspecting = false; 
+	OnInspectStateChanged.Broadcast(this, InspectingPawn, false);
+}
+
+void ADaInspectableItem::RotateDetailedMesh(float DeltaPitch, float DeltaYaw)
+{
+	if (bIsInspecting)
+	{
+		FRotator CurrentRotation = InspectMeshComponent->GetComponentRotation();
+		CurrentRotation.Pitch += DeltaPitch;
+		CurrentRotation.Yaw += DeltaYaw;
+		InspectMeshComponent->SetWorldRotation(CurrentRotation);
+	}
+}
+
+void ADaInspectableItem::ZoomDetailedMesh(float DeltaZoom)
+{
+	if (bIsInspecting)
+	{
+		CurrentCameraDistance = FMath::Clamp(CurrentCameraDistance - DeltaZoom * 10.0f, MinCameraDistance, MaxCameraDistance);
+	}
 }
 
 void ADaInspectableItem::Interact_Implementation(APawn* InstigatorPawn)
 {
+	if (ADaCharacter* PlayerCharacter = Cast<ADaCharacter>(InstigatorPawn))
+	{
+		PlayerCharacter->SetInspectedItem(this);
+	}
+	
 	Inspect(InstigatorPawn, ViewportPercentage, InspectAlignment);
 }
 

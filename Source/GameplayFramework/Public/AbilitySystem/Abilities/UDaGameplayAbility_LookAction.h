@@ -14,7 +14,7 @@ class GAMEPLAYFRAMEWORK_API UUDaGameplayAbility_LookAction : public UDaGameplayA
 {
 	GENERATED_BODY()
 
-	virtual void OnTriggeredInputAction(const FInputActionValue& Value) override;
+	virtual void OnTriggeredInputAction_Implementation(const FInputActionValue& Value) override;
 
 public:
 	UUDaGameplayAbility_LookAction(const FObjectInitializer& ObjectInitializer);

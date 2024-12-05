@@ -18,6 +18,8 @@ enum class EInspectAlignment : uint8
 	Right UMETA(DisplayName = "Right")
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnInspectStateChanged,  ADaInspectableItem*, InspectedItem, AActor*, InspectingActor, bool, IsInspecting);
+
 UCLASS()
 class GAMEPLAYFRAMEWORK_API ADaInspectableItem : public AActor , public IDaInteractableInterface
 {
@@ -37,6 +39,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inspect")
 	void HideDetailedMesh();
+
+	UFUNCTION(BlueprintCallable, Category = "Inspect")
+	void RotateDetailedMesh(float DeltaPitch, float DeltaYaw);
+
+	UFUNCTION(BlueprintCallable, Category = "Inspect")
+	void ZoomDetailedMesh(float DeltaZoom);
+
+	UPROPERTY(BlueprintAssignable, Category="PickupItem")
+	FOnInspectStateChanged OnInspectStateChanged;
 	
 protected:
 	
@@ -60,7 +71,13 @@ protected:
 	float CameraDistanceMultiplier = 2.5f;
 
 	UPROPERTY(EditAnywhere, Category = "Inspect")
-	float MinCameraDistance = 300.0f;
+	float CurrentCameraDistance = 300.0f;
+	
+	UPROPERTY(EditAnywhere, Category = "Inspect")
+	float MinCameraDistance = 100.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Inspect")
+	float MaxCameraDistance = 1000.0f;
 	
 	UPROPERTY(EditAnywhere, Category = "Inspect")
 	EInspectAlignment InspectAlignment = EInspectAlignment::Center;

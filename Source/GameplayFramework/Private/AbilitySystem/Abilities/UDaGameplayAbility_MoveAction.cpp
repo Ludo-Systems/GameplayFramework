@@ -6,7 +6,7 @@
 #include "DaCharacter.h"
 #include "CoreGameplayTags.h"
 
-void UUDaGameplayAbility_MoveAction::OnTriggeredInputAction(const FInputActionValue& Value)
+void UUDaGameplayAbility_MoveAction::OnTriggeredInputAction_Implementation(const FInputActionValue& Value)
 {
 	if (ADaCharacter* PlayerCharacter = Cast<ADaCharacter>(GetAvatarActorFromActorInfo()))
 	{

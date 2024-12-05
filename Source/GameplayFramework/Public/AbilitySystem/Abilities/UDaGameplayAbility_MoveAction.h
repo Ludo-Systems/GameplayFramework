@@ -14,7 +14,7 @@ class GAMEPLAYFRAMEWORK_API UUDaGameplayAbility_MoveAction : public UDaGameplayA
 {
 	GENERATED_BODY()
 
-	virtual void OnTriggeredInputAction(const FInputActionValue& Value) override;
+	virtual void OnTriggeredInputAction_Implementation(const FInputActionValue& Value) override;
 
 public:
 	UUDaGameplayAbility_MoveAction(const FObjectInitializer& ObjectInitializer);

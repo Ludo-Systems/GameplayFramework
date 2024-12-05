@@ -94,7 +94,7 @@ void UDaGameplayAbility_BaseTriggeredInputAction::InputPressed(const FGameplayAb
 }
 
 void UDaGameplayAbility_BaseTriggeredInputAction::InputReleased(const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
+                                                                const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	Super::InputReleased(Handle, ActorInfo, ActivationInfo);
 
@@ -105,7 +105,7 @@ void UDaGameplayAbility_BaseTriggeredInputAction::InputReleased(const FGameplayA
 	}
 }
 
-void UDaGameplayAbility_BaseTriggeredInputAction::OnTriggeredInputAction(const FInputActionValue& Value)
+void UDaGameplayAbility_BaseTriggeredInputAction::OnTriggeredInputAction_Implementation(const FInputActionValue& Value)
 {
 	// Subclasses should override this
 }

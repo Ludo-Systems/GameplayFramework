@@ -15,6 +15,8 @@ namespace CoreGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_Run, "Input.Run");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_Dash, "Input.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_Crouch, "Input.Crouch");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_InspectZoom, "Input.InspectZoom");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_InspectRotate, "Input.InspectRotate");
 	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character, "Character", "Base character tag");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_ID, "Character.ID", "Base Tag for Character ID, add a new component to identify different characters to the subsystem");
