@@ -65,19 +65,28 @@ protected:
 
 	// Viewport configuration
 	UPROPERTY(EditAnywhere, Category = "Inspect")
-	float ViewportPercentage = 0.5f;
+	float ViewportPercentage = 0.6f;
 
 	UPROPERTY(EditAnywhere, Category = "Inspect")
-	float CameraDistanceMultiplier = 2.5f;
+	float CameraDistanceMultiplier = 1.2f;
 
+	// Initial Forward Offset from Viewport
 	UPROPERTY(EditAnywhere, Category = "Inspect")
-	float CurrentCameraDistance = 300.0f;
+	float InitialCameraDistanceOffset;
 	
 	UPROPERTY(EditAnywhere, Category = "Inspect")
-	float MinCameraDistance = 100.0f;
+	float MinCameraDistance;
 
 	UPROPERTY(EditAnywhere, Category = "Inspect")
-	float MaxCameraDistance = 1000.0f;
+	float MaxCameraDistance;
+
+	// exponential smoothing, Lower = smoother
+	UPROPERTY(EditAnywhere, Category = "Inspect")
+	float ZoomSmoothingFactor;
+
+	// Smooth rotation transition, Higher = faster
+	UPROPERTY(EditAnywhere, Category = "Inspect")
+	float RotationSmoothingSpeed;
 	
 	UPROPERTY(EditAnywhere, Category = "Inspect")
 	EInspectAlignment InspectAlignment = EInspectAlignment::Center;
@@ -104,13 +113,31 @@ private:
 	// Asset loading handles
 	TSharedPtr<FStreamableHandle> DetailedMeshHandle;
 
-	// Current
-	float CurrentViewportPercentage;
-	EInspectAlignment CurrentAlignment;
-
 	bool bIsInspecting = false;
 
 	UPROPERTY()
 	APawn* InspectingPawn;
+
+	float CurrentViewportPercentage;
+	EInspectAlignment CurrentAlignment;
+	
+	// Mesh properties
+	float CameraDistance;
+	FRotator CurrentRotation;
+	FVector CurrentLocation;
+
+	// Rotation deltas set via RotateDetailedMesh function
+	float InputDeltaPitch;
+	float InputDeltaYaw;
+
+	// Zoom delta set via ZoomDetailedMesh function
+	float InputDeltaZoom;
+
+	// Bounds and scaling
+	float ScaleFactor;
+	FVector CenteringOffset;
+
+	// Utility functions
+	void UpdateMeshTransform(float DeltaTime);
 	
 };

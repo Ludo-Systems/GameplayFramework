@@ -10,11 +10,13 @@
 #define LOCTEXT_NAMESPACE "InspectableItems"
 
 static TAutoConsoleVariable<bool> CVarInspectDebug(TEXT("da.InspectDebug"), false, TEXT("Log Inspectable Item Debug Info"), ECVF_Cheat);
+static TAutoConsoleVariable<bool> CVarInspectTickDebug(TEXT("da.InspectOnTickDebug"), false, TEXT("Log Inspectable Item on tick Debug Info"), ECVF_Cheat);
 
 ADaInspectableItem::ADaInspectableItem()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	bReplicates = true;
+	
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	RootComponent = SphereComp;
 	
@@ -26,8 +28,24 @@ ADaInspectableItem::ADaInspectableItem()
 	InspectMeshComponent->SetupAttachment(RootComponent);
 	InspectMeshComponent->SetVisibility(false); // Initially hidden
 	InspectMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// Initialize defaults
+	CameraDistance = 1.2f;
+	MinCameraDistance = 5.0f;
+	MaxCameraDistance = 500.0f;
+	InitialCameraDistanceOffset = 30.0f;
+
+	ZoomSmoothingFactor = 0.2f;
+	RotationSmoothingSpeed = 30.0f;
 	
-	bReplicates = true;
+	InputDeltaPitch = 0.0f;
+	InputDeltaYaw = 0.0f;
+	InputDeltaZoom = 0.0f;
+
+	CurrentRotation = FRotator::ZeroRotator;
+	CurrentLocation = FVector::ZeroVector;
+
+	ScaleFactor = 1.0f;
 }
 
 void ADaInspectableItem::Inspect(APawn* InstigatorPawn, float ViewportPct,
@@ -47,9 +65,6 @@ void ADaInspectableItem::Inspect(APawn* InstigatorPawn, float ViewportPct,
 	CurrentViewportPercentage = ViewportPct;
 	CurrentAlignment = Alignment;
 	InspectMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-
-	bIsInspecting = true;
-	OnInspectStateChanged.Broadcast(this, InspectingPawn, true);
 	
 	if (LoadedDetailedMesh == nullptr)
 	{
@@ -71,9 +86,62 @@ void ADaInspectableItem::Tick(float DeltaSeconds)
 	if (bIsInspecting && LoadedDetailedMesh)
 	{
 		// TODO: Do this based on player movement events or anything that marks dirty and update needed, rather than tick
-		PlaceDetailMeshInView();
+		UpdateMeshTransform(DeltaSeconds);
 	}
 }
+
+void ADaInspectableItem::UpdateMeshTransform(float DeltaTime)
+{
+	if (!InspectMeshComponent)
+		return;
+	
+	// Update rotation
+	FRotator NewRotation = CurrentRotation;
+	NewRotation.Pitch += InputDeltaPitch;
+	NewRotation.Yaw += InputDeltaYaw;
+
+	// Update camera distance
+	CameraDistance = FMath::Clamp(CameraDistance - InputDeltaZoom * 10.0f, MinCameraDistance, MaxCameraDistance);
+	
+	// Reset input deltas (processed for this tick)
+	InputDeltaPitch = 0.0f;
+	InputDeltaYaw = 0.0f;
+	InputDeltaZoom = 0.0f;
+	
+	APlayerController* PlayerController = InspectingPawn->GetLocalViewingPlayerController();
+	if (PlayerController && PlayerController->PlayerCameraManager)
+	{
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		PlayerController->PlayerCameraManager->GetCameraViewPoint(CameraLocation, CameraRotation);
+		FVector ForwardVector = CameraRotation.Vector();
+		
+		// Calculate new mesh location
+		// Note: need to add an slight offset to push mesh away from camera since the CameraDistance was previously used to calculate the scale factor for the mesh
+		FVector ViewportPosition = CameraLocation + ForwardVector * (CameraDistance+InitialCameraDistanceOffset);
+		FVector NewLocation = ViewportPosition - CenteringOffset;
+
+		// Smooth the transition using exponential smoothing
+		CurrentLocation = FMath::VInterpTo(CurrentLocation, NewLocation, DeltaTime, ZoomSmoothingFactor / DeltaTime);
+
+		// Smooth rotation transition, Higher = faster
+		CurrentRotation = FMath::RInterpTo(CurrentRotation, NewRotation, DeltaTime, RotationSmoothingSpeed);
+		
+		// Apply updated transform
+		InspectMeshComponent->SetWorldLocation(CurrentLocation);
+		InspectMeshComponent->SetWorldRotation(CurrentRotation);
+
+		if (CVarInspectTickDebug.GetValueOnGameThread())
+		{
+			LOG("CameraDistance: %f, CameraLocation: %s, CameraRotationForwardVector: %s", CameraDistance, *CameraLocation.ToString(), *ForwardVector.ToString());
+			LOG("ViewportPosition: %s, NewLocation: %s, CurrentRotation: %s", *ViewportPosition.ToString(), *NewLocation.ToString(), *CurrentRotation.ToString());
+			DrawDebugSphere(GetWorld(), ViewportPosition, 10.0f, 12, FColor::Red, false, 1.0f);
+			DrawDebugSphere(GetWorld(), NewLocation, 10.0f, 12, FColor::Green, false, 1.0f);
+		}
+	}
+	
+}
+
 
 void ADaInspectableItem::LoadDetailMesh()
 {
@@ -110,13 +178,19 @@ void ADaInspectableItem::OnDetailedMeshLoaded()
 void ADaInspectableItem::PlaceDetailMeshInView_Implementation()
 {
 	check(InspectingPawn);
+
+	// Apply initial scaling
+	InspectMeshComponent->SetWorldScale3D(FVector(1.0f));
+	InspectMeshComponent->MarkRenderStateDirty();
+	InspectMeshComponent->UpdateBounds();
 	
-	// Get mesh bounds
-	FVector MeshOrigin, MeshExtent;
-	LoadedDetailedMesh->GetBounds().GetBox().GetCenterAndExtents(MeshOrigin, MeshExtent);
-	float MeshDiameter = 2.0f * MeshExtent.GetMax();
-	
-	// Calculate required scale to fit 60% of the viewport
+	// Calculate initial mesh fit (center, scale, and position)
+	FBoxSphereBounds MeshBounds = InspectMeshComponent->Bounds;
+	FVector MeshOrigin = MeshBounds.Origin;
+	FVector MeshExtent = MeshBounds.BoxExtent;
+	float MeshDiameter = MeshExtent.GetMax() * 2.0f;
+
+	// Calculate required scale to fit some percentage of the viewport
 	APlayerController* PlayerController = InspectingPawn->GetLocalViewingPlayerController();
 	if (PlayerController && PlayerController->PlayerCameraManager)
 	{
@@ -125,45 +199,39 @@ void ADaInspectableItem::PlaceDetailMeshInView_Implementation()
 		PlayerController->PlayerCameraManager->GetCameraViewPoint(CameraLocation, CameraRotation);
 		
 		float FOV = PlayerController->PlayerCameraManager->GetFOVAngle();
-		float FOVHalfHeight = FMath::Tan(FMath::DegreesToRadians(FOV * 0.5f));
-
+		float FOVRads = FMath::DegreesToRadians(FOV * 0.5f);
+		float FOVHalfHeight = FMath::Tan(FOVRads);
+		
 		// Dynamically adjust camera distance to fit the mesh
-		float CameraDistance = (MeshDiameter / 2.0f) / FOVHalfHeight;
-
-		// Add a multiplier to slightly increase the distance for a better fit
-		CameraDistance *= CurrentCameraDistance/100.0f; // Adjust multiplier as needed
-
-		// clamp to avoid clipping
-		CameraDistance = FMath::Clamp(CameraDistance, MinCameraDistance, MaxCameraDistance);
+		CameraDistance = (MeshDiameter / 2.0f) / FOVHalfHeight;
+		
+		// Add a multiplier to slightly increase the distance for a better fit and clamp to avoid clipping
+		CameraDistance = FMath::Clamp(CameraDistance*CameraDistanceMultiplier, MinCameraDistance, MaxCameraDistance);
 		
 		// Calculate the viewport height in world units using the dynamic CameraDistance
 		float ViewportHeightWorldUnits = CameraDistance * FOVHalfHeight * 2.0f;
 		
 		// Calculate desired size in world units
-		float DesiredSize = CurrentViewportPercentage * ViewportHeightWorldUnits;
-
-		// Calculate the scaling factor to make the mesh fit the desired height
-		float ScaleFactor = DesiredSize / MeshDiameter;
+		float DesiredHeight = CurrentViewportPercentage * ViewportHeightWorldUnits;
 		
-		// Position directly in front of the camera
-		FVector ViewportPosition = CameraLocation + CameraRotation.Vector() * CameraDistance;
-
-		// Scale
+		// Calculate the scaling factor to make the mesh fit the desired height
+		ScaleFactor = DesiredHeight / MeshDiameter;
+		
+		// Apply Initial Scale
 		InspectMeshComponent->SetWorldScale3D(FVector(ScaleFactor));
 		
-		// Update the component to ensure bounds are accurate
+		// Force bounds update
 		InspectMeshComponent->MarkRenderStateDirty();
 		InspectMeshComponent->UpdateBounds();
 		
-		// Get the updated mesh component's bounds in world space
-		FBoxSphereBounds MeshBounds = InspectMeshComponent->Bounds;
-		FVector MeshWorldCenter = MeshBounds.Origin;
-
-		// Calculate the offset to center the mesh
-		FVector CenteringOffset = ViewportPosition - MeshWorldCenter;
-
+		// Get the updated mesh component's bounds in local space
+		MeshBounds = InspectMeshComponent->GetStaticMesh()->GetBounds();
+		CenteringOffset = MeshBounds.Origin * InspectMeshComponent->GetComponentScale();
+		
+		CurrentLocation = InspectMeshComponent->GetComponentLocation();
+		CurrentRotation = InspectMeshComponent->GetComponentRotation();
+		
 		FVector AlignmentOffset = FVector::ZeroVector;
-
 		if (CurrentAlignment != EInspectAlignment::Center)
 		{
 			// Calculate viewport width for alignment offset 
@@ -175,28 +243,27 @@ void ADaInspectableItem::PlaceDetailMeshInView_Implementation()
 			switch (CurrentAlignment)
 			{
 			case EInspectAlignment::Left:
-				AlignmentOffset = -CameraRotation.Quaternion().GetRightVector() * (ViewportWidth * AlignmentShiftMultiplier); // Left-shift
+				AlignmentOffset = CameraRotation.Quaternion().GetRightVector() * (ViewportWidth * AlignmentShiftMultiplier); // Left-shift
 				break;
 			case EInspectAlignment::Right:
-				AlignmentOffset = CameraRotation.Quaternion().GetRightVector() * (ViewportWidth * AlignmentShiftMultiplier); // Right-shift
+				AlignmentOffset = -CameraRotation.Quaternion().GetRightVector() * (ViewportWidth * AlignmentShiftMultiplier); // Right-shift
 				break;
 			default:
 				break; // Centered
 			}
 		}
+		CenteringOffset+=AlignmentOffset;
 		
-		InspectMeshComponent->SetWorldLocation(InspectMeshComponent->GetComponentLocation() + CenteringOffset + AlignmentOffset);
-
-		// Align the mesh's rotation with the camera
-		InspectMeshComponent->SetWorldRotation(CameraRotation);
-
 		if (CVarInspectDebug.GetValueOnGameThread())
 		{
 			LOG("MeshOrigin: %s, MeshExtent: %s", *MeshOrigin.ToString(), *MeshExtent.ToString());
 			LOG("MeshDiameter: %f, ViewportHeightWorldUnits: %f, DesiredHeight: %f, ScaleFactor: %f, FOV: %f",
-				   MeshDiameter, ViewportHeightWorldUnits, DesiredSize, ScaleFactor, FOV);
+				   MeshDiameter, ViewportHeightWorldUnits, DesiredHeight, ScaleFactor, FOV);
 			LOG("CameraDistance: %f, CenteringOffset: %s", CameraDistance, *CenteringOffset.ToString());
 		}
+
+		bIsInspecting = true;
+		OnInspectStateChanged.Broadcast(this, InspectingPawn, true);
 	}
 }
 
@@ -219,10 +286,8 @@ void ADaInspectableItem::RotateDetailedMesh(float DeltaPitch, float DeltaYaw)
 {
 	if (bIsInspecting)
 	{
-		FRotator CurrentRotation = InspectMeshComponent->GetComponentRotation();
-		CurrentRotation.Pitch += DeltaPitch;
-		CurrentRotation.Yaw += DeltaYaw;
-		InspectMeshComponent->SetWorldRotation(CurrentRotation);
+		InputDeltaPitch = DeltaPitch;
+		InputDeltaYaw = DeltaYaw;
 	}
 }
 
@@ -230,7 +295,7 @@ void ADaInspectableItem::ZoomDetailedMesh(float DeltaZoom)
 {
 	if (bIsInspecting)
 	{
-		CurrentCameraDistance = FMath::Clamp(CurrentCameraDistance - DeltaZoom * 10.0f, MinCameraDistance, MaxCameraDistance);
+		InputDeltaZoom = DeltaZoom;
 	}
 }
 
