@@ -5,6 +5,7 @@
 
 #include "DaCharacter.h"
 #include "CoreGameplayTags.h"
+#include "InputActionValue.h"
 
 void UUDaGameplayAbility_LookAction::OnTriggeredInputAction_Implementation(const FInputActionValue& Value)
 {
