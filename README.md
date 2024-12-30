@@ -1,10 +1,14 @@
-# ModularGameplayFramework
+# GameplayFramework
 
-The modular gameplay framework is an Unreal 5 C++ plugin that simplifies creating a fully replicated data-driven Gameplay Ability System (GAS) based game rapidly. Classes can be overriden in C++ or Blueprints but often will expect Data Tables or Data Assets to set them up.
+The gameplay framework is an Unreal 5.5 C++ plugin that simplifies creating a fully replicated data-driven Gameplay Ability System (GAS) based game rapidly. Classes can be overriden in C++ or Blueprints but often will expect Data Tables or Data Assets to set them up.
 
 ## Overview
 
-The plugin utilizes the Gameplay Ability System (GAS) and is heavily influenced by the Epic Games Lyra example such as data driven ability set creation and an attribute component that is responsible for handling vital attributes like Health and Death of an actor. 
+The plugin utilizes the Gameplay Ability System (GAS) and while originally influenced by the Epic Games Lyra example; it is different. It combines several concepts such as data driven ability set creation and provides an optional attribute component that is responsible for handling vital attributes like Health and Death of an actor, but any attributes can be created in game as long as they are vended using the parent gameplay tags provided in the plugin. For example, One could use the Attributes.Stats.Primary and the Attributes.Stat.Secondary and subclass DaBaseAttributeSet to create a set of Attributes for their specific game. The base class would need a parent SetIdentifierTag (in this case Attributes.Stats), and would nee dto asssociate all Attributes with gameplay tags in the constructor like so: TagsToAttributes.Add(YourGameplayTags::AttributesStatsPrimaryStrength, GetStrengthAttribute);
+
+UI Base classes that handle and vend attribute updates are also provided. A WidgetController subclass will be associcated with attribute set tag and look for all attributes in the set and provide updates whenever their values change using multicast delegate methods. 
+
+An inventory Component and Inventory Item class can be used to create an inventory system and attache dto any actor. Inventory Item subclasses should be created using the factory to associate inventory items with actor types. 
 
 It provides core base character classes and player state set up with an ability system component and an attribute component, and subclasses for players and NPCs. Characters are granted attribute sets, gameplay effects, and gameplay abilities set up with AbilitySets defined as DataAssets. 
 
