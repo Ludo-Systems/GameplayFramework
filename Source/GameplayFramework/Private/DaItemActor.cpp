@@ -79,6 +79,11 @@ void ADaItemActor::Interact_Implementation(APawn* InstigatorPawn)
 	AddToInventory(InstigatorPawn);
 }
 
+void ADaItemActor::SecondaryInteract_Implementation(APawn* InstigatorPawn)
+{
+	// Derived classes to implement
+}
+
 FText ADaItemActor::GetInteractText_Implementation(APawn* InstigatorPawn)
 {
 	if (!OwnedAbilitySet)

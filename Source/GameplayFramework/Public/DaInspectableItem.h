@@ -31,6 +31,7 @@ public:
 
 	// Interactable interface
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
+	virtual void SecondaryInteract_Implementation(APawn* InstigatorPawn) override;
 	virtual FText GetInteractText_Implementation(APawn* InstigatorPawn) override;
 
 	// Inspectable

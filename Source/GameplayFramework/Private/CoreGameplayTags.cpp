@@ -77,8 +77,12 @@ namespace CoreGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Status_Healing, "Status.Healing", "Target is healing");
 	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Action, "Action", "Base Action Tag");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Action_Jump, "Action.Jump");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Action_Sprint, "Action.Sprint");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Action_PrimaryAttack, "Action.PrimaryAttack");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Action_SecondaryAttack, "Action.SecondaryAttack");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Action_PrimaryInteract, "Action.PrimaryInteract");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Action_SecondaryInteract, "Action.SecondaryInteract");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Action_Dash, "Action.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Action_Parry, "Action.Parry");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Action_SelectItem, "Action.SelectItem");

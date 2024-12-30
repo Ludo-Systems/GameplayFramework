@@ -37,6 +37,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "DA|Interaction")
 	void PrimaryInteract();
+
+	UFUNCTION(BlueprintCallable, Category = "DA|Interaction")
+	void SecondaryInteract();
 	
 	UDaInteractionComponent();
 
@@ -50,6 +53,9 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerInteract(AActor* InFocus);
 
+	UFUNCTION(Server, Reliable)
+	void ServerSecondaryInteract(AActor* InFocus);
+	
 	void FindBestInteractable();
 
 	void CursorTrace();

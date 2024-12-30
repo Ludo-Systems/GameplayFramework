@@ -309,6 +309,11 @@ void ADaInspectableItem::Interact_Implementation(APawn* InstigatorPawn)
 	Inspect(InstigatorPawn, ViewportPercentage, InspectAlignment);
 }
 
+void ADaInspectableItem::SecondaryInteract_Implementation(APawn* InstigatorPawn)
+{
+	// Derived classes to implement
+}
+
 FText ADaInspectableItem::GetInteractText_Implementation(APawn* InstigatorPawn)
 {
 	return FText::Format(LOCTEXT("Inspectable_HighlightText", "Inspect {0}"), FText::FromName(Name));

@@ -217,6 +217,16 @@ void UDaInteractionComponent::PrimaryInteract()
 	ServerInteract(FocusedActor);
 }
 
+void UDaInteractionComponent::SecondaryInteract()
+{
+	if (CVarDebugDrawInteraction.GetValueOnGameThread())
+	{
+		LogOnScreen(this,FString::Printf(TEXT("DaInteractionComponent::SecondaryInteract FocusedActor: %s."), *GetNameSafe(FocusedActor)), true, FColor::Green, 5.f, 2);
+	}
+
+	ServerSecondaryInteract(FocusedActor);
+}
+
 void UDaInteractionComponent::ServerInteract_Implementation(AActor* InFocus)
 {
 	if (InFocus == nullptr)
@@ -232,4 +242,21 @@ void UDaInteractionComponent::ServerInteract_Implementation(AActor* InFocus)
 	
 	APawn* MyPawn = CastChecked<APawn>(GetOwner());
 	IDaInteractableInterface::Execute_Interact(InFocus, MyPawn);
+}
+
+void UDaInteractionComponent::ServerSecondaryInteract_Implementation(AActor* InFocus)
+{
+	if (InFocus == nullptr)
+	{
+		LogOnScreen(this,"DaInteractionComponent: No FocusedActor to Interact.", true, FColor::Red);
+		return;
+	}
+
+	if (CVarDebugDrawInteraction.GetValueOnGameThread())
+	{
+		LogOnScreen(this,FString::Printf(TEXT("DaInteractionComponent::ServerSecondaryInteract_Implementation FocusedActor: %s."), *GetNameSafe(InFocus)), true, FColor::Green, 5.f, 3);
+	}
+	
+	APawn* MyPawn = CastChecked<APawn>(GetOwner());
+	IDaInteractableInterface::Execute_SecondaryInteract(InFocus, MyPawn);
 }

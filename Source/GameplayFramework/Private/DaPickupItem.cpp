@@ -44,6 +44,11 @@ void ADaPickupItem::Interact_Implementation(APawn* InstigatorPawn)
 	// Derived classes to implement
 }
 
+void ADaPickupItem::SecondaryInteract_Implementation(APawn* InstigatorPawn)
+{
+	// Derived classes to implement
+}
+
 FText ADaPickupItem::GetInteractText_Implementation(APawn* InstigatorPawn)
 {
 	// Derived classes to implement

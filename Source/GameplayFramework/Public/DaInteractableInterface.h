@@ -30,6 +30,9 @@ public:
 	void Interact(APawn* InstigatorPawn);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void SecondaryInteract(APawn* InstigatorPawn);
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	FText GetInteractText(APawn* InstigatorPawn);
 
 	UFUNCTION(BlueprintNativeEvent)

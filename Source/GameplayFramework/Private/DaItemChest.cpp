@@ -28,6 +28,11 @@ void ADaItemChest::Interact_Implementation(APawn* InstigatorPawn)
 	OnRep_LidOpened();
 }
 
+void ADaItemChest::SecondaryInteract_Implementation(APawn* InstigatorPawn)
+{
+	// Derived classes to implement
+}
+
 FText ADaItemChest::GetInteractText_Implementation(APawn* InstigatorPawn)
 {
 	if (bLidOpened)
