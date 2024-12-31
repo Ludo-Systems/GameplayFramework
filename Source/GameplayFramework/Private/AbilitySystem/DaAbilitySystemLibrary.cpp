@@ -101,3 +101,22 @@ UDaInventoryWidgetController* UDaAbilitySystemLibrary::GetInventoryMenuWidgetCon
 	}
 	return nullptr;
 }
+
+UDaInventoryWidgetController* UDaAbilitySystemLibrary::GetInventoryMenuWidgetControllerForActor(
+	const UObject* WorldContextObject, AActor* Actor)
+{
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
+	{
+		if (ADaHUD* HUD = Cast<ADaHUD>(PC->GetHUD()))
+		{
+			ADaPlayerState* PS = PC->GetPlayerState<ADaPlayerState>();
+			UDaAbilitySystemComponent* ASC = Cast<UDaAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+			const FGameplayTagContainer SetTags = HUD->GetInventoryAttributeSetTags();
+			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, SetTags);
+			UDaInventoryWidgetController* Controller = HUD->GetInventoryWidgetController(WidgetControllerParams);
+			Controller->InitializeInventory(Actor);
+			return Controller;
+		}
+	}
+	return nullptr;
+}

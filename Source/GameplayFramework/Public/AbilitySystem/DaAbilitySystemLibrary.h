@@ -34,4 +34,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category="DaAbilitySystemLibrary|WidgetController")
 	static UDaInventoryWidgetController* GetInventoryMenuWidgetController(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure, Category="DaAbilitySystemLibrary|WidgetController")
+	static UDaInventoryWidgetController* GetInventoryMenuWidgetControllerForActor(const UObject* WorldContextObject, AActor* Actor);
 };
