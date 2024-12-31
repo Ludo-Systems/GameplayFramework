@@ -61,6 +61,7 @@ void ADaInspectableItem::AddToInventory(APawn* InstigatorPawn)
 		{
 			if (InventoryComponent->AddItem(this) && HasAuthority())
 			{
+				Execute_ItemAddedToInventory(this);
 				Destroy();
 			}
 		}
