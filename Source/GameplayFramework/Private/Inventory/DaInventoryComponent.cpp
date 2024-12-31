@@ -113,8 +113,9 @@ int32 UDaInventoryComponent::FindSlot(FGameplayTagContainer Tags) const
 {
 	int32 SlotIndex = INDEX_NONE;
 
-	// Find the first slot where we can stack a duplicate 
-	for (int32 DuplicateSlotIndex: GetSlotsWithDuplicates(Tags))
+	// Find the first slot where we can stack a duplicate
+	TArray<int32> DuplicateSlotIndexes = GetSlotsWithDuplicates(Tags);
+	for (int32 DuplicateSlotIndex: DuplicateSlotIndexes)
 	{
 		UDaInventoryItemBase* DuplicateItem = Items[DuplicateSlotIndex];
 		if (UDaStackableInventoryItem* StackableItem = Cast<UDaStackableInventoryItem>(DuplicateItem))

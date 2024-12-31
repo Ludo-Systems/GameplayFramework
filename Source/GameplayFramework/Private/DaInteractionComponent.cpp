@@ -231,7 +231,10 @@ void UDaInteractionComponent::ServerInteract_Implementation(AActor* InFocus)
 {
 	if (InFocus == nullptr)
 	{
-		LogOnScreen(this,"DaInteractionComponent: No FocusedActor to Interact.", true, FColor::Red);
+		if (CVarDebugDrawInteraction.GetValueOnGameThread())
+		{
+			LogOnScreen(this,"DaInteractionComponent: No FocusedActor to Interact.", true, FColor::Red);
+		}
 		return;
 	}
 
@@ -248,7 +251,10 @@ void UDaInteractionComponent::ServerSecondaryInteract_Implementation(AActor* InF
 {
 	if (InFocus == nullptr)
 	{
-		LogOnScreen(this,"DaInteractionComponent: No FocusedActor to Interact.", true, FColor::Red);
+		if (CVarDebugDrawInteraction.GetValueOnGameThread())
+		{
+			LogOnScreen(this,"DaInteractionComponent: No FocusedActor to Interact.", true, FColor::Red);
+		}
 		return;
 	}
 

@@ -7,6 +7,7 @@
 #include "DaInteractableInterface.h"
 #include "GameplayTagContainer.h"
 #include "GameFramework/Actor.h"
+#include "Inventory/DaInventoryItemInterface.h"
 #include "DaItemActor.generated.h"
 
 struct FDaInventoryItemData;
@@ -15,49 +16,37 @@ class UDaAbilitySet;
 class USphereComponent;
 
 UCLASS(BlueprintType, Blueprintable)
-class GAMEPLAYFRAMEWORK_API ADaItemActor : public AActor, public IDaInteractableInterface, public IAbilitySystemInterface
+class GAMEPLAYFRAMEWORK_API ADaItemActor : public AActor, public IDaInteractableInterface, public IAbilitySystemInterface, public IDaInventoryItemInterface
 {
 	GENERATED_BODY()
 
 public:
 	ADaItemActor();
 
-	// Interactable interface
+	// IDaInteractableInterface
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 	virtual void SecondaryInteract_Implementation(APawn* InstigatorPawn) override;
 	virtual FText GetInteractText_Implementation(APawn* InstigatorPawn) override;
 	virtual void HighlightActor_Implementation() override;
 	virtual void UnHighlightActor_Implementation() override;
-	
+
+	// IAbilitySystemInterface 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Items")
-	FName Name;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Items")
-	FName Description;
-
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Items")
-	FGameplayTagContainer TypeTags;
-
-	UFUNCTION(BlueprintCallable, Category = "Items")
-	UDaAbilitySet* GetAbilitySet() const { return OwnedAbilitySet; }
-
-	UFUNCTION(BlueprintCallable, Category = "Items")
-	virtual void AddToInventory(APawn* InstigatorPawn);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Items|Icon")
-	TObjectPtr<UMaterialInterface> RenderTargetMaterial;
+	// IDaInventoryItemInterface
+	virtual FName GetItemName_Implementation() const override { return Name; }
+	virtual FName GetItemDescription_Implementation() const override { return Description; }
+	virtual int32 GetItemTags_Implementation(FGameplayTagContainer& OutItemTags) const override;
+	virtual UMaterialInterface* GetRenderTargetMaterial_Implementation() const override { return RenderTargetMaterial; }
+	virtual UDaAbilitySet* GetAbilitySet_Implementation() const override { return OwnedAbilitySet; }
+	virtual UStaticMeshComponent* GetMeshComponent_Implementation() const override { return MeshComp; }
+	virtual void AddToInventory(APawn* InstigatorPawn) override;
 	
 	static ADaItemActor* CreateFromInventoryItem(const FDaInventoryItemData& InventoryData);
-	
-	virtual UStaticMeshComponent* GetMeshComponent() const { return MeshComp; }
-	
 	void GrantSetToActor(UDaAbilitySystemComponent* ReceivingASC);
 
-
 protected:
-	
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Components")
 	TObjectPtr<USphereComponent> SphereComp;
 
@@ -67,13 +56,28 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UDaAbilitySystemComponent> AbilitySystemComponent;
 
-	UPROPERTY(EditDefaultsOnly, Category="Items")
-	TObjectPtr<UDaAbilitySet> OwnedAbilitySet;
+	// Begin IDaInventoryItemInterface Support
 	
-	UPROPERTY(BlueprintReadOnly, Category="Items")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "InventoryItems")
+	FName Name;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "InventoryItems")
+	FName Description;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "InventoryItems")
+	FGameplayTagContainer TypeTags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryItems|Icon")
+	TObjectPtr<UMaterialInterface> RenderTargetMaterial;
+
+	UPROPERTY(EditDefaultsOnly, Category="InventoryItems")
+	TObjectPtr<UDaAbilitySet> OwnedAbilitySet;
+
+	// END IDaInventoryItemInterface Support
+	
+	UPROPERTY(BlueprintReadOnly, Category="InventoryItems")
 	bool bHighlighted = false;
 
 	virtual void BeginPlay() override;
-	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };

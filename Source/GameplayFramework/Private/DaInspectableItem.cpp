@@ -3,9 +3,11 @@
 #include "DaInspectableItem.h"
 
 #include "DaCharacter.h"
+#include "DaPlayerState.h"
 #include "GameplayFramework.h"
 #include "Components/SphereComponent.h"
 #include "Engine/AssetManager.h"
+#include "Inventory/DaInventoryComponent.h"
 
 #define LOCTEXT_NAMESPACE "InspectableItems"
 
@@ -48,6 +50,20 @@ ADaInspectableItem::ADaInspectableItem()
 	ScaleFactor = 1.0f;
 }
 
+void ADaInspectableItem::AddToInventory(APawn* InstigatorPawn)
+{
+	checkf(TypeTags.IsValid(), TEXT("ADaInspectableItem: TypeTags is not valid!"));
+
+	if (APlayerState* PS = InstigatorPawn->GetPlayerState())
+	{
+		UDaInventoryComponent* InventoryComponent = Cast<ADaPlayerState>(PS)->GetInventoryComponent();
+		if (InventoryComponent)
+		{
+			InventoryComponent->AddItem(this);
+		}
+	}
+}
+
 void ADaInspectableItem::Inspect(APawn* InstigatorPawn, float ViewportPct,
                                  EInspectAlignment Alignment)
 {
@@ -77,6 +93,12 @@ void ADaInspectableItem::Inspect(APawn* InstigatorPawn, float ViewportPct,
 		
 		PlaceDetailMeshInView();
 	}
+}
+
+int32 ADaInspectableItem::GetItemTags_Implementation(FGameplayTagContainer& OutItemTags) const
+{
+	OutItemTags = TypeTags;
+	return OutItemTags.IsValid() ? OutItemTags.Num() : 0;
 }
 
 void ADaInspectableItem::Tick(float DeltaSeconds)
@@ -301,17 +323,17 @@ void ADaInspectableItem::ZoomDetailedMesh(float DeltaZoom)
 
 void ADaInspectableItem::Interact_Implementation(APawn* InstigatorPawn)
 {
+	AddToInventory(InstigatorPawn);
+}
+
+void ADaInspectableItem::SecondaryInteract_Implementation(APawn* InstigatorPawn)
+{
 	if (ADaCharacter* PlayerCharacter = Cast<ADaCharacter>(InstigatorPawn))
 	{
 		PlayerCharacter->SetInspectedItem(this);
 	}
 	
 	Inspect(InstigatorPawn, ViewportPercentage, InspectAlignment);
-}
-
-void ADaInspectableItem::SecondaryInteract_Implementation(APawn* InstigatorPawn)
-{
-	// Derived classes to implement
 }
 
 FText ADaInspectableItem::GetInteractText_Implementation(APawn* InstigatorPawn)

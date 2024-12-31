@@ -45,6 +45,8 @@ void ADaItemActor::BeginPlay()
 
 void ADaItemActor::AddToInventory(APawn* InstigatorPawn)
 {
+	checkf(TypeTags.IsValid(), TEXT("ItemActor: TypeTags is not valid!"));
+	
 	if (APlayerState* PS = InstigatorPawn->GetPlayerState())
 	{
 		UDaInventoryComponent* InventoryComponent = Cast<ADaPlayerState>(PS)->GetInventoryComponent();
@@ -109,6 +111,12 @@ void ADaItemActor::UnHighlightActor_Implementation()
 UAbilitySystemComponent* ADaItemActor::GetAbilitySystemComponent() const
 {
 	return Cast<UAbilitySystemComponent>(AbilitySystemComponent);
+}
+
+int32 ADaItemActor::GetItemTags_Implementation(FGameplayTagContainer& OutItemTags) const
+{
+	OutItemTags = TypeTags;
+	return OutItemTags.IsValid() ? OutItemTags.Num() : 0;
 }
 
 void ADaItemActor::GrantSetToActor(UDaAbilitySystemComponent* ReceivingASC)

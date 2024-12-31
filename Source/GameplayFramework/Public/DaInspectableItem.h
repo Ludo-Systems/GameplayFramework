@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "DaInteractableInterface.h"
 #include "GameFramework/Actor.h"
+#include "Inventory/DaInventoryItemInterface.h"
 #include "DaInspectableItem.generated.h"
 
 class USphereComponent;
@@ -21,7 +22,7 @@ enum class EInspectAlignment : uint8
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnInspectStateChanged,  ADaInspectableItem*, InspectedItem, AActor*, InspectingActor, bool, IsInspecting);
 
 UCLASS()
-class GAMEPLAYFRAMEWORK_API ADaInspectableItem : public AActor , public IDaInteractableInterface
+class GAMEPLAYFRAMEWORK_API ADaInspectableItem : public AActor , public IDaInteractableInterface, public IDaInventoryItemInterface
 {
 	GENERATED_BODY()
 
@@ -34,6 +35,15 @@ public:
 	virtual void SecondaryInteract_Implementation(APawn* InstigatorPawn) override;
 	virtual FText GetInteractText_Implementation(APawn* InstigatorPawn) override;
 
+	// IDaInventoryItemInterface
+	virtual FName GetItemName_Implementation() const override { return Name; }
+	virtual FName GetItemDescription_Implementation() const override { return Description; }
+	virtual int32 GetItemTags_Implementation(FGameplayTagContainer& OutItemTags) const override;
+	virtual UMaterialInterface* GetRenderTargetMaterial_Implementation() const override { return RenderTargetMaterial; }
+	virtual UDaAbilitySet* GetAbilitySet_Implementation() const override { return nullptr; }
+	virtual UStaticMeshComponent* GetMeshComponent_Implementation() const override { return PreviewMeshComponent; }
+	virtual void AddToInventory(APawn* InstigatorPawn) override;	
+	
 	// Inspectable
 	UFUNCTION(BlueprintCallable, Category = "Inspect")
 	void Inspect(APawn* InstigatorPawn, float ViewportPercentage = 0.5f, EInspectAlignment Alignment = EInspectAlignment::Center);
@@ -98,6 +108,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Inspect")
 	FName Name;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryItems")
+	FName Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryItems")
+	FGameplayTagContainer TypeTags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryItems|Icon")
+	TObjectPtr<UMaterialInterface> RenderTargetMaterial;
+	
 	UFUNCTION(BlueprintNativeEvent, Category="Inspect")
 	void PlaceDetailMeshInView();
 

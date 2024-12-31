@@ -3,35 +3,40 @@
 
 #include "Inventory/DaInventoryItemFactory.h"
 
-#include "AbilitySystemComponent.h"
 #include "DaItemActor.h"
-#include "DaPickupItem.h"
 #include "DaPickup_Ability.h"
 #include "DaRenderUtilLibrary.h"
 #include "GameplayFramework.h"
 #include "Inventory/DaStackableInventoryItem.h"
 
+static TAutoConsoleVariable<bool> CVarDebugRenderIconToDisk(TEXT("da.InventoryItemIconToDisk"), false, TEXT("Enable Dumping Generated Icon Textures to file at: C:/Temp/RenderTargetOutput.png."), ECVF_Cheat);
 
 // Add default functionality here for any IDaInventoryItemFactory functions that are not pure virtual.
 TSubclassOf<UDaInventoryItemBase> UDaBaseInventoryItemFactory::DetermineInventoryItemClass(
 	const UObject* SourceObject) const
 {
-	if (const ADaItemActor* Pickup = Cast<ADaItemActor>(SourceObject))
+	if (const IDaInventoryItemInterface* Pickup = Cast<IDaInventoryItemInterface>(SourceObject))
 	{
-		if (Pickup->TypeTags.HasTagExact(CoreGameplayTags::InventoryItem_Stackable))
-		{
-			return UDaStackableInventoryItem::StaticClass();
-		}
-
-		if (Pickup->TypeTags.HasTagExact(CoreGameplayTags::InventoryItem_Equipable))
-		{
-			// TODO: make an equipableItem class
-			return UDaInventoryItemBase::StaticClass();
-		}
+		FGameplayTagContainer Tags;
+		int32 NumTags = IDaInventoryItemInterface::Execute_GetItemTags(SourceObject, Tags);
 		
-		if (Pickup->TypeTags.HasTagExact(CoreGameplayTags::InventoryItem))
+		if (Tags.IsValid())
 		{
-			return UDaInventoryItemBase::StaticClass(); 
+			if (Tags.HasTagExact(CoreGameplayTags::InventoryItem_Stackable))
+			{
+				return UDaStackableInventoryItem::StaticClass();
+			}
+
+			if (Tags.HasTagExact(CoreGameplayTags::InventoryItem_Equipable))
+			{
+				// TODO: make an equipableItem class
+				return UDaInventoryItemBase::StaticClass();
+			}
+		
+			if (Tags.HasTagExact(CoreGameplayTags::InventoryItem))
+			{
+				return UDaInventoryItemBase::StaticClass(); 
+			}
 		}
 	}
 
@@ -40,40 +45,39 @@ TSubclassOf<UDaInventoryItemBase> UDaBaseInventoryItemFactory::DetermineInventor
 
 UDaInventoryItemBase* UDaBaseInventoryItemFactory::CreateInventoryItem(const UObject* SourceObject) const
 {
-	if (const ADaItemActor* Pickup = Cast<ADaItemActor>(SourceObject))
+	bool bDebugDraw = CVarDebugRenderIconToDisk.GetValueOnGameThread();
+
+	if (const IDaInventoryItemInterface* Pickup = Cast<IDaInventoryItemInterface>(SourceObject))
 	{
 		FDaInventoryItemData Data;
-		Data.ItemName = Pickup->Name;
-		Data.ItemDescription = Pickup->Description;
-		Data.Tags = Pickup->TypeTags;
-		Data.AbilitySetToGrant = Pickup->GetAbilitySet();
+		Data.ItemName = IDaInventoryItemInterface::Execute_GetItemName(SourceObject);
+		Data.ItemDescription = IDaInventoryItemInterface::Execute_GetItemDescription(SourceObject);
+		Data.AbilitySetToGrant = IDaInventoryItemInterface::Execute_GetAbilitySet(SourceObject);
 		Data.ItemClass = DetermineInventoryItemClass(SourceObject);
-
-		if (!FGuid::Parse(Pickup->GetName(), Data.ItemID))
+		int32 NumTags = IDaInventoryItemInterface::Execute_GetItemTags(SourceObject, Data.Tags);
+		
+		if (!FGuid::Parse(Data.ItemName.ToString(), Data.ItemID))
 		{
 			LOG_WARNING("InventoryItemFactory::CreateInventoryItem: Failed to create FGuid ItemID");
 		}
 
 		FVector2d ImageSize = FVector2D(64, 64);
-		UTextureRenderTarget2D* ThumbnailRT = UDaRenderUtilLibrary::GenerateThumbnailWithRenderTarget(Pickup->GetMeshComponent(), ImageSize, SourceObject->GetWorld());
+		UTextureRenderTarget2D* ThumbnailRT = UDaRenderUtilLibrary::GenerateThumbnailWithRenderTarget(IDaInventoryItemInterface::Execute_GetMeshComponent(SourceObject), ImageSize, SourceObject->GetWorld());
 		if (ThumbnailRT)
 		{
-			// Uncomment to Debug write image out to disk
-			//
-			// if (ThumbnailRT)
-			// {
-			// 	FTextureRenderTargetResource* RTResource = ThumbnailRT->GameThread_GetRenderTargetResource();
-			// 	if (!RTResource)
-			// 	{
-			// 		UE_LOG(LogTemp, Error, TEXT("Render target resource is invalid."));
-			// 	}
-			//
-			// 	UKismetRenderingLibrary::ExportRenderTarget(SourceObject->GetWorld(), ThumbnailRT, TEXT("C:/Temp/"), TEXT("RenderTargetOutput.png"));
-			//
+			if (bDebugDraw)
+			{
+				FTextureRenderTargetResource* RTResource = ThumbnailRT->GameThread_GetRenderTargetResource();
+				if (!RTResource)
+				{
+					LOG_ERROR("Render target resource is invalid.");
+				}
+				UKismetRenderingLibrary::ExportRenderTarget(SourceObject->GetWorld(), ThumbnailRT, TEXT("C:/Temp/"), TEXT("RenderTargetOutput.png"));
+			}
 
 			// check and see if there is a material set to create the thumbnail, and if not fallback to just using the render target directly
 			USlateBrushAsset* ThumbnailBrush = nullptr;
-			if (UMaterialInterface* BaseMaterial = Pickup->RenderTargetMaterial)
+			if (UMaterialInterface* BaseMaterial = IDaInventoryItemInterface::Execute_GetRenderTargetMaterial(SourceObject))
 			{
 				//UMaterialInterface* BaseMaterial = LoadObject<UMaterialInterface>(SourceObject->GetWorld(), TEXT("Material'/GameplayFramework/Materials/M_RenderTextureIcon.M_RenderTextureIcon'"));
 				// Create a dynamic material instance
