@@ -59,7 +59,10 @@ void ADaInspectableItem::AddToInventory(APawn* InstigatorPawn)
 		UDaInventoryComponent* InventoryComponent = Cast<ADaPlayerState>(PS)->GetInventoryComponent();
 		if (InventoryComponent)
 		{
-			InventoryComponent->AddItem(this);
+			if (InventoryComponent->AddItem(this) && HasAuthority())
+			{
+				Destroy();
+			}
 		}
 	}
 }
