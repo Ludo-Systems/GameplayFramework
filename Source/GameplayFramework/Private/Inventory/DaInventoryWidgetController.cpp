@@ -17,7 +17,10 @@ void UDaInventoryWidgetController::InitializeInventory(AActor* Actor)
 	}
 	
 	// Subscribe to inventory change notifications
-	InventoryComponent->OnInventoryChanged.AddDynamic(this, &UDaInventoryWidgetController::HandleInventoryChanged);
+	if (!InventoryComponent->OnInventoryChanged.IsAlreadyBound(this, &UDaInventoryWidgetController::HandleInventoryChanged))
+	{
+		InventoryComponent->OnInventoryChanged.AddDynamic(this, &UDaInventoryWidgetController::HandleInventoryChanged);
+	}
 	
 }
 
