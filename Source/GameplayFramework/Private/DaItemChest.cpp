@@ -16,7 +16,7 @@ ADaItemChest::ADaItemChest()
 
 	LidMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LidMesh"));
 	LidMesh->SetupAttachment(BaseMesh);
-
+	
 	TargetPitch = 110;
 
 	bReplicates = true;
@@ -70,6 +70,8 @@ void ADaItemChest::OnRep_LidOpened()
 {
 	float CurrentPitch = bLidOpened ? TargetPitch : 0.0f;
 	LidMesh->SetRelativeRotation(FRotator(CurrentPitch, 0, 0));
+	
+	OnLidOpenedStateChanged.Broadcast(bLidOpened);
 }
 
 void ADaItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
