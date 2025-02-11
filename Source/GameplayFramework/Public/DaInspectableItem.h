@@ -42,7 +42,7 @@ public:
 	virtual UMaterialInterface* GetRenderTargetMaterial_Implementation() const override { return RenderTargetMaterial; }
 	virtual UDaAbilitySet* GetAbilitySet_Implementation() const override { return nullptr; }
 	virtual UStaticMeshComponent* GetMeshComponent_Implementation() const override { return PreviewMeshComponent; }
-	virtual void AddToInventory(APawn* InstigatorPawn) override;	
+	virtual void AddToInventory(APawn* InstigatorPawn, bool bDestroyActor = true) override;	
 	
 	// Inspectable
 	UFUNCTION(BlueprintCallable, Category = "Inspect")
@@ -74,6 +74,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Inspect")
 	TSoftObjectPtr<UStaticMesh> DetailedMeshPtr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
+	int CustomDepthStencilValue = 250;
+	
 	// Viewport configuration
 	UPROPERTY(EditAnywhere, Category = "Inspect")
 	float ViewportPercentage = 0.6f;

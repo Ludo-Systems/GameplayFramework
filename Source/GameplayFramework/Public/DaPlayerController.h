@@ -33,6 +33,9 @@ class GAMEPLAYFRAMEWORK_API ADaPlayerController : public APlayerController
 
 public:
 	ADaPlayerController();
+
+	UFUNCTION(BlueprintCallable)
+	void ToggleIMC(bool bUI);
 	
 	UFUNCTION(BlueprintCallable)
 	void TogglePauseMenu();
@@ -50,8 +53,16 @@ protected:
 	virtual void SetupInputComponent() override;
 	void AnyKeyInput(FKey PressedKey);
 
+	void SetCurrentInputMode(EGameplayInputType Type);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	TObjectPtr<UInputMappingContext> InputMappingContext;
+	bool bLoadGameUIMappingContextByDefault;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	TObjectPtr<UInputMappingContext> GameUIInputMappingContext;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	TObjectPtr<UInputMappingContext> GameplayInputMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<UDaInputConfig> InputConfig;
@@ -64,10 +75,10 @@ protected:
 	TObjectPtr<UDaAbilitySystemComponent> AbilitySystemComponent;
 	UDaAbilitySystemComponent* GetAbilitySystemComponent();
 
-	UPROPERTY(EditAnywhere, Category="UI Setup")
+	UPROPERTY(EditAnywhere, Category=Input)
 	TEnumAsByte<EGameplayInputType> InputType;
 	
-	UPROPERTY(EditDefaultsOnly, Category="UI Setup")
+	UPROPERTY(EditDefaultsOnly, Category=Input)
 	TSubclassOf<UUserWidget> PauseMenuClass;
 
 	UPROPERTY()
