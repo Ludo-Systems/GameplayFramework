@@ -11,7 +11,7 @@ class UDaAbilitySet;
 struct FDaInventoryItemData;
 
 // This class does not need to be modified.
-UINTERFACE()
+UINTERFACE(Blueprintable)
 class GAMEPLAYFRAMEWORK_API UDaInventoryItemInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -47,7 +47,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "InventoryItems")
 	UDaAbilitySet* GetAbilitySet() const;
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, Category = "InventoryItems")
 	void ItemAddedToInventory();
 	
 	virtual void AddToInventory(APawn* InstigatorPawn, bool bDestroyActor = true) = 0;

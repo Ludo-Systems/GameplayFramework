@@ -7,8 +7,8 @@
 #include "DaInteractableInterface.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI)
-class UDaInteractableInterface : public UInterface
+UINTERFACE(Blueprintable)
+class GAMEPLAYFRAMEWORK_API UDaInteractableInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -23,21 +23,21 @@ class GAMEPLAYFRAMEWORK_API IDaInteractableInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, Category = "Interactable")
 	void OnActorLoaded();
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")
 	void Interact(APawn* InstigatorPawn);
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")
 	void SecondaryInteract(APawn* InstigatorPawn);
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")
 	FText GetInteractText(APawn* InstigatorPawn);
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, Category = "Interactable")
 	void HighlightActor();
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, Category = "Interactable")
 	void UnHighlightActor();
 };
