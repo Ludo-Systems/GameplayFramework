@@ -26,14 +26,15 @@ public:
 
 	virtual int32 GetCharacterLevel() override;
 
-	void SetInspectedItem(ADaInspectableItem* Item);
+	UFUNCTION(BlueprintCallable)
+	void SetInspectedItem(AActor* Item);
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UDaInteractionComponent> InteractionComp;
 
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<ADaInspectableItem> InspectedItem;
+	TObjectPtr<AActor> InspectedItem;
 	
 	virtual void InitAbilitySystem() override;
 
@@ -41,6 +42,6 @@ protected:
 	virtual void OnDeathStarted(AActor* OwningActor, AActor* InstigatorActor) override;
 
 	UFUNCTION()
-	void InspectedItemStateChanged(ADaInspectableItem* Item, AActor* InspectingActor, bool IsInspecting);
+	void InspectedItemStateChanged(AActor* Item, AActor* InspectingActor, bool IsInspecting);
 	
 };
