@@ -40,43 +40,49 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Inspect")
 	FOnInspectStateChanged OnInspectStateChanged;
 
+	FBoxSphereBounds GetHierarchyBounds(USceneComponent* RootComponent, bool bMeshLocalSpace);
+	
 protected:
 	
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 							   FActorComponentTickFunction* ThisTickFunction) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
+	bool bShowDetailAsPreview = true;
 	
-	UPROPERTY(EditAnywhere, Category = "Inspect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
 	float ViewportPercentage = 0.6f;
 
-	UPROPERTY(EditAnywhere, Category = "Inspect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
 	float CameraDistanceMultiplier = 1.2f;
 
-	UPROPERTY(EditAnywhere, Category = "Inspect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
 	float MinCameraDistance = 5.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Inspect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
 	float MaxCameraDistance = 500.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Inspect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
 	float InitialCameraDistanceOffset = 30.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Inspect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
 	float ZoomSmoothingFactor = 0.2f;
 
-	UPROPERTY(EditAnywhere, Category = "Inspect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
 	float RotationSmoothingSpeed = 30.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Inspect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
 	EInspectAlignment InspectAlignment = EInspectAlignment::Center;
 
-	UPROPERTY(EditAnywhere, Category = "Inspect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
 	float AlignmentShiftMultiplier = 0.2f;
-
-private:
-
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inspect")
 	bool bIsInspecting = false;
 
+private:
+	
 	float CurrentViewportPercentage;
 	EInspectAlignment CurrentAlignment;
 	FTransform BaseDetailMeshTransform;

@@ -32,9 +32,26 @@ void UDaInspectableComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Validate owner implements interface
-	//if (!GetOwner()->Implements<UDaInspectableInterface>())
-	if (!GetOwner()->GetClass()->ImplementsInterface(UDaInspectableInterface::StaticClass()))
+	AActor* Owner = GetOwner();
+	if (Owner && Owner->GetClass()->ImplementsInterface(UDaInspectableInterface::StaticClass()))
+	{
+		PreviewMeshComponent = IDaInspectableInterface::Execute_GetPreviewMeshComponent(Owner);
+		DetailedMeshComponent = IDaInspectableInterface::Execute_GetDetailedMeshComponent(Owner);
+
+		if (DetailedMeshComponent)
+		{
+			if (!bShowDetailAsPreview)
+				DetailedMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			
+			DetailedMeshComponent->SetVisibility(bShowDetailAsPreview, true);
+
+			if (PreviewMeshComponent)
+			{
+				PreviewMeshComponent->SetVisibility(!bShowDetailAsPreview, true);
+			}
+		}
+	}
+	else
 	{
 		LOG_WARNING("Owner of DaInspectableComponent must implement IDaInspectableInterface");
 	}
@@ -48,7 +65,6 @@ void UDaInspectableComponent::Inspect(APawn* InstigatorPawn, float ViewportPct, 
 
 	if (bIsInspecting)
 	{
-		HideDetailedMesh();
 		return;
 	}
 
@@ -70,11 +86,11 @@ void UDaInspectableComponent::Inspect(APawn* InstigatorPawn, float ViewportPct, 
 			BaseDetailMeshTransform = DetailedMeshComponent->GetComponentTransform();
 			
 			DetailedMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-			DetailedMeshComponent->SetVisibility(true);
+			DetailedMeshComponent->SetVisibility(true, true);
             
 			if (PreviewMeshComponent)
 			{
-				PreviewMeshComponent->SetVisibility(false);
+				PreviewMeshComponent->SetVisibility(false, true);
 			}
 
 			PlaceDetailMeshInView();
@@ -92,14 +108,16 @@ void UDaInspectableComponent::HideDetailedMesh()
 
 	if (PreviewMeshComponent)
 	{
-		PreviewMeshComponent->SetVisibility(true);
+		PreviewMeshComponent->SetVisibility(!bShowDetailAsPreview, true);
 	}
 
 	if (DetailedMeshComponent)
 	{
-		DetailedMeshComponent->SetVisibility(false);
+		DetailedMeshComponent->SetVisibility(bShowDetailAsPreview, true);
 		DetailedMeshComponent->SetWorldTransform(BaseDetailMeshTransform);
-		DetailedMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		if (!bShowDetailAsPreview)
+			DetailedMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 	// Notify owner inspection ended
@@ -181,7 +199,8 @@ void UDaInspectableComponent::PlaceDetailMeshInView()
     DetailedMeshComponent->MarkRenderStateDirty();
     DetailedMeshComponent->UpdateBounds();
 
-    FBoxSphereBounds MeshBounds = DetailedMeshComponent->Bounds;
+	// Get bounds of all static mesh components in world space
+    FBoxSphereBounds MeshBounds = GetHierarchyBounds(DetailedMeshComponent, false);
     float MeshDiameter = MeshBounds.BoxExtent.GetMax() * 2.0f;
 
     // Calculate viewport fit
@@ -210,10 +229,10 @@ void UDaInspectableComponent::PlaceDetailMeshInView()
         DetailedMeshComponent->MarkRenderStateDirty();
         DetailedMeshComponent->UpdateBounds();
 
-        // Calculate centering offset
-        MeshBounds = DetailedMeshComponent->GetStaticMesh()->GetBounds();
-        CenteringOffset = MeshBounds.Origin * DetailedMeshComponent->GetComponentScale();
-
+    	// Get bounds of just the mesh local space now to caclulate centering offset
+    	MeshBounds = GetHierarchyBounds(DetailedMeshComponent, true);
+    	CenteringOffset = MeshBounds.Origin * DetailedMeshComponent->GetComponentScale();
+    	
         // Handle alignment
         if (CurrentAlignment != EInspectAlignment::Center)
         {
@@ -269,3 +288,66 @@ void UDaInspectableComponent::ZoomDetailedMesh(float DeltaZoom)
 	}
 }
 
+FBoxSphereBounds UDaInspectableComponent::GetHierarchyBounds(USceneComponent* RootComponent, bool bMeshLocalSpace)
+{
+	if (!RootComponent)
+		return FBoxSphereBounds(FVector::ZeroVector, FVector::ZeroVector, 0.0f);
+
+	FBoxSphereBounds CombinedBounds;
+	bool bFirstValidBounds = true;
+
+	// Get all child components (including nested children)
+	TArray<USceneComponent*> ChildComponents;
+	RootComponent->GetChildrenComponents(true, ChildComponents);
+
+	// Include root component if it's a static mesh
+	if (UStaticMeshComponent* RootMesh = Cast<UStaticMeshComponent>(RootComponent))
+	{
+		if (RootMesh->GetStaticMesh())
+		{
+			if (bMeshLocalSpace)
+			{
+				CombinedBounds = RootMesh->GetStaticMesh()->GetBounds();
+			}
+			else
+			{
+				CombinedBounds = RootMesh->CalcBounds(RootMesh->GetComponentTransform());
+			}
+			bFirstValidBounds = false;
+		}
+	}
+
+	// Process each child component
+	for (USceneComponent* Child : ChildComponents)
+	{
+		if (UStaticMeshComponent* MeshComp = Cast<UStaticMeshComponent>(Child))
+		{
+			if (MeshComp->GetStaticMesh())
+			{
+				FBoxSphereBounds ChildBounds;
+
+				if (bMeshLocalSpace)
+				{
+					ChildBounds = MeshComp->GetStaticMesh()->GetBounds();
+				}
+				else
+				{
+					ChildBounds = MeshComp->CalcBounds(MeshComp->GetComponentTransform());
+				}
+				
+				if (bFirstValidBounds)
+				{
+					CombinedBounds = ChildBounds;
+					bFirstValidBounds = false;
+				}
+				else
+				{
+					// TODO: Verify that adding bounds from mesh local doesnt get screwed up.
+					CombinedBounds = CombinedBounds + ChildBounds;
+				}
+			}
+		}
+	}
+
+	return CombinedBounds;
+}
