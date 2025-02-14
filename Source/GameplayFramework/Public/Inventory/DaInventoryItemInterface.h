@@ -47,8 +47,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "InventoryItems")
 	UDaAbilitySet* GetAbilitySet() const;
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "InventoryItems")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "InventoryItems")
 	void ItemAddedToInventory();
-	
-	virtual void AddToInventory(APawn* InstigatorPawn, bool bDestroyActor = true) = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "InventoryItems")
+	void AddToInventory(APawn* InstigatorPawn, bool bDestroyActor = true);
 };

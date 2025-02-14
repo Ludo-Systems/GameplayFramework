@@ -95,7 +95,7 @@ void ADaInspectableItem::SecondaryInteract_Implementation(APawn* InstigatorPawn)
 	// TODO: Also check if its already in inventory before adding
 	if (bCanBeAddedToInventory)
 	{
-		AddToInventory(InstigatorPawn);
+		Execute_AddToInventory(this, InstigatorPawn, true);
 	}
 }
 
@@ -104,7 +104,7 @@ FText ADaInspectableItem::GetInteractText_Implementation(APawn* InstigatorPawn)
 	return InteractionText;
 }
 
-void ADaInspectableItem::AddToInventory(APawn* InstigatorPawn, bool bDestroyActor)
+void ADaInspectableItem::AddToInventory_Implementation(APawn* InstigatorPawn, bool bDestroyActor)
 {
 	checkf(TypeTags.IsValid(), TEXT("ADaInspectableItem: TypeTags is not valid!"));
 

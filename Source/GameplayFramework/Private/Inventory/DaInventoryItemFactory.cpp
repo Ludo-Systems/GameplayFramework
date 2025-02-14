@@ -41,7 +41,7 @@ TSubclassOf<UDaInventoryItemBase> UDaBaseInventoryItemFactory::DetermineInventor
 TSubclassOf<UDaInventoryItemBase> UDaBaseInventoryItemFactory::DetermineInventoryItemClass(
 	const UObject* SourceObject) const
 {
-	if (const IDaInventoryItemInterface* Pickup = Cast<IDaInventoryItemInterface>(SourceObject))
+	if (SourceObject->GetClass()->ImplementsInterface(UDaInventoryItemInterface::StaticClass()))
 	{
 		FGameplayTagContainer Tags;
 		IDaInventoryItemInterface::Execute_GetItemTags(SourceObject, Tags);
@@ -55,7 +55,7 @@ UDaInventoryItemBase* UDaBaseInventoryItemFactory::CreateInventoryItem(const UOb
 {
 	bool bDebugDraw = CVarDebugRenderIconToDisk.GetValueOnGameThread();
 
-	if (const IDaInventoryItemInterface* Pickup = Cast<IDaInventoryItemInterface>(SourceObject))
+	if (SourceObject->GetClass()->ImplementsInterface(UDaInventoryItemInterface::StaticClass()))
 	{
 		FDaInventoryItemData Data;
 		Data.ItemName = IDaInventoryItemInterface::Execute_GetItemName(SourceObject);
