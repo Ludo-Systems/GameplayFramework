@@ -176,7 +176,7 @@ void UDaInspectableComponent::UpdateMeshTransform(float DeltaTime)
 		CurrentLocation = FMath::VInterpTo(CurrentLocation, NewLocation, DeltaTime, ZoomSmoothingFactor / DeltaTime);
 
 		// Smooth rotation transition, RotationSmoothingSpeed: Higher = faster
-		CurrentRotation = FMath::RInterpTo(CurrentRotation, NewRotation, DeltaTime, RotationSmoothingSpeed);
+		CurrentRotation = FMath::RInterpConstantTo(CurrentRotation, NewRotation, DeltaTime, RotationSmoothingSpeed);
 
 		// Apply transform
 		DetailedMeshComponent->SetWorldLocation(CurrentLocation);

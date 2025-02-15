@@ -64,13 +64,13 @@ protected:
 	float MaxCameraDistance = 500.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
-	float InitialCameraDistanceOffset = 30.0f;
+	float InitialCameraDistanceOffset = 20.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
-	float ZoomSmoothingFactor = 0.2f;
+	float ZoomSmoothingFactor = 0.9f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
-	float RotationSmoothingSpeed = 30.0f;
+	float RotationSmoothingSpeed = 50.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
 	EInspectAlignment InspectAlignment = EInspectAlignment::Center;
