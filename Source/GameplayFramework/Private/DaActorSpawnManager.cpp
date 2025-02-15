@@ -21,7 +21,7 @@ static TAutoConsoleVariable<bool> CVarDebugSpawnBots(TEXT("da.DrawDebugSpawnBots
 static TAutoConsoleVariable<bool> CVarDebugSpawnItems(TEXT("da.DrawDebugSpawnItems"), false, TEXT("Draw Debug Spheres showing location where Items spawned"), ECVF_Cheat);
 
 
-void UDaActorSpawnManager::StartSpawning()
+void UDaActorSpawnManager::StartSpawning(FString LevelName)
 {
 	// virtual only
 }
@@ -34,7 +34,7 @@ void UDaActorSpawnManager::OnSpawnQueryCompleted(TSharedPtr<FEnvQueryResult> Res
 
 /// ----------------- AI Spawn Manager ---------------- ///
 
-void UDaAISpawnManager::StartSpawning()
+void UDaAISpawnManager::StartSpawning(FString LevelName)
 {
 	if (TimerHandle_SpawnBots.IsValid())
 	{
@@ -151,7 +151,7 @@ void UDaAISpawnManager::KillAllBots()
 
 /// ----------------- Pickup Item Spawn Manager ---------------- ///
 
-void UDaPickupItemSpawnManager::StartSpawning()
+void UDaPickupItemSpawnManager::StartSpawning(FString LevelName)
 {
 	// Skip the Blueprint wrapper and use the direct C++ option which the Wrapper uses as well
 	FEnvQueryRequest Request(SpawnQuery, this);
