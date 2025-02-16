@@ -119,8 +119,12 @@ void ADaCharacter::SetInspectedItem(AActor* Item)
 
 }
 
-void ADaCharacter::InspectedItemStateChanged(AActor* Item, AActor* InspectingActor,
-	bool IsInspecting)
+void ADaCharacter::SetMovingItem(AActor* Item)
+{
+	MovingItem = Item;
+}
+
+void ADaCharacter::InspectedItemStateChanged(AActor* Item, AActor* InspectingActor, bool IsInspecting)
 {
 	if (!IsInspecting && InspectedItem == Item)
 	{
