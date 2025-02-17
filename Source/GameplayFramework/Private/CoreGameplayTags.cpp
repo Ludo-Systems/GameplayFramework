@@ -17,6 +17,7 @@ namespace CoreGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_Crouch, "Input.Crouch");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_InspectZoom, "Input.InspectZoom");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_InspectRotate, "Input.InspectRotate");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Input_PickupMoveItem, "Input.PickupMoveItem");
 	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character, "Character", "Base character tag");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_ID, "Character.ID", "Base Tag for Character ID, add a new component to identify different characters to the subsystem");
@@ -97,7 +98,9 @@ namespace CoreGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Action_Heal, "Action.Heal");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Action_GainMana, "Action.GainMana");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Action_Buff, "Action.Buff", "Base Action Buff Tag");
-
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Action_Look, "Action.Look");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Action_PickupMoveitem, "Action.PickupMoveItem");
+	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Pickup, "Pickup", "Base Tag for Pickup Items");
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Pickup_Health, "Pickup.Health")
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Pickup_Credits, "Pickup.Credits")

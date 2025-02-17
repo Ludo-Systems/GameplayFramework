@@ -38,6 +38,11 @@ protected:
 	
 	// Subclasses should override this
 	UFUNCTION(BlueprintNativeEvent)
+	void OnStartedInputAction(const FInputActionValue& Value);
+
+	UFUNCTION(BlueprintNativeEvent)
 	void OnTriggeredInputAction(const FInputActionValue& Value);
 	
+	UFUNCTION(BlueprintNativeEvent)
+	void OnEndedInputAction(const FInputActionValue& Value);
 };

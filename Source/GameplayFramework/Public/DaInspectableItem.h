@@ -40,7 +40,7 @@ public:
 	virtual UMaterialInterface* GetRenderTargetMaterial_Implementation() const override { return RenderTargetMaterial; }
 	virtual UDaAbilitySet* GetAbilitySet_Implementation() const override { return nullptr; }
 	virtual UStaticMeshComponent* GetMeshComponent_Implementation() const override { return PreviewMeshComponent; }
-	virtual void AddToInventory(APawn* InstigatorPawn, bool bDestroyActor = true) override;	
+	virtual void AddToInventory_Implementation(APawn* InstigatorPawn, bool bDestroyActor = true) override;
 	
 protected:
 	virtual void BeginPlay() override;

@@ -40,11 +40,26 @@ void UDaGameplayAbility_BaseTriggeredInputAction::ActivateAbility(const FGamepla
 				{
 					if (It.InputAction && StartupActivationTags.HasTagExact(It.InputTag))
 					{
+						const FEnhancedInputActionEventBinding& StartedEventBinding = InputComponent->BindAction(It.InputAction, ETriggerEvent::Started, this, &UDaGameplayAbility_BaseTriggeredInputAction::OnStartedInputAction);
+						const uint32 StartedEventHandle = StartedEventBinding.GetHandle();
+
+						TriggeredEventHandles.AddUnique(StartedEventHandle);
+						
 						const FEnhancedInputActionEventBinding& TriggeredEventBinding = InputComponent->BindAction(It.InputAction, ETriggerEvent::Triggered, this, &UDaGameplayAbility_BaseTriggeredInputAction::OnTriggeredInputAction);
 						const uint32 TriggeredEventHandle = TriggeredEventBinding.GetHandle();
 	
 						TriggeredEventHandles.AddUnique(TriggeredEventHandle);
-      
+
+						const FEnhancedInputActionEventBinding& CancelledEventBinding = InputComponent->BindAction(It.InputAction, ETriggerEvent::Canceled, this, &UDaGameplayAbility_BaseTriggeredInputAction::OnEndedInputAction);
+						const uint32 CancelledEventHandle = CancelledEventBinding.GetHandle();
+
+						TriggeredEventHandles.AddUnique(CancelledEventHandle);
+
+						const FEnhancedInputActionEventBinding& EndedEventBinding = InputComponent->BindAction(It.InputAction, ETriggerEvent::Completed, this, &UDaGameplayAbility_BaseTriggeredInputAction::OnEndedInputAction);
+						const uint32 EndedEventHandle = EndedEventBinding.GetHandle();
+
+						TriggeredEventHandles.AddUnique(EndedEventHandle);
+						
 						bSuccess = true;
 					}
 				}
@@ -105,8 +120,18 @@ void UDaGameplayAbility_BaseTriggeredInputAction::InputReleased(const FGameplayA
 	}
 }
 
+void UDaGameplayAbility_BaseTriggeredInputAction::OnStartedInputAction_Implementation(const FInputActionValue& Value)
+{
+	// Subclasses should override this
+}
+
+
 void UDaGameplayAbility_BaseTriggeredInputAction::OnTriggeredInputAction_Implementation(const FInputActionValue& Value)
 {
 	// Subclasses should override this
 }
 
+void UDaGameplayAbility_BaseTriggeredInputAction::OnEndedInputAction_Implementation(const FInputActionValue& Value)
+{
+	// Subclasses should override this
+}

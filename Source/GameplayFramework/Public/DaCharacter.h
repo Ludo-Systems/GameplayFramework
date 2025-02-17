@@ -28,6 +28,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetInspectedItem(AActor* Item);
+
+	UFUNCTION(BlueprintCallable)
+	void SetMovingItem(AActor* Item);
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
@@ -35,6 +38,9 @@ protected:
 
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<AActor> InspectedItem;
+
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<AActor> MovingItem;
 	
 	virtual void InitAbilitySystem() override;
 
