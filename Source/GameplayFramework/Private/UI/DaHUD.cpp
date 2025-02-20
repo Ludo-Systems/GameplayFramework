@@ -4,23 +4,29 @@
 #include "UI/DaHUD.h"
 
 #include "CoreGameplayTags.h"
-#include "DaPlayerState.h"
-#include "Inventory/DaInventoryUIWidget.h"
+#include "GameplayFramework.h"
 #include "Inventory/DaInventoryWidgetController.h"
-#include "UI/DaCommonUIExtensions.h"
-#include "UI/DaOverlayWidgetBase.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/DaOverlayWidgetController.h"
 #include "UI/DaStatMenuWidgetController.h"
 #include "UI/DaUserWidgetBase.h"
 #include "UI/DaPrimaryGameLayout.h"
+#include "UI/DaUILevelData.h"
+
+UDaWidgetController* ADaHUD::GetWidgetController(const TSubclassOf<UDaWidgetController>& WidgetControllerClass, const FWidgetControllerParams& WCParams)
+{
+	UDaWidgetController* WidgetController = NewObject<UDaWidgetController>(this, WidgetControllerClass);
+	WidgetController->SetWidgetControllerParams(WCParams);
+	WidgetController->BindCallbacksToDependencies();
+	
+	return WidgetController;
+}
 
 UDaOverlayWidgetController* ADaHUD::GetOverlayWidgetController(const FWidgetControllerParams& WCParams)
 {
 	if (OverlayWidgetController == nullptr)
 	{
-		OverlayWidgetController = NewObject<UDaOverlayWidgetController>(this, OverlayWidgetControllerClass);
-		OverlayWidgetController->SetWidgetControllerParams(WCParams);
-		OverlayWidgetController->BindCallbacksToDependencies();
+		OverlayWidgetController = Cast<UDaOverlayWidgetController>(GetWidgetController(OverlayWidgetControllerClass, WCParams));
 	}
 	return OverlayWidgetController;
 }
@@ -29,9 +35,7 @@ UDaStatMenuWidgetController* ADaHUD::GetStatMenuWidgetController(const FWidgetCo
 {
 	if (StatMenuWidgetController == nullptr)
 	{
-		StatMenuWidgetController = NewObject<UDaStatMenuWidgetController>(this, StatMenuWidgetControllerClass);
-		StatMenuWidgetController->SetWidgetControllerParams(WCParams);
-		StatMenuWidgetController->BindCallbacksToDependencies();
+		StatMenuWidgetController = Cast<UDaStatMenuWidgetController>(GetWidgetController(StatMenuWidgetControllerClass, WCParams));
 	}
 	return StatMenuWidgetController;
 }
@@ -40,9 +44,7 @@ UDaInventoryWidgetController* ADaHUD::GetInventoryWidgetController(const FWidget
 {
 	if (InventoryWidgetController == nullptr)
 	{
-		InventoryWidgetController = NewObject<UDaInventoryWidgetController>(this, InventoryWidgetControllerClass);
-		InventoryWidgetController->SetWidgetControllerParams(WCParams);
-		InventoryWidgetController->BindCallbacksToDependencies();
+		InventoryWidgetController = Cast<UDaInventoryWidgetController>(GetWidgetController(InventoryWidgetControllerClass, WCParams));
 	}
 	return InventoryWidgetController;
 }
@@ -61,19 +63,57 @@ void ADaHUD::InitRootLayout(APlayerController* PC, APlayerState* PS, UDaAbilityS
 
 void ADaHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UDaAbilitySystemComponent* ASC)
 {
-	checkf(OverlayWidgetClass, TEXT("OverlayWidgetClass uninitialized, fill out in HUD blueprint class defaults."));
-	checkf(OverlayWidgetControllerClass, TEXT("OverlayWidgetControllerClass uninitialized, fill out in HUD blueprint class defaults."));
-	checkf(OverlayWidgetAttributeSetTags.IsValid(), TEXT("OverlayWidgetAttributeSetTags empty, Fill out AttributeSet Tags in HUD blueprint class defaults."));
+	// look for per-level overlay and controller overrides  
+	bool bFound = false;
+	TSubclassOf<UDaUserWidgetBase> OverlayWidgetClassToLoad = nullptr;
 	
-	const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, OverlayWidgetAttributeSetTags);
-	UDaOverlayWidgetController* WidgetController = GetOverlayWidgetController(WidgetControllerParams);
-	
-	RootLayout->PushWidgetToLayerStack<UDaOverlayWidgetBase>(CoreGameplayTags::TAG_UI_Layer_Game, OverlayWidgetClass, [this, WidgetController](UDaOverlayWidgetBase& Widget)
+	for (UDaUILevelData* LevelData : OverlayWidgetLevelData)
 	{
-		OverlayWidget = Widget;
-		OverlayWidget->SetWidgetController(WidgetController);
-		WidgetController->BroadcastInitialValues();
-	});
+		if (LevelData->Level != nullptr)
+		{
+			if (LevelData->Level.GetAssetName().Equals(UGameplayStatics::GetCurrentLevelName(this)))
+			{
+				checkf(LevelData->WidgetClass, TEXT("LevelData.WidgetClass uninitialized, fill out in DaUILevelData DataAsset class defaults set on HUD LevelWidgetData."));
+				checkf(LevelData->WidgetControllerClass, TEXT("LevelData.WidgetClass uninitialized,  fill out in DaUILevelData DataAsset class defaults set on HUD LevelWidgetData."));
+				checkf(LevelData->WidgetGameplayAttributeSetTags.IsValid(), TEXT("LevelData.WidgetClass empty,  fill out in DaUILevelData DataAsset class defaults set on HUD LevelWidgetData."));
+				
+				// Load Overlay
+				const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, LevelData->WidgetGameplayAttributeSetTags);
+				OverlayWidgetController = Cast<UDaOverlayWidgetController>(GetWidgetController(LevelData->WidgetControllerClass, WidgetControllerParams));
+				OverlayWidgetClassToLoad = LevelData->WidgetClass;
+				bFound = true;
+				break;
+			}
+		}
+	}
+
+	// We didnt find any per-level data overrides so load default overlay and controller
+	if (!bFound && OverlayWidgetClass && OverlayWidgetControllerClass)
+	{
+		checkf(OverlayWidgetClass, TEXT("OverlayWidgetClass uninitialized, either fill out in DaUILevelData DataAsset class defaults set on HUD LevelWidgetData."));
+		checkf(OverlayWidgetControllerClass, TEXT("OverlayWidgetControllerClass uninitialized, either fill out in DaUILevelData DataAsset class defaults set on HUD LevelWidgetData."));
+		checkf(OverlayWidgetAttributeSetTags.IsValid(), TEXT("OverlayWidgetAttributeSetTags empty, either fill out in DaUILevelData DataAsset class defaults set on HUD LevelWidgetData."));
+
+		// Load Overlay
+		const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, OverlayWidgetAttributeSetTags);
+		OverlayWidgetController = GetOverlayWidgetController(WidgetControllerParams);
+		OverlayWidgetClassToLoad = OverlayWidgetClass;
+		bFound = true;
+	}
+
+	if (bFound)
+	{
+		RootLayout->PushWidgetToLayerStack<UDaUserWidgetBase>(CoreGameplayTags::TAG_UI_Layer_Game, OverlayWidgetClassToLoad, [this](UDaUserWidgetBase& Widget)
+		{
+				OverlayWidget = Widget;
+				OverlayWidget->SetWidgetController(OverlayWidgetController);
+				OverlayWidgetController->BroadcastInitialValues();
+		});
+	}
+	else
+	{
+		LOG_ERROR("DaHud: No Game Overlay Class or OverlayController Class found");
+	}
 }
 
 void ADaHUD::RemoveOverlay()
@@ -81,6 +121,7 @@ void ADaHUD::RemoveOverlay()
 	if (OverlayWidget)
 	{
 		RootLayout->FindAndRemoveWidgetFromLayer(OverlayWidget);
+		OverlayWidget = nullptr;
 	}
 
 	if (OverlayWidgetController)
