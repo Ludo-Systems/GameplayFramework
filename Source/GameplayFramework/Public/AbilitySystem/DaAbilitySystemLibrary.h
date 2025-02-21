@@ -25,6 +25,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "DaAbilitySystemLibrary|GameplayTags")
 	static FGameplayTag GetLeafTag(const FGameplayTag& ParentTag, const FGameplayTagContainer& FromContainer);
+
+	UFUNCTION(BlueprintPure, Category = "DaAbilitySystemLibrary|GameplayTags")
+	static FName GetLeafString(const FGameplayTag& FromTag);
 	
 	UFUNCTION(BlueprintPure, Category="DaAbilitySystemLibrary|WidgetController")
 	static UDaOverlayWidgetController* GetOverlayWidgetController(const UObject* WorldContextObject);
