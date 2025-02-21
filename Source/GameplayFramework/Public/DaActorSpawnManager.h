@@ -86,7 +86,7 @@ public:
 protected:
 
 	// Locations in the game to spawn physical items
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(RowType="FDaPOIDataRef"), Category = "Environment")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(RowType="/Script/GameplayFramework.DaLevelDataRef"), Category = "Environment")
 	TObjectPtr<UDataTable> POILocationsForLevel;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Environment")

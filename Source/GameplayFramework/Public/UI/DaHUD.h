@@ -7,6 +7,8 @@
 #include "GameFramework/HUD.h"
 #include "DaHUD.generated.h"
 
+class UDaWidgetController;
+class UDaUILevelData;
 class UDaPrimaryGameLayout;
 class UDaInventoryUIWidget;
 class UDaInventoryWidgetController;
@@ -29,6 +31,8 @@ class GAMEPLAYFRAMEWORK_API ADaHUD : public AHUD
 public:
 
 	UDaPrimaryGameLayout* GetRootLayout() {return RootLayout;}
+
+	UDaWidgetController* GetWidgetController(const TSubclassOf<UDaWidgetController>& WidgetControllerClass, const FWidgetControllerParams& WCParams);
 	
 	UDaOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
 	UDaStatMenuWidgetController* GetStatMenuWidgetController(const FWidgetControllerParams& WCParams);
@@ -48,51 +52,69 @@ public:
 
 protected:
 
+	// HUD Loads this before anything else. See: Blueprint Asset WBP_PrimaryLayout which loads 4 UI.Layer activatable widget Containers. EWhen this class is loaded the event OnPrimaryGameLayoutLoaded will get fired.
 	UPROPERTY(EditAnywhere, Category=UI)
 	TSubclassOf<UDaPrimaryGameLayout> RootLayoutClass;
-	
-	UPROPERTY(EditAnywhere, Category=UI)
-	TSubclassOf<UDaUserWidgetBase> OverlayWidgetClass;
-	
-	UPROPERTY(EditAnywhere, Category=UI)
-	TSubclassOf<UDaOverlayWidgetController> OverlayWidgetControllerClass;
 
-	UPROPERTY(EditAnywhere, Category=UI)
-	TSubclassOf<UDaStatMenuWidgetController> StatMenuWidgetControllerClass;
-
-	UPROPERTY(EditAnywhere, Category=UI)
-	TSubclassOf<UDaInventoryWidgetController> InventoryWidgetControllerClass;
-
-	// Attribute Set Tags
-	
-	UPROPERTY(EditAnywhere, Category=UI)
-	FGameplayTagContainer OverlayWidgetAttributeSetTags;
-
-	UPROPERTY(EditAnywhere, Category=UI)
-	FGameplayTagContainer StatMenuWidgetAttributeSetTags;
-
-	UPROPERTY(EditAnywhere, Category=UI)
-	FGameplayTagContainer InventoryWidgetAttributeSetTags;
-
-	// Instances
-	
+	// Runtime RootLayout instance pointer
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=UI)
 	TObjectPtr<UDaPrimaryGameLayout> RootLayout;
+	
+	// Overlay
+	
+	// The Default OverlayWidget to use if a level data is not found in CurrentLevelData for the current level.
+	UPROPERTY(EditAnywhere, Category="UI|Overlay")
+	TSubclassOf<UDaUserWidgetBase> OverlayWidgetClass;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=UI)
+	// Runtime DefaultOverlayWidget instance pointer
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UI|Overlay")
 	TObjectPtr<UDaUserWidgetBase> OverlayWidget;
+	
+	// The Default OverlayWidgetController to use if a level data is not found in CurrentLevelData for the current level.
+	UPROPERTY(EditAnywhere, Category="UI|Overlay")
+	TSubclassOf<UDaOverlayWidgetController> OverlayWidgetControllerClass;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=UI)
+	// Runtime Default OverlayWidgetController instance pointer
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UI|Overlay")
 	TObjectPtr<UDaOverlayWidgetController> OverlayWidgetController;
+	
+	// Default Overlay Attribute Set Tags
+	UPROPERTY(EditAnywhere, Category="UI|Overlay")
+	FGameplayTagContainer OverlayWidgetAttributeSetTags;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=UI)
+	// Per-Level Overlay Overrides - Data Assets which map Root "UI.Layer.Game" Overlay Widgets and Controllers
+	UPROPERTY(EditDefaultsOnly, Category="UI|Overlay")
+	TArray<TObjectPtr<UDaUILevelData>> OverlayWidgetLevelData;
+	
+	// Stats
+	
+	// Widget Controller for all GAS attributes in a given AttributeSet array
+	UPROPERTY(EditAnywhere, Category="UI|Stats")
+	TSubclassOf<UDaStatMenuWidgetController> StatMenuWidgetControllerClass;
+
+	// Stat Menu Attribute Set GameplayTags 
+	UPROPERTY(EditAnywhere, Category="UI|Stats")
+	FGameplayTagContainer StatMenuWidgetAttributeSetTags;
+
+	// Runtime StatWidgetController instance pointer
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UI|Stats")
 	TObjectPtr<UDaStatMenuWidgetController> StatMenuWidgetController;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=UI)
+	// Inventory
+	
+	// Widget Controller setup to respond to a given InventoryComponent
+	UPROPERTY(EditAnywhere, Category="UI|Inventory")
+	TSubclassOf<UDaInventoryWidgetController> InventoryWidgetControllerClass;
+
+	// Inventory Attribute set GameplayTags  
+	UPROPERTY(EditAnywhere, Category="UI|Inventory")
+	FGameplayTagContainer InventoryWidgetAttributeSetTags;
+
+	// Runtime Inventory WidgetController instance pointer
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UI|Inventory")
 	TObjectPtr<UDaInventoryWidgetController> InventoryWidgetController;
 
-	// Events
-	
+	// OnPrimaryGameLayoutLoaded Event
 	UPROPERTY(BlueprintAssignable, Category="Events")
 	FOnOnPrimaryGameLayoutLoaded OnPrimaryGameLayoutLoaded;
 };

@@ -51,6 +51,19 @@ FGameplayTag UDaAbilitySystemLibrary::GetLeafTag(const FGameplayTag& ParentTag, 
 	return FGameplayTag();
 }
 
+FName UDaAbilitySystemLibrary::GetLeafString(const FGameplayTag& FromTag)
+{
+	// This needs to be in the same order as the gameplay tag node ParentTags, which is immediate parent first
+	FName RawTag = FromTag.GetTagName();
+	TStringBuilder<FName::StringBufferSize> TagBuffer(InPlace, RawTag);
+	FStringView TagView = TagBuffer.ToView();
+
+	int32 DotIndex = UE::String::FindLastChar(TagView, TEXT('.'));
+	TagView.RemovePrefix(DotIndex); 
+	
+	return FName(TagView);
+}
+
 UDaOverlayWidgetController* UDaAbilitySystemLibrary::GetOverlayWidgetController(const UObject* WorldContextObject)
 {
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
