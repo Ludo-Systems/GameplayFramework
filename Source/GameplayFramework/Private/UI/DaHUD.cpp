@@ -49,7 +49,7 @@ UDaInventoryWidgetController* ADaHUD::GetInventoryWidgetController(const FWidget
 	return InventoryWidgetController;
 }
 
-void ADaHUD::InitRootLayout(APlayerController* PC, APlayerState* PS, UDaAbilitySystemComponent* ASC)
+void ADaHUD::InitRootLayout(APlayerController* PC)
 {
 	checkf(RootLayoutClass, TEXT("RootLayoutClass uninitialized, fill out in HUD blueprint class defaults."));
 
