@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "DaGameModeBase.generated.h"
 
+class UDaSaveGameSubsystem;
 class AController;
 
 /**
@@ -18,16 +19,22 @@ class GAMEPLAYFRAMEWORK_API ADaGameModeBase : public AGameModeBase
 
 protected:
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SaveGame")
+	TSubclassOf<UDaSaveGameSubsystem> SaveGameSubsystemClass;
+
+	UPROPERTY()
+	UDaSaveGameSubsystem* SaveGameSubsystem;
+	
 	// if true will auto respawn if false, let subclasses handle how we respawn or end, example might be go to spectator mode or start menu
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player Respawn Ruleset")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Respawn")
 	bool bAutoRespawnPlayer;
 
 	// if auto respawn is true, how long to wait between respawns
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player Respawn Ruleset")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Respawn")
 	float RespawnDelay;
 
 	// respawn at last save if true or a start point if false
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player Respawn Ruleset")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Respawn")
 	bool bRespawnAtLastSaveLocation;
 	
 	UFUNCTION()

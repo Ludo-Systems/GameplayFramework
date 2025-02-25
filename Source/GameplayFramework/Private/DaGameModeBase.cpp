@@ -12,16 +12,27 @@ ADaGameModeBase::ADaGameModeBase(const FObjectInitializer& ObjectInitializer)
 	bAutoRespawnPlayer = true;
 	bRespawnAtLastSaveLocation = false;
 	RespawnDelay = 3.0f;
+	SaveGameSubsystemClass = UDaSaveGameSubsystem::StaticClass();
+	SaveGameSubsystem = nullptr;
 }
 
 void ADaGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
-	UDaSaveGameSubsystem* SG = GetGameInstance()->GetSubsystem<UDaSaveGameSubsystem>();
+	if (UGameInstanceSubsystem* GIS = GetGameInstance()->GetSubsystemBase(SaveGameSubsystemClass))
+	{
+		SaveGameSubsystem = Cast<UDaSaveGameSubsystem>(GIS);
+	}
 
-	FString SelectedSaveSlot = UGameplayStatics::ParseOption(Options, "SaveGame");
-	SG->LoadSaveGame(SelectedSaveSlot);
+	if (SaveGameSubsystem)
+	{
+		FString SelectedSaveSlot = UGameplayStatics::ParseOption(Options, "SaveGame");
+		SaveGameSubsystem->LoadSaveGame(SelectedSaveSlot);
+	} else
+	{
+		ErrorMessage = FString::Printf(TEXT("SaveGame Subsystem not found in GameInstance: %s"), *GetNameSafe(GetGameInstance()));
+	}
 }
 
 void ADaGameModeBase::OnActorKilled(AActor* VictimActor, AActor* KillerActor)
@@ -49,8 +60,8 @@ void ADaGameModeBase::OnActorKilled(AActor* VictimActor, AActor* KillerActor)
 		}
 		
 		// AutoSave on Player Death
-		UDaSaveGameSubsystem* SG = GetGameInstance()->GetSubsystem<UDaSaveGameSubsystem>();
-		SG->WriteSaveGame();
+		//UDaSaveGameSubsystem* SG = GetGameInstance()->GetSubsystem<UDaSaveGameSubsystem>();
+		SaveGameSubsystem->WriteSaveGame();
 	}
 }
 
@@ -68,8 +79,8 @@ void ADaGameModeBase::RespawnPlayerElapsed(AController* Controller)
 
 void ADaGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
-	UDaSaveGameSubsystem* SG = GetGameInstance()->GetSubsystem<UDaSaveGameSubsystem>();
-	SG->HandleStartingNewPlayer(NewPlayer);
+	//UDaSaveGameSubsystem* SG = GetGameInstance()->GetSubsystem<UDaSaveGameSubsystem>();
+	SaveGameSubsystem->HandleStartingNewPlayer(NewPlayer);
 	
 	// // Will call BeginPlaying State in Player Controller so make sure our data is setup before this calls super
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
@@ -77,7 +88,7 @@ void ADaGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* 
 	// Override spawn location
 	if (bRespawnAtLastSaveLocation)
 	{
-		SG->OverrideSpawnTransform(NewPlayer);
+		SaveGameSubsystem->OverrideSpawnTransform(NewPlayer);
 	}
 }
 
