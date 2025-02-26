@@ -56,16 +56,13 @@ void ADaCharacter::PrimaryInteraction() const
 
 void ADaCharacter::InitPlayerHUD() const
 {
-	ADaPlayerState* PS = GetPlayerState<ADaPlayerState>();
-	check(PS);
-
 	ADaPlayerController* PlayerController = Cast<ADaPlayerController>(GetController());
 	if (PlayerController && IsLocallyControlled())
 	{
 		if (ADaHUD* HUD = Cast<ADaHUD>(PlayerController->GetHUD()))
 		{
 			HUD->RemoveOverlay();
-			HUD->InitRootLayout(PlayerController, PS, AbilitySystemComponent);
+			HUD->InitRootLayout(PlayerController);
 		}
 	}
 }

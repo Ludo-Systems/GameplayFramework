@@ -29,7 +29,7 @@ void UDaSaveGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 void UDaSaveGameSubsystem::HandleStartingNewPlayer(AController* NewPlayer)
 {
 	ADaPlayerState* PS = NewPlayer->GetPlayerState<ADaPlayerState>();
-	if (ensure(PS))
+	if (PS)
 	{
 		PS->LoadPlayerState(CurrentSaveGame);
 	}

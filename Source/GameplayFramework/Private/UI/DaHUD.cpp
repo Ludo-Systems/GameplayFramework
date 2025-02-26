@@ -49,15 +49,20 @@ UDaInventoryWidgetController* ADaHUD::GetInventoryWidgetController(const FWidget
 	return InventoryWidgetController;
 }
 
-void ADaHUD::InitRootLayout(APlayerController* PC, APlayerState* PS, UDaAbilitySystemComponent* ASC)
+void ADaHUD::InitRootLayout(APlayerController* PC)
 {
 	checkf(RootLayoutClass, TEXT("RootLayoutClass uninitialized, fill out in HUD blueprint class defaults."));
 
 	UUserWidget* Widget = CreateWidget<UUserWidget>(PC, RootLayoutClass);
 	RootLayout = Cast<UDaPrimaryGameLayout>(Widget);
-	
 	Widget->AddToViewport();
 
+	// notify we are loaded and ready to have widgets pushed onto layers
+	NativeRootLayoutLoaded();
+}
+
+void ADaHUD::NativeRootLayoutLoaded()
+{
 	OnPrimaryGameLayoutLoaded.Broadcast();
 }
 
