@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/SaveGame.h"
 #include "DaSaveGame.generated.h"
+
+class UGameplayAbility;
 
 USTRUCT()
 struct FActorSaveData
@@ -15,15 +18,61 @@ public:
 
 	// ID of Actor
 	UPROPERTY()
-	FName ActorName;
+	FName ActorName = FName();
 
 	// For Movable Actors
 	UPROPERTY()
-	FTransform Transform;
+	FTransform Transform = FTransform();
 
 	UPROPERTY()
 	TArray<uint8> ByteData;
 };
+
+inline bool operator==(const FActorSaveData& Left, const FActorSaveData& Right)
+{
+	return Left.ActorName == Right.ActorName;
+}
+
+USTRUCT()
+struct FSavedMap
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString MapAssetName = FString();
+
+	UPROPERTY()
+	TArray<FActorSaveData> SavedActors;
+};
+
+USTRUCT(BlueprintType)
+struct FSavedAbility
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ClassDefaults")
+	TSubclassOf<UGameplayAbility> GameplayAbility;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag AbilityTag = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag AbilityStatus = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag AbilitySlot = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag AbilityType = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	int32 AbilityLevel;
+};
+
+inline bool operator==(const FSavedAbility& Left, const FSavedAbility& Right)
+{
+	return Left.AbilityTag.MatchesTagExact(Right.AbilityTag);
+}
 
 USTRUCT()
 struct FPlayerSaveData
@@ -69,6 +118,13 @@ public:
 	}
 };
 
+UENUM(BlueprintType)
+enum ESaveSlotStatus
+{
+	Vacant,
+	EnterName,
+	Taken
+};
 
 /**
  * 
@@ -80,12 +136,45 @@ class GAMEPLAYFRAMEWORK_API UDaSaveGame : public USaveGame
 
 public:
 
+	/* Level */
+	
+	UPROPERTY()
+	FString SlotName = FString();
+
+	UPROPERTY()
+	int32 SlotIndex = 0;
+
+	UPROPERTY()
+	FString PlayerName = FString("Default Name");
+
+	UPROPERTY()
+	FString MapName = FString("Default Map Name");
+	
+	UPROPERTY()
+	TEnumAsByte<ESaveSlotStatus> SaveSlotStatus = Vacant;
+
+	UPROPERTY()
+	FName PlayerStartTag;
+
+	UPROPERTY()
+	bool bFirstTimeLoadIn = true;
+
+	/* Player */
+	
 	UPROPERTY()
 	TArray<FPlayerSaveData> SavedPlayers;
 
 	UPROPERTY()
 	TArray<FActorSaveData> SavedActors;
 
-	FPlayerSaveData* GetPlayerData(APlayerState* PlayerState);
+	UPROPERTY()
+	TArray<FSavedAbility> SavedAbilities;
 	
+	UPROPERTY()
+	TArray<FSavedMap> SavedMaps;
+	
+	FPlayerSaveData* GetPlayerData(APlayerState* PlayerState);
+
+	FSavedMap GetSavedMapWithMapName(const FString& InMapName);
+	auto HasMap(const FString& InMapName) -> bool;
 };

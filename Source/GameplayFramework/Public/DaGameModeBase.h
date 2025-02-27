@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "DaGameModeBase.generated.h"
 
+class UDaSaveGame;
 class UDaSaveGameSubsystem;
 class AController;
 
@@ -17,11 +18,28 @@ class GAMEPLAYFRAMEWORK_API ADaGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
-protected:
+public:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SaveGame")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level")
+	FString DefaultMapName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level")
+	TSoftObjectPtr<UWorld> DefaultMap;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level")
+	TMap<FString, TSoftObjectPtr<UWorld>> Maps;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SaveGame")
 	TSubclassOf<UDaSaveGameSubsystem> SaveGameSubsystemClass;
-
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerStart")
+	FName DefaultPlayerStartTag;
+	
+	UFUNCTION(BlueprintCallable, Category = "Level")
+	void TravelToMap(const FString& MapName);
+	
+protected:
+	
 	UPROPERTY()
 	UDaSaveGameSubsystem* SaveGameSubsystem;
 	
@@ -40,14 +58,22 @@ protected:
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);
 
+	virtual void BeginPlay() override;
+
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
 public:
 
 	ADaGameModeBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
-
+	
 	// subclass should call super if override to handle respawn behavior but can check if a player or AI was killed and act accordingly
 	virtual void OnActorKilled(AActor* VictimActor, AActor* KillerActor);
 	
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+
+	UDaSaveGame* RetrieveInGameSaveData();
+	void SaveInGameProgressData(UDaSaveGame* SaveObject);
+	
 };

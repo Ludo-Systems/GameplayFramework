@@ -37,6 +37,8 @@ public:
 	// Will check the default mesh for ProjectileSocketName and return that. Subclasses can override and use their own mesh like a weapon if they have one.
 	virtual FVector GetProjectileSocketLocation_Implementation() override;
 
+	virtual void SaveProgress_Implementation(const FName& CheckpointTag) override;
+	
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
