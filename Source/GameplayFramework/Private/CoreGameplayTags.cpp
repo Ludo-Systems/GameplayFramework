@@ -43,8 +43,11 @@ namespace CoreGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVitalMetaDamage, "Attributes.Vital.Meta.Damage", "Damage Meta Attribute");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVitalMetaHealing, "Attributes.Vital.Meta.Healing", "healing Meta Attribute");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStats, "Attributes.Stats", "Game specific Stats defined in game code. Should have Primary and Secondary");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsPlayer, "Attributes.Stats.Player", "Player Attribute Stats Set Identifier");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsPrimary, "Attributes.Stats.Primary", "Primary attributes specific player stats/buff attributes that can be modified directly");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsPrimaryPlayer, "Attributes.Stats.Primary.Player", "Player specific Primary attributes specific player stats/buff attributes that can be modified directly");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsSecondary, "Attributes.Stats.Secondary", "Secondary Attributes adjust or modified via calculations or modifications based on primary attribute values");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsSecondaryPlayer, "Attributes.Stats.Secondary.Player", "Player specific Secondary Attributes adjust or modified via calculations or modifications based on primary attribute values");
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Inventory, "Inventory", "Base Inventory Tag");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Inventory_Master, "Inventory.Master", "Base Inventory Master Tag");
