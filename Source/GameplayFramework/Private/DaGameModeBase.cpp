@@ -35,6 +35,18 @@ void ADaGameModeBase::InitGame(const FString& MapName, const FString& Options, F
 	}
 }
 
+inline void ADaGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	Maps.Add(DefaultMapName, DefaultMap);
+}
+
+void ADaGameModeBase::TravelToMap(const FString& MapName)
+{
+	UGameplayStatics::OpenLevelBySoftObjectPtr(this, Maps.FindChecked(MapName));
+}
+
 void ADaGameModeBase::OnActorKilled(AActor* VictimActor, AActor* KillerActor)
 {
 	//LogOnScreen(this, FString::Printf(TEXT("ADaGameModeBase::OnActorKilled VictimActor: (%s) KillerActor: (%s)"), *GetNameSafe(VictimActor), *GetNameSafe(KillerActor)));
