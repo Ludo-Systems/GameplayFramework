@@ -132,3 +132,13 @@ void ADaGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* 
 	}
 }
 
+UDaSaveGame* ADaGameModeBase::RetrieveInGameSaveData()
+{
+	return SaveGameSubsystem->RetrieveInGameSaveData();
+}
+
+void ADaGameModeBase::SaveInGameProgressData(UDaSaveGame* SaveObject)
+{
+	SaveGameSubsystem->SaveInGameProgressData(SaveObject);
+}
+

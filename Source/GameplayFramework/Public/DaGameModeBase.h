@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "DaGameModeBase.generated.h"
 
+class UDaSaveGame;
 class UDaSaveGameSubsystem;
 class AController;
 
@@ -72,4 +73,7 @@ public:
 	
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
+	UDaSaveGame* RetrieveInGameSaveData();
+	void SaveInGameProgressData(UDaSaveGame* SaveObject);
+	
 };

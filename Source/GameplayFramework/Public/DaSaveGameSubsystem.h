@@ -6,6 +6,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "DaSaveGameSubsystem.generated.h"
 
+class UMVVMViewModelBase;
 class UDaSaveGame;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSaveGameSignature, class UDaSaveGame*, SaveObject);
@@ -28,6 +29,12 @@ protected:
 
 public:
 
+	void SaveSlotData(const FString& LoadSlotName, int32 SlotIndex, TFunction<void(UDaSaveGame*)> SaveDataCallback);
+	UDaSaveGame* GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const;
+	static void DeleteSlot(const FString& SlotName, int32 SlotIndex);
+	UDaSaveGame* RetrieveInGameSaveData();
+	void SaveInGameProgressData(UDaSaveGame* SaveObject);
+	
 	// Restore Serialized data from PlayerState into Player
 	void HandleStartingNewPlayer(AController* NewPlayer);
 

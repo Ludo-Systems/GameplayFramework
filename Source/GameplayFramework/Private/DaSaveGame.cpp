@@ -35,3 +35,27 @@ FPlayerSaveData* UDaSaveGame::GetPlayerData(APlayerState* PlayerState)
 	// Iterate the array and match by PlayerID (eg. unique ID provided by Steam)
 	return SavedPlayers.FindByPredicate([&](const FPlayerSaveData& Data) { return Data.PlayerID == PlayerID; });
 }
+
+FSavedMap UDaSaveGame::GetSavedMapWithMapName(const FString& InMapName)
+{
+	for (const FSavedMap& Map : SavedMaps)
+	{
+		if (Map.MapAssetName == InMapName)
+		{
+			return Map;
+		}
+	}
+	return FSavedMap();
+}
+
+bool UDaSaveGame::HasMap(const FString& InMapName)
+{
+	for (const FSavedMap& Map : SavedMaps)
+	{
+		if (Map.MapAssetName == InMapName)
+		{
+			return true;
+		}
+	}
+	return false;
+}

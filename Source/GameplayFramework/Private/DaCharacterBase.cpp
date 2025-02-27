@@ -6,11 +6,14 @@
 #include "AbilitySystemComponent.h"
 #include "CoreGameplayTags.h"
 #include "DaAttributeComponent.h"
+#include "DaGameModeBase.h"
+#include "DaSaveGame.h"
 #include "GameplayFramework.h"
 #include "AbilitySystem/DaAbilitySystemComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/DaDamageWidget.h"
 #include "UI/DaWorldUserWidget.h"
 #include "Util/ColorConstants.h"
@@ -90,6 +93,22 @@ void ADaCharacterBase::OnDeathFinished(AActor* OwningActor)
 FVector ADaCharacterBase::GetProjectileSocketLocation_Implementation()
 {
 	return GetMesh()->GetSocketLocation(ProjectileSocketName);
+}
+
+void ADaCharacterBase::SaveProgress_Implementation(const FName& CheckpointTag)
+{
+
+	ADaGameModeBase* GameMode = Cast<ADaGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (GameMode)
+	{
+		UDaSaveGame* SaveData = GameMode->RetrieveInGameSaveData();
+		if (SaveData == nullptr) return;
+
+		SaveData->PlayerStartTag = CheckpointTag;
+
+		GameMode->SaveInGameProgressData(SaveData);
+	}
+
 }
 
 UAnimMontage* ADaCharacterBase::GetAttackMontage_Implementation()
