@@ -28,9 +28,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level")
 	TMap<FString, TSoftObjectPtr<UWorld>> Maps;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SaveGame")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SaveGame")
 	TSubclassOf<UDaSaveGameSubsystem> SaveGameSubsystemClass;
-
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerStart")
+	FName DefaultPlayerStartTag;
+	
 	UFUNCTION(BlueprintCallable, Category = "Level")
 	void TravelToMap(const FString& MapName);
 	
@@ -55,6 +58,8 @@ protected:
 	void RespawnPlayerElapsed(AController* Controller);
 
 	virtual void BeginPlay() override;
+
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 public:
 

@@ -2,8 +2,10 @@
 
 #include "DaGameModeBase.h"
 #include "DaCharacter.h"
+#include "DaGameInstanceBase.h"
 #include "DaPlayerState.h"
 #include "DaSaveGameSubsystem.h"
+#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
 ADaGameModeBase::ADaGameModeBase(const FObjectInitializer& ObjectInitializer)
@@ -40,6 +42,32 @@ inline void ADaGameModeBase::BeginPlay()
 	Super::BeginPlay();
 	
 	Maps.Add(DefaultMapName, DefaultMap);
+}
+
+AActor* ADaGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
+{
+	if (UDaGameInstanceBase* GameInstance = Cast<UDaGameInstanceBase>(GetGameInstance()))
+	{
+		TArray<AActor*> Actors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), Actors);
+		if (Actors.Num() > 0)
+		{
+			AActor* SelectedActor = Actors[0];
+			for (AActor* Actor : Actors)
+			{
+				if (APlayerStart* PlayerStart = Cast<APlayerStart>(Actor))
+				{
+					if (PlayerStart->PlayerStartTag == GameInstance->PlayerStartTag)
+					{
+						SelectedActor = PlayerStart;
+						break;
+					}
+				}
+			}
+			return SelectedActor;
+		}
+	}
+	return nullptr;
 }
 
 void ADaGameModeBase::TravelToMap(const FString& MapName)
