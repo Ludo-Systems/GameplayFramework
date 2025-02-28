@@ -110,7 +110,7 @@ void ADaPlayerState::InitCharacterAttributes(bool bReset) const
 		Character->InitPlayerHUD();
 
 		if (bReset)
-			Character->InitDefaultAttributes();
+			Character->LoadProgress();
 	}
 	
 }

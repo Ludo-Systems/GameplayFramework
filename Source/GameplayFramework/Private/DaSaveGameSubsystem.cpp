@@ -10,7 +10,6 @@
 #include "DaSaveGameSettings.h"
 #include "GameplayFramework.h"
 #include "GameFramework/GameStateBase.h"
-#include "DaInteractableInterface.h"
 #include "DaSaveInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
@@ -29,7 +28,7 @@ void UDaSaveGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 }
 
 /* Static */
-UDaSaveGame* UDaSaveGameSubsystem::GetSaveSlotData(const FString& SlotName, int32 SlotIndex)
+UDaSaveGame* UDaSaveGameSubsystem::GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const
 {
 	USaveGame* SaveGameObject = nullptr;
 	if (UGameplayStatics::DoesSaveGameExist(SlotName, SlotIndex))
@@ -38,7 +37,13 @@ UDaSaveGame* UDaSaveGameSubsystem::GetSaveSlotData(const FString& SlotName, int3
 	}
 	else
 	{
-		SaveGameObject = UGameplayStatics::CreateSaveGameObject(UDaSaveGame::StaticClass());
+		TSubclassOf<UDaSaveGame> SaveGameClass = UDaSaveGame::StaticClass();
+		UDaGameInstanceBase* GI = Cast<UDaGameInstanceBase>(GetGameInstance());
+		if (GI->SaveGameClass != nullptr)
+		{
+			SaveGameClass = GI->SaveGameClass;
+		} 
+		SaveGameObject = UGameplayStatics::CreateSaveGameObject(SaveGameClass);
 	}
 
 	UDaSaveGame* SaveGame = Cast<UDaSaveGame>(SaveGameObject);
@@ -74,12 +79,21 @@ void UDaSaveGameSubsystem::SaveInGameProgressData(TFunction<void(UDaSaveGame*)> 
 	CurrentSaveGame = GetSaveSlotData(InGameLoadSlotName, InGameLoadSlotIndex);
 
 	SaveDataCallback(CurrentSaveGame);
+
+	// Save world and everything else
+	WriteSaveGame();
+	
 	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, InGameLoadSlotName, InGameLoadSlotIndex);
 	OnSaveGameWritten.Broadcast(CurrentSaveGame);
 }
 
+void UDaSaveGameSubsystem::DebugLogCurrentSaveGameInfo(const FString& AdditionalLoggingText)
+{
+	LogOnScreen(this, FString::Printf(TEXT("DaSaveGameSubsystem: SaveGame: %s, %s"), *GetNameSafe(CurrentSaveGame), *AdditionalLoggingText));
+}
+
 void UDaSaveGameSubsystem::SaveSlotData(const FString& LoadSlotName, int32 SlotIndex, bool bClearExisting,
-	TFunction<void(UDaSaveGame*)> SaveDataCallback)
+                                        TFunction<void(UDaSaveGame*)> SaveDataCallback)
 {
 	if (UGameplayStatics::DoesSaveGameExist(LoadSlotName, SlotIndex))
 	{
@@ -99,6 +113,7 @@ void UDaSaveGameSubsystem::SaveSlotData(const FString& LoadSlotName, int32 SlotI
 
 void UDaSaveGameSubsystem::HandleStartingNewPlayer(AController* NewPlayer)
 {
+	
 	ADaPlayerState* PS = NewPlayer->GetPlayerState<ADaPlayerState>();
 	if (PS)
 	{
@@ -189,12 +204,14 @@ void UDaSaveGameSubsystem::WriteSaveGame()
 
 		CurrentSaveGame->SavedActors.Add(ActorData);
 	}
+
+	// Let whoever called this write to disk
 	
-	UDaGameInstanceBase* GI = Cast<UDaGameInstanceBase>(GetGameInstance());
-	const FString InGameLoadSlotName = GI->LoadSlotName;
-	const int32 InGameLoadSlotIndex = GI->LoadSlotIndex;
-	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, InGameLoadSlotName, InGameLoadSlotIndex);
-	OnSaveGameWritten.Broadcast(CurrentSaveGame);
+	//UDaGameInstanceBase* GI = Cast<UDaGameInstanceBase>(GetGameInstance());
+	//const FString InGameLoadSlotName = GI->LoadSlotName;
+	//const int32 InGameLoadSlotIndex = GI->LoadSlotIndex;
+	//UGameplayStatics::SaveGameToSlot(CurrentSaveGame, InGameLoadSlotName, InGameLoadSlotIndex);
+	//OnSaveGameWritten.Broadcast(CurrentSaveGame);
 }
 
 void UDaSaveGameSubsystem::LoadSaveGame(FString InSlotName, int32 SlotIndex)
@@ -248,8 +265,12 @@ void UDaSaveGameSubsystem::LoadSaveGame(FString InSlotName, int32 SlotIndex)
 	}
 	else
 	{
-		CurrentSaveGame = Cast<UDaSaveGame>(UGameplayStatics::CreateSaveGameObject(UDaSaveGame::StaticClass()));
-
-		LOG("Created New SaveGame Data.");
+		TSubclassOf<UDaSaveGame> SaveGameClass = UDaSaveGame::StaticClass();
+		UDaGameInstanceBase* GI = Cast<UDaGameInstanceBase>(GetGameInstance());
+		if (GI->SaveGameClass != nullptr)
+		{
+			SaveGameClass = GI->SaveGameClass;
+		} 
+		CurrentSaveGame = Cast<UDaSaveGame>(UGameplayStatics::CreateSaveGameObject(SaveGameClass));
 	}
 }

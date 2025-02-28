@@ -4,6 +4,7 @@
 #include "DaCharacter.h"
 #include "DaGameInstanceBase.h"
 #include "DaPlayerState.h"
+#include "DaSaveGame.h"
 #include "DaSaveGameSubsystem.h"
 #include "GameplayFramework.h"
 #include "GameFramework/PlayerStart.h"
@@ -40,6 +41,8 @@ void ADaGameModeBase::InitGame(const FString& MapName, const FString& Options, F
 				LogOnScreen(this, FString::Printf(TEXT("Loading SaveData From GameInstance: %s"), *GameInstance->LoadSlotName));
 				SaveGameSubsystem->LoadSaveGame(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex);
 			}
+			SaveGameSubsystem->DebugLogCurrentSaveGameInfo(FString(TEXT(">>> ADaGameModeBase::InitGame")));
+
 		}
 		else
 		{
@@ -53,6 +56,8 @@ inline void ADaGameModeBase::BeginPlay()
 	Super::BeginPlay();
 	
 	Maps.Add(DefaultMapName, DefaultMap);
+
+	SaveGameSubsystem->DebugLogCurrentSaveGameInfo(FString(TEXT(">>> ADaGameModeBase::BeginPlay")));
 }
 
 AActor* ADaGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
@@ -116,7 +121,7 @@ void ADaGameModeBase::OnActorKilled(AActor* VictimActor, AActor* KillerActor)
 		}
 		
 		// AutoSave on Player Death
-		SaveGameSubsystem->WriteSaveGame();
+		WriteSaveGame();
 	}
 }
 
@@ -135,7 +140,9 @@ void ADaGameModeBase::RespawnPlayerElapsed(AController* Controller)
 void ADaGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
 	SaveGameSubsystem->HandleStartingNewPlayer(NewPlayer);
-	
+
+	SaveGameSubsystem->DebugLogCurrentSaveGameInfo(FString(TEXT(">>> ADaGameModeBase::HandleStartingNewPlayer_Implementation")));
+
 	// // Will call BeginPlaying State in Player Controller so make sure our data is setup before this calls super
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 	
@@ -148,11 +155,21 @@ void ADaGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* 
 
 UDaSaveGame* ADaGameModeBase::RetrieveInGameSaveData()
 {
+	SaveGameSubsystem->DebugLogCurrentSaveGameInfo(FString(TEXT(">>> ADaGameModeBase::RetrieveInGameSaveData")));
 	return SaveGameSubsystem->RetrieveInGameSaveData();
 }
 
 void ADaGameModeBase::SaveInGameProgressData(TFunction<void(UDaSaveGame*)> SaveDataCallback)
 {
+	SaveGameSubsystem->DebugLogCurrentSaveGameInfo(FString(TEXT(">>> ADaGameModeBase::SaveInGameProgressData")));
 	SaveGameSubsystem->SaveInGameProgressData(SaveDataCallback);
 }
 
+void ADaGameModeBase::WriteSaveGame()
+{
+	SaveGameSubsystem->DebugLogCurrentSaveGameInfo(FString(TEXT(">>> ADaGameModeBase::WriteSaveGame")));
+	SaveInGameProgressData([this](UDaSaveGame* SaveData)
+	{
+		SaveData->bFirstTimeLoadIn = false;
+	});
+}

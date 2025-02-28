@@ -23,11 +23,13 @@ public:
 	
 	void SaveSlotData(const FString& LoadSlotName, int32 SlotIndex, bool bClearExisting, TFunction<void(UDaSaveGame*)> SaveDataCallback);
 	
-	static UDaSaveGame* GetSaveSlotData(const FString& SlotName, int32 SlotIndex);
+	UDaSaveGame* GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const;
 	static void DeleteSlot(const FString& SlotName, int32 SlotIndex);
 
 	UDaSaveGame* RetrieveInGameSaveData() const;
 	void SaveInGameProgressData(TFunction<void(UDaSaveGame*)> SaveDataCallback);
+
+	void DebugLogCurrentSaveGameInfo(const FString& AdditionalLoggingText);
 	
 	// Restore Serialized data from PlayerState into Player
 	void HandleStartingNewPlayer(AController* NewPlayer);

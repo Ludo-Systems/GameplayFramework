@@ -28,9 +28,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level")
 	TMap<FString, TSoftObjectPtr<UWorld>> Maps;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SaveGame")
-	bool bLoadSaveGameOnStart;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SaveGame")
 	TSubclassOf<UDaSaveGameSubsystem> SaveGameSubsystemClass;
@@ -46,6 +43,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Level")
 	void TravelToMapWithOptions(const FString& MapName, bool bResetOptions, const FString& Options);
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	void WriteSaveGame();
 	
 protected:
 	

@@ -6,6 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "DaGameInstanceBase.generated.h"
 
+class UDaSaveGame;
 /**
  * 
  */
@@ -16,6 +17,9 @@ class GAMEPLAYFRAMEWORK_API UDaGameInstanceBase : public UGameInstance
 
 public:
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SaveGame")
+	TSubclassOf<UDaSaveGame> SaveGameClass;
+	
 	UPROPERTY()
 	FName PlayerStartTag = FName();
 

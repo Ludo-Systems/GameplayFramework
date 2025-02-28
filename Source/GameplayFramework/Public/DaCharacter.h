@@ -33,6 +33,7 @@ public:
 	void SetMovingItem(AActor* Item);
 
 	virtual void SaveProgress_Implementation(const FName& CheckpointTag) override;
+	void LoadProgress();
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")

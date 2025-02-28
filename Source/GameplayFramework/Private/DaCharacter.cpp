@@ -53,17 +53,45 @@ void ADaCharacter::InitAbilitySystem()
 	}
 }
 
+void ADaCharacter::LoadProgress()
+{
+	// If SaveData->First time load in, initialize, otherwise load saved values from disk
+	ADaGameModeBase* AuraGameMode = Cast<ADaGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (AuraGameMode)
+	{
+		UDaSaveGame* SaveData = AuraGameMode->RetrieveInGameSaveData();
+		if (SaveData == nullptr) return;
+		
+		if (SaveData->bFirstTimeLoadIn)
+		{
+			InitDefaultAttributes();
+			//AddCharacterAbilities();
+		}
+		else
+		{
+			// TODO: Load from save data (remove the InitDefaultAttributes below)
+			InitDefaultAttributes();
+		}
+	}
+}
+
 void ADaCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 {
 	if (ADaGameModeBase* GameMode = Cast<ADaGameModeBase>(UGameplayStatics::GetGameMode(this)))
 	{
 		GameMode->SaveInGameProgressData([this, CheckpointTag](UDaSaveGame* SaveData)
 		{
-			SaveData->PlayerStartTag = CheckpointTag;
+			if (CheckpointTag.IsNone() == false)
+			{
+				// Allow not resetting Checkpoint or passing in null string to not have any impact on existing save data
+				SaveData->PlayerStartTag = CheckpointTag;
 
-			// Save the player start tag in the game instance so that it can be used to load the player start on the client
-			UDaGameInstanceBase* GameInstance = Cast<UDaGameInstanceBase>(GetGameInstance());
-			GameInstance->PlayerStartTag = CheckpointTag;
+				// Save the player start tag in the game instance so that it can be used to load the player start on the client
+				UDaGameInstanceBase* GameInstance = Cast<UDaGameInstanceBase>(GetGameInstance());
+				GameInstance->PlayerStartTag = CheckpointTag;
+			}
+
+			SaveData->bFirstTimeLoadIn = false;
 		});
 	}
 
