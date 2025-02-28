@@ -44,6 +44,7 @@ UDaSaveGame* UDaSaveGameSubsystem::GetSaveSlotData(const FString& SlotName, int3
 			SaveGameClass = GI->SaveGameClass;
 		} 
 		SaveGameObject = UGameplayStatics::CreateSaveGameObject(SaveGameClass);
+		LogOnScreen(GetWorld(), FString::Printf(TEXT("DaSaveGameSubsystem: Created SaveGame: %s"), *GetNameSafe(SaveGameObject)));
 	}
 
 	UDaSaveGame* SaveGame = Cast<UDaSaveGame>(SaveGameObject);
