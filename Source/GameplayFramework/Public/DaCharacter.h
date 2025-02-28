@@ -31,6 +31,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetMovingItem(AActor* Item);
+
+	virtual void SaveProgress_Implementation(const FName& CheckpointTag) override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")

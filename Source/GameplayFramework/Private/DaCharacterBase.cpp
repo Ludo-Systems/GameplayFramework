@@ -95,22 +95,6 @@ FVector ADaCharacterBase::GetProjectileSocketLocation_Implementation()
 	return GetMesh()->GetSocketLocation(ProjectileSocketName);
 }
 
-void ADaCharacterBase::SaveProgress_Implementation(const FName& CheckpointTag)
-{
-
-	ADaGameModeBase* GameMode = Cast<ADaGameModeBase>(UGameplayStatics::GetGameMode(this));
-	if (GameMode)
-	{
-		UDaSaveGame* SaveData = GameMode->RetrieveInGameSaveData();
-		if (SaveData == nullptr) return;
-
-		SaveData->PlayerStartTag = CheckpointTag;
-
-		GameMode->SaveInGameProgressData(SaveData);
-	}
-
-}
-
 UAnimMontage* ADaCharacterBase::GetAttackMontage_Implementation()
 {
 	return AttackMontage;
@@ -125,7 +109,6 @@ void ADaCharacterBase::PossessedBy(AController* NewController)
 		//server
 		InitAbilitySystem();
 	}
-
 }
 
 void ADaCharacterBase::OnRep_PlayerState()
