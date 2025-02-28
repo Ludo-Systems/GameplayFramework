@@ -12,12 +12,15 @@ struct FDaAttributeData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	// Tag mapped to Attribute Variable in UAttributeSet derived subclass
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Attributes"))
 	FGameplayTag AttributeTag = FGameplayTag();
 
+	// Localizable Display Name for Attribute
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText AttributeName = FText();
 
+	// Localizable Description of Attribute
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText AttributeDescription = FText();
 
