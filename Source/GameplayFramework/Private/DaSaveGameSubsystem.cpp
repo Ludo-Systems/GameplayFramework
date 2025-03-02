@@ -18,13 +18,10 @@ void UDaSaveGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	//const UDaSaveGameSettings* SGSettings = GetDefault<UDaSaveGameSettings>();
+	// TODO: Setup Defaults in settings so they can be done centrally
+	// const UDaSaveGameSettings* SGSettings = GetDefault<UDaSaveGameSettings>();
 	// Access defaults from DefaultGame.ini
 	//LoadSlotName = SGSettings->SaveSlotName;
-
-	// Make sure its loaded into memeory. .Get() Only resolves if already loaded previously elsewhere in code
-	//UDataTable* DummyTable = SGSettings->DummyTablePath.LoadSynchronous();
-	// Dummytable->GetAllRows() // not needed currently, just an example
 }
 
 /* Static */
@@ -44,7 +41,7 @@ UDaSaveGame* UDaSaveGameSubsystem::GetSaveSlotData(const FString& SlotName, int3
 			SaveGameClass = GI->SaveGameClass;
 		} 
 		SaveGameObject = UGameplayStatics::CreateSaveGameObject(SaveGameClass);
-		LogOnScreen(GetWorld(), FString::Printf(TEXT("DaSaveGameSubsystem: Created SaveGame: %s"), *GetNameSafe(SaveGameObject)));
+		//LogOnScreen(GetWorld(), FString::Printf(TEXT("DaSaveGameSubsystem: Created SaveGame: %s"), *GetNameSafe(SaveGameObject)));
 	}
 
 	UDaSaveGame* SaveGame = Cast<UDaSaveGame>(SaveGameObject);
@@ -90,7 +87,7 @@ void UDaSaveGameSubsystem::SaveInGameProgressData(TFunction<void(UDaSaveGame*)> 
 
 void UDaSaveGameSubsystem::DebugLogCurrentSaveGameInfo(const FString& AdditionalLoggingText)
 {
-	LogOnScreen(this, FString::Printf(TEXT("DaSaveGameSubsystem: SaveGame: %s, %s"), *GetNameSafe(CurrentSaveGame), *AdditionalLoggingText));
+	//LogOnScreen(this, FString::Printf(TEXT("DaSaveGameSubsystem: SaveGame: %s, %s"), *GetNameSafe(CurrentSaveGame), *AdditionalLoggingText));
 }
 
 void UDaSaveGameSubsystem::SaveSlotData(const FString& LoadSlotName, int32 SlotIndex, bool bClearExisting,
@@ -205,14 +202,6 @@ void UDaSaveGameSubsystem::WriteSaveGame()
 
 		CurrentSaveGame->SavedActors.Add(ActorData);
 	}
-
-	// Let whoever called this write to disk
-	
-	//UDaGameInstanceBase* GI = Cast<UDaGameInstanceBase>(GetGameInstance());
-	//const FString InGameLoadSlotName = GI->LoadSlotName;
-	//const int32 InGameLoadSlotIndex = GI->LoadSlotIndex;
-	//UGameplayStatics::SaveGameToSlot(CurrentSaveGame, InGameLoadSlotName, InGameLoadSlotIndex);
-	//OnSaveGameWritten.Broadcast(CurrentSaveGame);
 }
 
 void UDaSaveGameSubsystem::LoadSaveGame(FString InSlotName, int32 SlotIndex)
