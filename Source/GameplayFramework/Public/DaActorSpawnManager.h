@@ -91,6 +91,12 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Environment")
 	TObjectPtr<UEnvQuery> SpawnQuery;
+
+	UPROPERTY(EditDefaultsOnly, Category="Environment")
+	TEnumAsByte<EEnvQueryRunMode::Type> SpawnQueryRunMode = EEnvQueryRunMode::AllMatching;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Environment")
+	FString CurrentLevelName;
 	
 	virtual void OnSpawnQueryCompleted(TSharedPtr<FEnvQueryResult> Result);
 
