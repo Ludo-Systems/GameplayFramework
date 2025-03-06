@@ -41,35 +41,6 @@ public:
 	float KillReward;
 };
 
-USTRUCT(BlueprintType)
-struct FDaPOIDataRef 
-{
-	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Categories = "Level.POI"), Category="POI")
-	FGameplayTagContainer POIInfoTags;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="POI")
-	TArray<FTransform> WorldLocationTransforms;
-	
-};
-
-USTRUCT(BlueprintType)
-struct FDaLevelDataRef : public FTableRowBase
-{
-	GENERATED_BODY()
-
-	// Should be the same as Row Name
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Level Data")
-	FName LevelName;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Categories = "Level.ID"), Category="Level Data")
-	FGameplayTagContainer LevelInfoTags;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Level Data")
-	TArray<FDaPOIDataRef> POIData;
-};
-
 /**
  * 
  */
@@ -84,10 +55,6 @@ public:
 	virtual void StartSpawning(FString LevelName);
 	
 protected:
-
-	// Locations in the game to spawn physical items
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(RowType="/Script/GameplayFramework.DaLevelDataRef"), Category = "Environment")
-	TObjectPtr<UDataTable> POILocationsForLevel;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Environment")
 	TObjectPtr<UEnvQuery> SpawnQuery;
