@@ -8,6 +8,7 @@
 
 // Define alias to easily keep track of custom channels in C++ (must match what is specified in Project Settings > Collision 
 #define COLLISION_PROJECTILE ECC_GameTraceChannel1
+#define TRACE_INTERACT ECC_GameTraceChannel2
 
 GAMEPLAYFRAMEWORK_API DECLARE_STATS_GROUP(TEXT("DA_GameplayFramework"), STATGROUP_DAGF, STATCAT_Advanced);
 

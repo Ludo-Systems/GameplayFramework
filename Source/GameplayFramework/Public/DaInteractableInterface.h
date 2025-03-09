@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "DaInteractableInterface.generated.h"
 
+class UDaWorldUserWidget;
 // This class does not need to be modified.
 UINTERFACE(Blueprintable)
 class GAMEPLAYFRAMEWORK_API UDaInteractableInterface : public UInterface
@@ -35,6 +36,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interactable")
 	FText GetInteractText(APawn* InstigatorPawn);
 
+	UFUNCTION(BlueprintNativeEvent, Category = "Interactable")
+	TSubclassOf<UDaWorldUserWidget> GetInteractWidget();
+	
 	UFUNCTION(BlueprintNativeEvent, Category = "Interactable")
 	void HighlightActor();
 
