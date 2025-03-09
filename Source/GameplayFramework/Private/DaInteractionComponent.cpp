@@ -70,7 +70,7 @@ void UDaInteractionComponent::CursorTrace()
 	
 	APawn* MyPawn = CastChecked<APawn>(GetOwner());
 	APlayerController* PlayerController = CastChecked<APlayerController>(MyPawn->Controller);
-	PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	PlayerController->GetHitResultUnderCursor(CollisionChannel, false, CursorHit);
 	if (!CursorHit.bBlockingHit) return;
 
 	// Clear Focused Actor before hit
