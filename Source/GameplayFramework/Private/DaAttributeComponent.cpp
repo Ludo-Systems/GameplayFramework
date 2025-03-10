@@ -290,7 +290,8 @@ bool UDaAttributeComponent::IsActorAlive(AActor* Actor)
 		return !AttributeComp->IsDeadOrDying();
 	}
 
-	return false;
+	// if it doesnt have something to manage its health its alive by default
+	return true;
 }
 
 bool UDaAttributeComponent::StartDeath(AActor* InstigatorActor)

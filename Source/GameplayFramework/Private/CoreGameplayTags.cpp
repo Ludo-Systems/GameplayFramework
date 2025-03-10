@@ -23,6 +23,7 @@ namespace CoreGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_ID, "Character.ID", "Base Tag for Character ID, add a new component to identify different characters to the subsystem");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type, "Character.Type", "Base Tag for Character Type, add a new component to identify different character types to the subsystem");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_AI, "Character.Type.AI", "Base AI Character Type.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_AI_NPC, "Character.Type.AI.NPC", "NPC AI Character Type.");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_Player, "Character.Type.Player", "Base Player Character Type");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_Player_ThirdPerson, "Character.Type.Player.ThirdPerson", "Third person perspective player character type");
 

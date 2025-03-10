@@ -13,7 +13,7 @@ class UUserWidget;
 class UDaWorldUserWidget;
 
 UCLASS()
-class GAMEPLAYFRAMEWORK_API ADaAICharacter : public ADaCharacterBase
+class GAMEPLAYFRAMEWORK_API ADaAICharacter : public ADaCharacterBase 
 {
 	GENERATED_BODY()
 

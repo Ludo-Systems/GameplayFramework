@@ -18,16 +18,19 @@ EBTNodeResult::Type UDaBTTask_DoAbilityToSelf::ExecuteTask(UBehaviorTreeComponen
 	AAIController* MyController = OwnerComp.GetAIOwner();
 	if (ensure(MyController))
 	{
-		ADaAICharacter* Character = Cast<ADaAICharacter>(MyController->GetPawn());
+		ACharacter* Character = Cast<ACharacter>(MyController->GetPawn());
 		if (Character == nullptr)
 		{
 			return EBTNodeResult::Failed;
 		}
 
-		UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent();
-		if(ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(AbilityToExecute)))
+		if (IAbilitySystemInterface* ASCCharacter = Cast<IAbilitySystemInterface>(Character))
 		{
-			return EBTNodeResult::Succeeded;
+			UAbilitySystemComponent* ASC = ASCCharacter->GetAbilitySystemComponent();
+			if(ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(AbilityToExecute)))
+			{
+				return EBTNodeResult::Succeeded;
+			}
 		}
 	}
 

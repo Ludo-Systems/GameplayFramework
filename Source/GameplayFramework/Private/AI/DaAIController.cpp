@@ -3,8 +3,8 @@
 
 #include "AI/DaAIController.h"
 
+#include "AbilitySystemInterface.h"
 #include "AbilitySystem/DaAbilitySystemComponent.h"
-#include "AI/DaAICharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -18,10 +18,13 @@ void ADaAIController::BeginPlay()
 	APawn* ControlledActor = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (ControlledActor)
 	{
-		if (ADaAICharacter* AICharacter = Cast<ADaAICharacter>(ControlledActor))
+		if (IAbilitySystemInterface* ASCCharacter = Cast<IAbilitySystemInterface>(ControlledActor))
 		{
-			UAbilitySystemComponent* ASC =  AICharacter->GetAbilitySystemComponent();
-			BB->SetValueAsObject("ASC", ASC);
+			UAbilitySystemComponent* ASC =  ASCCharacter->GetAbilitySystemComponent();
+			if (BB)
+			{
+				BB->SetValueAsObject("ASC", ASC);
+			}
 		}
 	}
 	
