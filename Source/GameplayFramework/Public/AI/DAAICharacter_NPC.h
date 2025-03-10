@@ -39,9 +39,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI")
 	TObjectPtr<UDaPawnData> PawnData;
 	
-	UPROPERTY(VisibleDefaultsOnly, Category="AI")
-	FName TargetActorKey;
-
 	// Gameplay effect used to set all (non-vital) attributes (provided in an AbilitySet) to default.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI")
 	TSubclassOf<UGameplayEffect> DefaultAttributes;
@@ -52,11 +49,4 @@ protected:
 	/* Can be used to identify a specific avatar actor character (and possibly what skin they are using) like Character.ID.Gideon.Inquisitor. Will be set to a default Character.ID tag if unspecified. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI")
 	FGameplayTag CharacterIDGameplayTag;
-
-	UFUNCTION(BlueprintCallable, Category = "AI")
-	AActor* GetTargetActor();
-
-	UFUNCTION(BlueprintCallable, Category = "AI")
-	void SetTargetActor(AActor* NewTarget);
-	
 };

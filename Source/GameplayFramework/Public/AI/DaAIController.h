@@ -15,8 +15,11 @@ class GAMEPLAYFRAMEWORK_API ADaAIController : public AAIController
 
 protected:
 	
-	UPROPERTY(EditDefaultsOnly, Category="AI")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="AI")
 	TObjectPtr<UBehaviorTree> BehaviorTree;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="AI")
+	bool bAutoRunBehaviorTree = true;
 	
 	virtual void BeginPlay() override;
 	
