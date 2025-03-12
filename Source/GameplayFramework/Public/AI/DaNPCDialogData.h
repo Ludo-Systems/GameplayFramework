@@ -77,9 +77,9 @@ enum EDialogNegotiationStateEnum
 {
 	NotStarted,
 	Offer,
-	Accept,
 	Reject,
 	Finalize,
+	Accept,
 	NoResponse,
 	NegotiationStateMAX
 };
