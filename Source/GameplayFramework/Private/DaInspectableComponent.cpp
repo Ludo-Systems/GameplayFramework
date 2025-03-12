@@ -28,6 +28,13 @@ UDaInspectableComponent::UDaInspectableComponent()
 	ScaleFactor = 1.0f;
 }
 
+void UDaInspectableComponent::ConfigureInspection(float NewViewportPercentage, 
+	EInspectAlignment NewAlignment)
+{
+	DefaultViewportPercentage = NewViewportPercentage;
+	DefaultAlignment = NewAlignment;
+}
+
 void UDaInspectableComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -57,7 +64,24 @@ void UDaInspectableComponent::BeginPlay()
 	}
 }
 
-void UDaInspectableComponent::Inspect(APawn* InstigatorPawn, float ViewportPct, EInspectAlignment Alignment)
+void UDaInspectableComponent::SetAlignment(EInspectAlignment NewAlignment)
+{
+	CurrentAlignment = NewAlignment;
+    
+	// Reset alignment offset if centered
+	if (CurrentAlignment == EInspectAlignment::Center)
+	{
+		AlignmentOffset = FVector::ZeroVector;
+	}
+    
+	// If we're currently inspecting, recalculate position with new alignment
+	if (bIsInspecting)
+	{
+		PlaceDetailMeshInView();
+	}
+}
+
+void UDaInspectableComponent::Inspect(APawn* InstigatorPawn)
 {
 	// This is just for viewing on clients
 	if (!InstigatorPawn->IsLocallyControlled()) 
@@ -70,9 +94,14 @@ void UDaInspectableComponent::Inspect(APawn* InstigatorPawn, float ViewportPct, 
 
 	// Cache inspection parameters (used during tick)
 	InspectingPawn = InstigatorPawn;
-	CurrentViewportPercentage = ViewportPct;
-	CurrentAlignment = Alignment;
+	CurrentViewportPercentage = DefaultViewportPercentage;
+	CurrentAlignment = DefaultAlignment;
 
+	if (CVarInspectDebug.GetValueOnGameThread())
+	{
+		LOG("Inspect called with alignment: %d", static_cast<int>(CurrentAlignment));
+	}
+	
 	// Get mesh components through interface
 	AActor* Owner = GetOwner();
 	if (Owner && Owner->GetClass()->ImplementsInterface(UDaInspectableInterface::StaticClass()))
@@ -165,12 +194,19 @@ void UDaInspectableComponent::UpdateMeshTransform(float DeltaTime)
 	{
 		FVector CameraLocation;
 		FRotator CameraRotation;
-		PlayerController->PlayerCameraManager->GetCameraViewPoint(CameraLocation, CameraRotation);
+		//PlayerController->PlayerCameraManager->GetCameraViewPoint(CameraLocation, CameraRotation);
+		PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
 		FVector ForwardVector = CameraRotation.Vector();
 
+		// Only recalculate alignment offset when camera distance changes
+		if (CurrentAlignment != EInspectAlignment::Center)
+		{
+			AlignmentOffset = CalculateAlignmentOffset(CameraRotation, CameraDistance);
+		}
+		
 		// Calculate new mesh location with offset
 		FVector ViewportPosition = CameraLocation + ForwardVector * (CameraDistance + InitialCameraDistanceOffset);
-		FVector NewLocation = ViewportPosition - CenteringOffset;
+		FVector NewLocation = ViewportPosition - CenteringOffset + AlignmentOffset;
 
 		// Smooth transition using exponential smoothing
 		CurrentLocation = FMath::VInterpTo(CurrentLocation, NewLocation, DeltaTime, ZoomSmoothingFactor / DeltaTime);
@@ -186,6 +222,10 @@ void UDaInspectableComponent::UpdateMeshTransform(float DeltaTime)
 		{
 			LOG("CameraDistance: %f, Location: %s, Rotation: %s", 
 				CameraDistance, *CurrentLocation.ToString(), *CurrentRotation.ToString());
+
+			LOG("Update Transform - CenteringOffset: %s, AlignmentOffset: %s", *CenteringOffset.ToString(), *AlignmentOffset.ToString());
+			LOG("Current Location: %s, Target Location: %s", *CurrentLocation.ToString(), *NewLocation.ToString());
+
 		}
 	}
 }
@@ -209,7 +249,8 @@ void UDaInspectableComponent::PlaceDetailMeshInView()
     {
         FVector CameraLocation;
         FRotator CameraRotation;
-        PlayerController->PlayerCameraManager->GetCameraViewPoint(CameraLocation, CameraRotation);
+        //PlayerController->PlayerCameraManager->GetCameraViewPoint(CameraLocation, CameraRotation);
+    	PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
 
         float FOV = PlayerController->PlayerCameraManager->GetFOVAngle();
         float FOVRads = FMath::DegreesToRadians(FOV * 0.5f);
@@ -232,44 +273,55 @@ void UDaInspectableComponent::PlaceDetailMeshInView()
     	// Get bounds of just the mesh local space now to caclulate centering offset
     	MeshBounds = GetHierarchyBounds(DetailedMeshComponent, true);
     	CenteringOffset = MeshBounds.Origin * DetailedMeshComponent->GetComponentScale();
+
+    	if (CVarInspectDebug.GetValueOnGameThread())
+    	{
+    		LOG("PlaceDetailMeshInView - CurrentAlignment: %d", static_cast<int>(CurrentAlignment));
+    		LOG("AlignmentShiftMultiplier: %f", AlignmentShiftMultiplier);
+    		LOG("Initial placement - Scale: %f, Distance: %f", ScaleFactor, CameraDistance);
+    	}
     	
-        // Handle alignment
-        if (CurrentAlignment != EInspectAlignment::Center)
-        {
-            FVector2D ViewportSize;
-            if (GEngine && GEngine->GameViewport)
-            {
-                GEngine->GameViewport->GetViewportSize(ViewportSize);
-                float AspectRatio = ViewportSize.X / ViewportSize.Y;
-                float ViewportWidth = ViewportHeightWorldUnits * AspectRatio;
-
-                FVector AlignmentOffset = FVector::ZeroVector;
-                switch (CurrentAlignment)
-                {
-                case EInspectAlignment::Left:
-                    AlignmentOffset = CameraRotation.Quaternion().GetRightVector() * (ViewportWidth * AlignmentShiftMultiplier);
-                    break;
-                case EInspectAlignment::Right:
-                    AlignmentOffset = -CameraRotation.Quaternion().GetRightVector() * (ViewportWidth * AlignmentShiftMultiplier);
-                    break;
-                }
-                CenteringOffset += AlignmentOffset;
-            }
-        }
-
-        if (CVarInspectDebug.GetValueOnGameThread())
-        {
-            UE_LOG(LogTemp, Log, TEXT("Initial placement - Scale: %f, Distance: %f"), 
-                ScaleFactor, CameraDistance);
-        }
-
-        CurrentLocation = DetailedMeshComponent->GetComponentLocation();
-        CurrentRotation = DetailedMeshComponent->GetComponentRotation();
-        bIsInspecting = true;
+    	AlignmentOffset = CalculateAlignmentOffset(CameraRotation, CameraDistance);
+    	
+    	CurrentLocation = DetailedMeshComponent->GetComponentLocation() + CenteringOffset + AlignmentOffset;
+    	CurrentRotation = DetailedMeshComponent->GetComponentRotation();
+    	bIsInspecting = true;
         
         OnInspectStateChanged.Broadcast(GetOwner(), InspectingPawn, true);
     }
 }
+
+FVector UDaInspectableComponent::CalculateAlignmentOffset(const FRotator& CameraRotation, float CurrentCameraDistance)
+{
+	if (CurrentAlignment == EInspectAlignment::Center)
+		return FVector::ZeroVector;
+
+	if (GEngine && GEngine->GameViewport)
+	{
+		FVector2D ViewportSize;
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+		float AspectRatio = ViewportSize.X / ViewportSize.Y;
+        
+		APlayerController* PlayerController = InspectingPawn->GetLocalViewingPlayerController();
+		float FOV = PlayerController->PlayerCameraManager->GetFOVAngle();
+        
+		// Calculate the viewport width in world units at the current camera distance
+		float ViewportWidthAtDistance = 2.0f * CurrentCameraDistance * 
+			FMath::Tan(FMath::DegreesToRadians(FOV * 0.5f)) * AspectRatio;
+
+		// Calculate offset direction
+		FVector OffsetDirection = CameraRotation.Quaternion().GetRightVector();
+		if (CurrentAlignment == EInspectAlignment::Left)
+		{
+			OffsetDirection = -OffsetDirection;
+		}
+
+		return OffsetDirection * (ViewportWidthAtDistance * AlignmentShiftMultiplier);
+	}
+    
+	return FVector::ZeroVector;
+}
+
 
 void UDaInspectableComponent::RotateDetailedMesh(float DeltaPitch, float DeltaYaw)
 {

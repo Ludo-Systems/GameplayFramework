@@ -24,10 +24,25 @@ class GAMEPLAYFRAMEWORK_API UDaInspectableComponent : public UActorComponent
 public:
 	UDaInspectableComponent();
 
-	// Core inspection functionality
-	UFUNCTION(BlueprintCallable, Category = "Inspect")
-	void Inspect(APawn* InstigatorPawn, float ViewportPercentage = 0.5f, EInspectAlignment Alignment = EInspectAlignment::Center);
+	/** Begins inspection using current settings. Will use default settings if ConfigureInspection() 
+	 * wasn't called first.
+	 * @param InstigatorPawn The pawn that initiated the inspection
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Inspect", 
+		meta=(DisplayName="Start Inspection",
+			Tooltip="Begins inspection using current or default settings"))
+	void Inspect(APawn* InstigatorPawn);
 
+	// Optional configuration function - call before Inspect() to override defaults
+	UFUNCTION(BlueprintCallable, Category = "Inspect", 
+		meta=(DisplayName="Configure Inspection Settings"))
+	void ConfigureInspection(float NewViewportPercentage, EInspectAlignment NewAlignment);
+
+	// Runtime adjustment
+	UFUNCTION(BlueprintCallable, Category = "Inspect|Runtime Adjustment",
+		meta=(DisplayName="Change Inspection Alignment"))
+	void SetAlignment(EInspectAlignment NewAlignment);
+	
 	UFUNCTION(BlueprintCallable, Category = "Inspect")
 	void HideDetailedMesh();
 
@@ -36,10 +51,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inspect")
 	void ZoomDetailedMesh(float DeltaZoom);
-
+	
 	UPROPERTY(BlueprintAssignable, Category="Inspect")
 	FOnInspectStateChanged OnInspectStateChanged;
-
+	
 	FBoxSphereBounds GetHierarchyBounds(USceneComponent* RootComponent, bool bMeshLocalSpace);
 	
 protected:
@@ -50,10 +65,13 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
 	bool bShowDetailAsPreview = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
+	EInspectAlignment DefaultAlignment = EInspectAlignment::Center;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
-	float ViewportPercentage = 0.6f;
-
+	float DefaultViewportPercentage = 0.6f;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
 	float CameraDistanceMultiplier = 1.2f;
 
@@ -73,9 +91,6 @@ protected:
 	float RotationSmoothingSpeed = 50.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
-	EInspectAlignment InspectAlignment = EInspectAlignment::Center;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inspect")
 	float AlignmentShiftMultiplier = 0.2f;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inspect")
@@ -86,6 +101,7 @@ private:
 	float CurrentViewportPercentage;
 	EInspectAlignment CurrentAlignment;
 	FTransform BaseDetailMeshTransform;
+	FVector AlignmentOffset = FVector::ZeroVector;
 
 	// Mesh properties
 	float CameraDistance;
@@ -104,6 +120,7 @@ private:
 	// Utility functions from original class
 	void UpdateMeshTransform(float DeltaTime);
 	void PlaceDetailMeshInView();
+	FVector CalculateAlignmentOffset(const FRotator& CameraRotation, float CurrentCameraDistance);
 
 	// Cache for mesh components
 	UPROPERTY(Transient, DuplicateTransient)
