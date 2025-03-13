@@ -43,6 +43,12 @@ void ADAAICharacter_NPC::UpgradeAttribute(const FGameplayTag& AttributeTag, int3
 	AbilitySystemComponent->UpgradeAttribute(AttributeTag, Amount);
 }
 
+void ADAAICharacter_NPC::ResetDefaultAttributes()
+{
+	if (DefaultAttributes)
+		ApplyEffectToSelf(DefaultAttributes, 1.f);
+}
+
 void ADAAICharacter_NPC::InitAbilitySystem()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);

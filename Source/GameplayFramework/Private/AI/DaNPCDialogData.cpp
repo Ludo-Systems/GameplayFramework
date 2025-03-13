@@ -6,8 +6,7 @@
 UDaNPCDialogData::UDaNPCDialogData()
 	: CurrentEmotionState(Neutral),
 	CurrentMotivationState(Unspecified),
-	CurrentRelationshipState(Unknown),
-	CurrentNegotiationState(NotStarted)
+	CurrentRelationshipState(Unknown)
 {
 	
 }

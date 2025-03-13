@@ -103,7 +103,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialog" )
 	TEnumAsByte<EDialogRelationshipStateEnum> CurrentRelationshipState;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialog" )
-	TEnumAsByte<EDialogNegotiationStateEnum> CurrentNegotiationState;
 };

@@ -54,6 +54,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void UpgradeAttribute(const FGameplayTag& AttributeTag, int32 Amount);
+
+	UFUNCTION(BlueprintCallable)
+	void ResetDefaultAttributes();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AI")
 	TObjectPtr<UDaPawnData> PawnData;
