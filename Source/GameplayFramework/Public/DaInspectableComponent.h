@@ -102,6 +102,7 @@ private:
 	EInspectAlignment CurrentAlignment;
 	FTransform BaseDetailMeshTransform;
 	FVector AlignmentOffset = FVector::ZeroVector;
+	FRotator LastCameraRotation;  // Cache last camera rotation to detect significant changes
 
 	// Mesh properties
 	float CameraDistance;

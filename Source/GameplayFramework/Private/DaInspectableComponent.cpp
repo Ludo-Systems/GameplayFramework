@@ -176,6 +176,10 @@ void UDaInspectableComponent::UpdateMeshTransform(float DeltaTime)
 	if (!DetailedMeshComponent || !InspectingPawn)
 		return;
 
+	// Cache old values to check for significant changes
+	float OldCameraDistance = CameraDistance;
+	FRotator OldCameraRotation = LastCameraRotation;
+
 	// Update rotation
 	FRotator NewRotation = CurrentRotation;
 	NewRotation.Pitch += InputDeltaPitch;
@@ -183,12 +187,8 @@ void UDaInspectableComponent::UpdateMeshTransform(float DeltaTime)
 
 	// Update camera distance
 	CameraDistance = FMath::Clamp(CameraDistance - InputDeltaZoom * 10.0f, MinCameraDistance, MaxCameraDistance);
-
-	// Reset input deltas
-	InputDeltaPitch = 0.0f;
-	InputDeltaYaw = 0.0f;
-	InputDeltaZoom = 0.0f;
-
+	
+	// Get current camera info
 	APlayerController* PlayerController = InspectingPawn->GetLocalViewingPlayerController();
 	if (PlayerController && PlayerController->PlayerCameraManager)
 	{
@@ -196,14 +196,22 @@ void UDaInspectableComponent::UpdateMeshTransform(float DeltaTime)
 		FRotator CameraRotation;
 		//PlayerController->PlayerCameraManager->GetCameraViewPoint(CameraLocation, CameraRotation);
 		PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
-		FVector ForwardVector = CameraRotation.Vector();
 
-		// Only recalculate alignment offset when camera distance changes
-		if (CurrentAlignment != EInspectAlignment::Center)
+		// Check if we need to recalculate alignment
+		bool bNeedsAlignmentUpdate = 
+			CurrentAlignment != EInspectAlignment::Center && 
+			(
+				!FMath::IsNearlyEqual(OldCameraDistance, CameraDistance, 0.1f) ||  // Distance changed
+				!CameraRotation.Equals(OldCameraRotation, 1.0f)                     // Rotation changed by more than 1 degree
+			);
+
+		if (bNeedsAlignmentUpdate)
 		{
 			AlignmentOffset = CalculateAlignmentOffset(CameraRotation, CameraDistance);
+			LastCameraRotation = CameraRotation;  // Cache for next frame
 		}
 		
+		FVector ForwardVector = CameraRotation.Vector();
 		// Calculate new mesh location with offset
 		FVector ViewportPosition = CameraLocation + ForwardVector * (CameraDistance + InitialCameraDistanceOffset);
 		FVector NewLocation = ViewportPosition - CenteringOffset + AlignmentOffset;
@@ -228,6 +236,11 @@ void UDaInspectableComponent::UpdateMeshTransform(float DeltaTime)
 
 		}
 	}
+
+	// Reset input deltas
+	InputDeltaPitch = 0.0f;
+	InputDeltaYaw = 0.0f;
+	InputDeltaZoom = 0.0f;
 }
 
 void UDaInspectableComponent::PlaceDetailMeshInView()
