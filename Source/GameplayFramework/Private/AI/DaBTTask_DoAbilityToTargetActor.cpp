@@ -24,12 +24,6 @@ EBTNodeResult::Type UDaBTTask_DoAbilityToTargetActor::ExecuteTask(UBehaviorTreeC
 	AAIController* MyController = OwnerComp.GetAIOwner();
 	if (ensure(MyController))
 	{
-		ACharacter* Character = Cast<ACharacter>(MyController->GetPawn());
-		if (Character == nullptr)
-		{
-			return EBTNodeResult::Failed;
-		}
-
 		AActor* TargetActor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TargetActorKeyName));
 		if (TargetActor == nullptr)
 		{

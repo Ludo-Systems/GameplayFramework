@@ -8,25 +8,14 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+
 void ADaAIController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UBlackboardComponent* BB = GetBlackboardComponent();
-
-	// Set the ability system component of this pawn so its available in Blackboard
-	APawn* ControlledActor = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (ControlledActor)
-	{
-		if (IAbilitySystemInterface* ASCCharacter = Cast<IAbilitySystemInterface>(ControlledActor))
-		{
-			UAbilitySystemComponent* ASC =  ASCCharacter->GetAbilitySystemComponent();
-			if (BB)
-			{
-				BB->SetValueAsObject("ASC", ASC);
-			}
-		}
-	}
+	// Will only work from BeginPlay if AI actor is spawned in the world, not placed in map
+	// ASC Key will be NULL in that case.
+	AddPlayerPawnAbilitySystemComponentToBlackboard();
 	
 	if (bAutoRunBehaviorTree && ensureMsgf(BehaviorTree, TEXT("Behavior Tree is nullptr! Please assign BehaviorTree in your AI Controller")))
 	{
@@ -34,3 +23,40 @@ void ADaAIController::BeginPlay()
 	}
 }
 
+ADaAIController::ADaAIController()
+{
+	TargetActorKeyName = "TargetActor";
+	AbilitySystemComponentKeyName = "ASC";
+	bAutoRunBehaviorTree = true;
+	bHasAddedAbilitySystemComponentToBlackboard = false;
+}
+
+void ADaAIController::AddPlayerPawnAbilitySystemComponentToBlackboard()
+{
+	UBlackboardComponent* BB = GetBlackboardComponent();
+	if (BB && !bHasAddedAbilitySystemComponentToBlackboard)
+	{
+		APawn* ControlledActor = UGameplayStatics::GetPlayerPawn(this, 0);
+		if (ControlledActor)
+		{
+			if (IAbilitySystemInterface* ASCCharacter = Cast<IAbilitySystemInterface>(ControlledActor))
+			{
+				UAbilitySystemComponent* ASC =  ASCCharacter->GetAbilitySystemComponent();
+				BB->SetValueAsObject(AbilitySystemComponentKeyName, ASC);
+				bHasAddedAbilitySystemComponentToBlackboard = true;
+			}
+		}
+	}
+}
+
+void ADaAIController::AddTargetActorToBlackBoard(AActor* TargetActor)
+{
+	UBlackboardComponent* BB = GetBlackboardComponent();
+	if (BB && !bHasAddedAbilitySystemComponentToBlackboard)
+	{
+		if (TargetActor)
+		{
+			BB->SetValueAsObject(TargetActorKeyName, TargetActor);
+		}
+	}
+}

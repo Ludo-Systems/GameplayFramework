@@ -131,6 +131,11 @@ void ADaCharacterBase::InitAbilitySystem()
 	AttributeComponent->OnDeathFinished.AddDynamic(this, &ThisClass::OnDeathFinished);
 }
 
+void ADaCharacterBase::UpgradeAttribute(const FGameplayTag& AttributeTag, int32 Amount)
+{
+	AbilitySystemComponent->UpgradeAttribute(AttributeTag, Amount);
+}
+
 void ADaCharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level) const
 {
 	check(IsValid(GetAbilitySystemComponent()));
@@ -149,10 +154,15 @@ void ADaCharacterBase::InitDefaultAttributes() const
 	{
 		LOG_WARNING("No DefaultVitalAttributes GameplayEffect set on Character: %s", *GetNameSafe(this));	
 	}
-	
-	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
-	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
-	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
+
+	if (DefaultPrimaryAttributes)
+		ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
+
+	if (DefaultSecondaryAttributes)
+		ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
+
+	if (DefaultVitalAttributes)
+		ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
 }
 
 void ADaCharacterBase::ShowSetHealthBarWidget()
