@@ -31,6 +31,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetMovingItem(AActor* Item);
+
+	virtual void SaveProgress_Implementation(const FName& CheckpointTag) override;
+	void LoadProgress();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "AbilitySystem")
+	void OnCharacterAbilitiesLoaded();
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")

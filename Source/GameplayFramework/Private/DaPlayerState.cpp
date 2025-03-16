@@ -109,8 +109,11 @@ void ADaPlayerState::InitCharacterAttributes(bool bReset) const
 	{
 		Character->InitPlayerHUD();
 
+		// Notify Blueprints they can activate abilites or whatever
+		Character->OnCharacterAbilitiesLoaded();
+		
 		if (bReset)
-			Character->InitDefaultAttributes();
+			Character->LoadProgress();
 	}
 	
 }

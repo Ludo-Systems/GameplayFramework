@@ -10,7 +10,7 @@
 #include "DaSaveGameSettings.h"
 #include "GameplayFramework.h"
 #include "GameFramework/GameStateBase.h"
-#include "DaInteractableInterface.h"
+#include "DaSaveInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
@@ -18,33 +18,13 @@ void UDaSaveGameSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	const UDaSaveGameSettings* SGSettings = GetDefault<UDaSaveGameSettings>();
+	// TODO: Setup Defaults in settings so they can be done centrally
+	// const UDaSaveGameSettings* SGSettings = GetDefault<UDaSaveGameSettings>();
 	// Access defaults from DefaultGame.ini
-	CurrentSlotName = SGSettings->SaveSlotName;
-
-	// Make sure its loaded into memeory. .Get() Only resolves if already loaded previously elsewhere in code
-	UDataTable* DummyTable = SGSettings->DummyTablePath.LoadSynchronous();
-	// Dummytable->GetAllRows() // not needed currently, just an example
+	//LoadSlotName = SGSettings->SaveSlotName;
 }
 
-void UDaSaveGameSubsystem::SaveSlotData(const FString& LoadSlotName, int32 SlotIndex,
-	TFunction<void(UDaSaveGame*)> SaveDataCallback)
-{
-	// TODO: Use CurrentSlotName?? Its set from UDaSaveGameSettings
-	if (UGameplayStatics::DoesSaveGameExist(LoadSlotName, SlotIndex))
-	{
-		UGameplayStatics::DeleteGameInSlot(LoadSlotName, SlotIndex);
-	}
-
-	USaveGame* SaveGameObject = UGameplayStatics::CreateSaveGameObject(UDaSaveGame::StaticClass());
-	UDaSaveGame* LoadScreenSaveGame = Cast<UDaSaveGame>(SaveGameObject);
-
-	// Callback to let anyone set data before we save to disk
-	SaveDataCallback(LoadScreenSaveGame);
-	
-	UGameplayStatics::SaveGameToSlot(LoadScreenSaveGame, LoadSlotName, SlotIndex);
-}
-
+/* Static */
 UDaSaveGame* UDaSaveGameSubsystem::GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const
 {
 	USaveGame* SaveGameObject = nullptr;
@@ -54,12 +34,21 @@ UDaSaveGame* UDaSaveGameSubsystem::GetSaveSlotData(const FString& SlotName, int3
 	}
 	else
 	{
-		SaveGameObject = UGameplayStatics::CreateSaveGameObject(UDaSaveGame::StaticClass());
+		TSubclassOf<UDaSaveGame> SaveGameClass = UDaSaveGame::StaticClass();
+		UDaGameInstanceBase* GI = Cast<UDaGameInstanceBase>(GetGameInstance());
+		if (GI->SaveGameClass != nullptr)
+		{
+			SaveGameClass = GI->SaveGameClass;
+		} 
+		SaveGameObject = UGameplayStatics::CreateSaveGameObject(SaveGameClass);
+		//LogOnScreen(GetWorld(), FString::Printf(TEXT("DaSaveGameSubsystem: Created SaveGame: %s"), *GetNameSafe(SaveGameObject)));
 	}
+
 	UDaSaveGame* SaveGame = Cast<UDaSaveGame>(SaveGameObject);
 	return SaveGame;
 }
 
+/* Static */
 void UDaSaveGameSubsystem::DeleteSlot(const FString& SlotName, int32 SlotIndex)
 {
 	if (UGameplayStatics::DoesSaveGameExist(SlotName, SlotIndex))
@@ -68,7 +57,7 @@ void UDaSaveGameSubsystem::DeleteSlot(const FString& SlotName, int32 SlotIndex)
 	}
 }
 
-UDaSaveGame* UDaSaveGameSubsystem::RetrieveInGameSaveData()
+UDaSaveGame* UDaSaveGameSubsystem::RetrieveInGameSaveData() const
 {
 	UDaGameInstanceBase* GI = Cast<UDaGameInstanceBase>(GetGameInstance());
 
@@ -78,19 +67,51 @@ UDaSaveGame* UDaSaveGameSubsystem::RetrieveInGameSaveData()
 	return GetSaveSlotData(InGameLoadSlotName, InGameLoadSlotIndex);
 }
 
-void UDaSaveGameSubsystem::SaveInGameProgressData(UDaSaveGame* SaveObject)
+/* Save */
+void UDaSaveGameSubsystem::SaveInGameProgressData(TFunction<void(UDaSaveGame*)> SaveDataCallback)
 {
 	UDaGameInstanceBase* GI = Cast<UDaGameInstanceBase>(GetGameInstance());
 
 	const FString InGameLoadSlotName = GI->LoadSlotName;
 	const int32 InGameLoadSlotIndex = GI->LoadSlotIndex;
-	GI->PlayerStartTag = SaveObject->PlayerStartTag;
+	CurrentSaveGame = GetSaveSlotData(InGameLoadSlotName, InGameLoadSlotIndex);
 
-	UGameplayStatics::SaveGameToSlot(SaveObject, InGameLoadSlotName, InGameLoadSlotIndex);
+	SaveDataCallback(CurrentSaveGame);
+
+	// Save world and everything else
+	WriteSaveGame();
+	
+	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, InGameLoadSlotName, InGameLoadSlotIndex);
+	OnSaveGameWritten.Broadcast(CurrentSaveGame);
+}
+
+void UDaSaveGameSubsystem::DebugLogCurrentSaveGameInfo(const FString& AdditionalLoggingText)
+{
+	//LogOnScreen(this, FString::Printf(TEXT("DaSaveGameSubsystem: SaveGame: %s, %s"), *GetNameSafe(CurrentSaveGame), *AdditionalLoggingText));
+}
+
+void UDaSaveGameSubsystem::SaveSlotData(const FString& LoadSlotName, int32 SlotIndex, bool bClearExisting,
+                                        TFunction<void(UDaSaveGame*)> SaveDataCallback)
+{
+	if (UGameplayStatics::DoesSaveGameExist(LoadSlotName, SlotIndex))
+	{
+		if (bClearExisting)
+		{
+			UGameplayStatics::DeleteGameInSlot(LoadSlotName, SlotIndex);
+		}
+	}
+
+	// Load SaveGame Data from slot, if it doesn't exist create new one, either way save it as current
+	CurrentSaveGame = GetSaveSlotData(LoadSlotName, SlotIndex);
+
+	SaveDataCallback(CurrentSaveGame);
+	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, LoadSlotName, SlotIndex);
+	OnSaveGameWritten.Broadcast(CurrentSaveGame);
 }
 
 void UDaSaveGameSubsystem::HandleStartingNewPlayer(AController* NewPlayer)
 {
+	
 	ADaPlayerState* PS = NewPlayer->GetPlayerState<ADaPlayerState>();
 	if (PS)
 	{
@@ -159,9 +180,9 @@ void UDaSaveGameSubsystem::WriteSaveGame()
 	for (FActorIterator It(GetWorld()); It; ++It)
 	{
 		AActor* Actor = *It;
-		// Only interested in our 'interactable actors', skip actors that are being destroyed
-		// Note: You might instead use a dedicated SavableObject interface for Actors you want to save instead of re-using GameplayInterface
-		if (Actor->IsPendingKillPending() || !Actor->Implements<UDaInteractableInterface>())
+		
+		// Only interested in our 'actors with a saveable interface', skip actors that are being destroyed
+		if (Actor->IsPendingKillPending() || !Actor->Implements<UDaSaveInterface>())
 		{
 			continue;
 		}
@@ -181,20 +202,15 @@ void UDaSaveGameSubsystem::WriteSaveGame()
 
 		CurrentSaveGame->SavedActors.Add(ActorData);
 	}
-
-	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, CurrentSlotName, 0);
-
-	OnSaveGameWritten.Broadcast(CurrentSaveGame);
 }
 
-void UDaSaveGameSubsystem::LoadSaveGame(FString InSlotName)
+void UDaSaveGameSubsystem::LoadSaveGame(FString InSlotName, int32 SlotIndex)
 {
 	// Update slot name first if specified, otherwise keeps default name
-	SetSlotName(InSlotName);
 
-	if (UGameplayStatics::DoesSaveGameExist(CurrentSlotName, 0))
+	if (UGameplayStatics::DoesSaveGameExist(InSlotName, SlotIndex))
 	{
-		CurrentSaveGame = Cast<UDaSaveGame>(UGameplayStatics::LoadGameFromSlot(CurrentSlotName, 0));
+		CurrentSaveGame = Cast<UDaSaveGame>(UGameplayStatics::LoadGameFromSlot(InSlotName, SlotIndex));
 		if (CurrentSaveGame == nullptr)
 		{
 			LOG("Failed to load SaveGame Data.");
@@ -202,14 +218,14 @@ void UDaSaveGameSubsystem::LoadSaveGame(FString InSlotName)
 		}
 
 		LOG("Loaded SaveGame Data.");
-
-
+		
 		// Iterate the entire world of actors
 		for (FActorIterator It(GetWorld()); It; ++It)
 		{
 			AActor* Actor = *It;
+			
 			// Only interested in our 'gameplay actors'
-			if (!Actor->Implements<UDaInteractableInterface>())
+			if (!Actor->Implements<UDaSaveInterface>())
 			{
 				continue;
 			}
@@ -218,8 +234,11 @@ void UDaSaveGameSubsystem::LoadSaveGame(FString InSlotName)
 			{
 				if (ActorData.ActorName == Actor->GetFName())
 				{
-					Actor->SetActorTransform(ActorData.Transform);
-
+					if (IDaSaveInterface::Execute_ShouldLoadTransform(Actor))
+					{
+						Actor->SetActorTransform(ActorData.Transform);
+					}
+					
 					FMemoryReader MemReader(ActorData.ByteData);
 
 					FObjectAndNameAsStringProxyArchive Ar(MemReader, true);
@@ -227,9 +246,7 @@ void UDaSaveGameSubsystem::LoadSaveGame(FString InSlotName)
 					// Convert binary array back into actor's variables
 					Actor->Serialize(Ar);
 
-					IDaInteractableInterface::Execute_OnActorLoaded(Actor);
-
-					break;
+					IDaSaveInterface::Execute_LoadActor(Actor);
 				}
 			}
 		}
@@ -238,19 +255,12 @@ void UDaSaveGameSubsystem::LoadSaveGame(FString InSlotName)
 	}
 	else
 	{
-		CurrentSaveGame = Cast<UDaSaveGame>(UGameplayStatics::CreateSaveGameObject(UDaSaveGame::StaticClass()));
-
-		LOG("Created New SaveGame Data.");
+		TSubclassOf<UDaSaveGame> SaveGameClass = UDaSaveGame::StaticClass();
+		UDaGameInstanceBase* GI = Cast<UDaGameInstanceBase>(GetGameInstance());
+		if (GI->SaveGameClass != nullptr)
+		{
+			SaveGameClass = GI->SaveGameClass;
+		} 
+		CurrentSaveGame = Cast<UDaSaveGame>(UGameplayStatics::CreateSaveGameObject(SaveGameClass));
 	}
-}
-
-void UDaSaveGameSubsystem::SetSlotName(FString NewSlotName)
-{
-	// Ignore empty name
-	if (NewSlotName.Len() == 0)
-	{
-		return;
-	}
-
-	CurrentSlotName = NewSlotName;
 }

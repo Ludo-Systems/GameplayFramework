@@ -45,11 +45,6 @@ FText ADaItemChest::GetInteractText_Implementation(APawn* InstigatorPawn)
 	}
 }
 
-void ADaItemChest::OnActorLoaded_Implementation()
-{
-	OnRep_LidOpened();
-}
-
 void ADaItemChest::HighlightActor_Implementation()
 {
 	bHighlighted = true;
@@ -64,6 +59,16 @@ void ADaItemChest::UnHighlightActor_Implementation()
 	bHighlighted = false;
 	BaseMesh->SetRenderCustomDepth(false);
 	LidMesh->SetRenderCustomDepth(false);
+}
+
+void ADaItemChest::LoadActor_Implementation()
+{
+	OnRep_LidOpened();
+}
+
+bool ADaItemChest::ShouldLoadTransform_Implementation()
+{
+	return true;
 }
 
 void ADaItemChest::OnRep_LidOpened()

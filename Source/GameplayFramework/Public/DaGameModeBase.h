@@ -28,20 +28,26 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level")
 	TMap<FString, TSoftObjectPtr<UWorld>> Maps;
-
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SaveGame")
 	TSubclassOf<UDaSaveGameSubsystem> SaveGameSubsystemClass;
+
+	UPROPERTY()
+	UDaSaveGameSubsystem* SaveGameSubsystem;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerStart")
 	FName DefaultPlayerStartTag;
 	
 	UFUNCTION(BlueprintCallable, Category = "Level")
 	void TravelToMap(const FString& MapName);
+
+	UFUNCTION(BlueprintCallable, Category = "Level")
+	void TravelToMapWithOptions(const FString& MapName, bool bResetOptions, const FString& Options);
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	void WriteSaveGame();
 	
 protected:
-	
-	UPROPERTY()
-	UDaSaveGameSubsystem* SaveGameSubsystem;
 	
 	// if true will auto respawn if false, let subclasses handle how we respawn or end, example might be go to spectator mode or start menu
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Respawn")
@@ -74,6 +80,6 @@ public:
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
 	UDaSaveGame* RetrieveInGameSaveData();
-	void SaveInGameProgressData(UDaSaveGame* SaveObject);
+	void SaveInGameProgressData(TFunction<void(UDaSaveGame*)> SaveDataCallback);
 	
 };

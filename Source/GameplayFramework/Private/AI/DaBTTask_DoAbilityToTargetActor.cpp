@@ -4,12 +4,13 @@
 #include "AI/DaBTTask_DoAbilityToTargetActor.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystemInterface.h"
 #include "AIController.h"
 
-#include "AI/DaAICharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DaAttributeComponent.h"
 #include "CoreGameplayTags.h"
+#include "GameFramework/Character.h"
 
 UDaBTTask_DoAbilityToTargetActor::UDaBTTask_DoAbilityToTargetActor()
 {
@@ -23,12 +24,6 @@ EBTNodeResult::Type UDaBTTask_DoAbilityToTargetActor::ExecuteTask(UBehaviorTreeC
 	AAIController* MyController = OwnerComp.GetAIOwner();
 	if (ensure(MyController))
 	{
-		ADaAICharacter* Character = Cast<ADaAICharacter>(MyController->GetPawn());
-		if (Character == nullptr)
-		{
-			return EBTNodeResult::Failed;
-		}
-
 		AActor* TargetActor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TargetActorKeyName));
 		if (TargetActor == nullptr)
 		{
@@ -39,11 +34,14 @@ EBTNodeResult::Type UDaBTTask_DoAbilityToTargetActor::ExecuteTask(UBehaviorTreeC
 		{
 			return EBTNodeResult::Failed;
 		}
-		
-		UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent();
-		if(ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(AbilityToExecute)))
+
+		if (IAbilitySystemInterface* TargetActorWithASC = Cast<IAbilitySystemInterface>(TargetActor))
 		{
-			return EBTNodeResult::Succeeded;
+			UAbilitySystemComponent* ASC = TargetActorWithASC->GetAbilitySystemComponent();
+			if(ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(AbilityToExecute)))
+			{
+				return EBTNodeResult::Succeeded;
+			}
 		}
 	}
 

@@ -28,17 +28,23 @@ public:
 	// Set up Ability system component and attribute component which contains this characters Vital attributes
 	virtual void InitAbilitySystem();
 
-	// Fires off the DefaultPrimaryAttributes GameplayEffect which should be setup to initialize any attributes passed in to the character's pawn data AbilitySet
-	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level) const;
-	void InitDefaultAttributes() const;
+	// fire off an event based gameplay ability of attribute tag and amount. Ability needs to have been previously activated and listening for GameplayEvent
+	UFUNCTION(BlueprintCallable)
+	void UpgradeAttribute(const FGameplayTag& AttributeTag, int32 Amount);
 
+	// Fires off the DefaultPrimaryAttributes GameplayEffect which should be setup to initialize any attributes passed in to the character's pawn data AbilitySet
+	UFUNCTION(BlueprintCallable)
+	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level) const;
+
+	// Resets all default attributes using default gameplay effects for primary, secondary and vital stats (if available)
+	UFUNCTION(BlueprintCallable)
+	void InitDefaultAttributes() const;
+	
 	virtual UAnimMontage* GetAttackMontage_Implementation() override;
 	
 	// Will check the default mesh for ProjectileSocketName and return that. Subclasses can override and use their own mesh like a weapon if they have one.
 	virtual FVector GetProjectileSocketLocation_Implementation() override;
 
-	virtual void SaveProgress_Implementation(const FName& CheckpointTag) override;
-	
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")

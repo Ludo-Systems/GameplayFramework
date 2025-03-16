@@ -48,6 +48,7 @@ namespace CoreGameplayTags
 	DA_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_ID);
 	DA_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Type);
 	DA_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Type_AI);
+	DA_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Type_AI_NPC);
 	DA_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Type_Player);
 	DA_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_Type_Player_ThirdPerson);
 
@@ -68,8 +69,11 @@ namespace CoreGameplayTags
 	DA_DECLARE_GAMEPLAY_TAG_EXTERN(AttributesVitalMetaDamage);
 	DA_DECLARE_GAMEPLAY_TAG_EXTERN(AttributesVitalMetaHealing);
 	DA_DECLARE_GAMEPLAY_TAG_EXTERN(AttributesStats);
+	DA_DECLARE_GAMEPLAY_TAG_EXTERN(AttributesStatsPlayer);
 	DA_DECLARE_GAMEPLAY_TAG_EXTERN(AttributesStatsPrimary);
+	DA_DECLARE_GAMEPLAY_TAG_EXTERN(AttributesStatsPrimaryPlayer);
 	DA_DECLARE_GAMEPLAY_TAG_EXTERN(AttributesStatsSecondary);
+	DA_DECLARE_GAMEPLAY_TAG_EXTERN(AttributesStatsSecondaryPlayer);
 
 	DA_DECLARE_GAMEPLAY_TAG_EXTERN(Inventory);
 	DA_DECLARE_GAMEPLAY_TAG_EXTERN(Inventory_Master);

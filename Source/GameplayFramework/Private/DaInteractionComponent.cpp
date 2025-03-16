@@ -21,7 +21,7 @@ UDaInteractionComponent::UDaInteractionComponent()
 	TraceRadius = 30.0f;
 	TraceDistance = 500.0f;
 
-	CollisionChannel = ECC_WorldDynamic;
+	CollisionChannel = TRACE_INTERACT;
 }
 
 void UDaInteractionComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -70,7 +70,7 @@ void UDaInteractionComponent::CursorTrace()
 	
 	APawn* MyPawn = CastChecked<APawn>(GetOwner());
 	APlayerController* PlayerController = CastChecked<APlayerController>(MyPawn->Controller);
-	PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	PlayerController->GetHitResultUnderCursor(CollisionChannel, false, CursorHit);
 	if (!CursorHit.bBlockingHit) return;
 
 	// Clear Focused Actor before hit
@@ -179,10 +179,20 @@ void UDaInteractionComponent::ToggleWidgetOnFocusedActor(bool bDebugDraw)
 		// focus effect - loads a custom widget onto interactable
 		if (FocusedActor)
 		{
-			// Lazily load the widget when its first needed
-			if (DefaultWidgetInstance == nullptr && ensure(DefaultWidgetClass))
+			TSubclassOf<UDaWorldUserWidget> WidgetClassToSpawn = IDaInteractableInterface::Execute_GetInteractWidget(FocusedActor);
+			if (WidgetClassToSpawn == nullptr)
+				WidgetClassToSpawn = DefaultWidgetClass;
+
+			if (DefaultWidgetInstance && DefaultWidgetInstance->GetClass() != WidgetClassToSpawn)
 			{
-				DefaultWidgetInstance = CreateWidget<UDaWorldUserWidget>(GetWorld(), DefaultWidgetClass);
+				RemoveWidget();
+				DefaultWidgetInstance = nullptr;
+			}
+			
+			// Lazily load the widget when its first needed
+			if (DefaultWidgetInstance == nullptr && ensure(WidgetClassToSpawn))
+			{
+				DefaultWidgetInstance = CreateWidget<UDaWorldUserWidget>(GetWorld(), WidgetClassToSpawn);
 			}
 
 			if (DefaultWidgetInstance)

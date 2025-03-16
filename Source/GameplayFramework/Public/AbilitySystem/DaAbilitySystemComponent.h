@@ -40,6 +40,11 @@ public:
 	void InitAbilitiesWithPawnData(const UDaPawnData* DataAsset);
 	void ClearAbilitySets();
 
+	void UpgradeAttribute(const FGameplayTag& AttributeTag, int32 Amount);
+
+	UFUNCTION(Server, Reliable)
+	void ServerUpgradeAttribute(const FGameplayTag& AttributeTag, int32 Amount);
+	
 	void GrantSet(const UDaAbilitySet* AbilitySet);
 	
 	void AbilityInputTagPressed(const FInputActionValue& Value, const FGameplayTag& InputTag);

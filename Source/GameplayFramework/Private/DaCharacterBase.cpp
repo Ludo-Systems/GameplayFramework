@@ -95,22 +95,6 @@ FVector ADaCharacterBase::GetProjectileSocketLocation_Implementation()
 	return GetMesh()->GetSocketLocation(ProjectileSocketName);
 }
 
-void ADaCharacterBase::SaveProgress_Implementation(const FName& CheckpointTag)
-{
-
-	ADaGameModeBase* GameMode = Cast<ADaGameModeBase>(UGameplayStatics::GetGameMode(this));
-	if (GameMode)
-	{
-		UDaSaveGame* SaveData = GameMode->RetrieveInGameSaveData();
-		if (SaveData == nullptr) return;
-
-		SaveData->PlayerStartTag = CheckpointTag;
-
-		GameMode->SaveInGameProgressData(SaveData);
-	}
-
-}
-
 UAnimMontage* ADaCharacterBase::GetAttackMontage_Implementation()
 {
 	return AttackMontage;
@@ -125,7 +109,6 @@ void ADaCharacterBase::PossessedBy(AController* NewController)
 		//server
 		InitAbilitySystem();
 	}
-
 }
 
 void ADaCharacterBase::OnRep_PlayerState()
@@ -148,6 +131,11 @@ void ADaCharacterBase::InitAbilitySystem()
 	AttributeComponent->OnDeathFinished.AddDynamic(this, &ThisClass::OnDeathFinished);
 }
 
+void ADaCharacterBase::UpgradeAttribute(const FGameplayTag& AttributeTag, int32 Amount)
+{
+	AbilitySystemComponent->UpgradeAttribute(AttributeTag, Amount);
+}
+
 void ADaCharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level) const
 {
 	check(IsValid(GetAbilitySystemComponent()));
@@ -166,10 +154,15 @@ void ADaCharacterBase::InitDefaultAttributes() const
 	{
 		LOG_WARNING("No DefaultVitalAttributes GameplayEffect set on Character: %s", *GetNameSafe(this));	
 	}
-	
-	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
-	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
-	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
+
+	if (DefaultPrimaryAttributes)
+		ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
+
+	if (DefaultSecondaryAttributes)
+		ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
+
+	if (DefaultVitalAttributes)
+		ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
 }
 
 void ADaCharacterBase::ShowSetHealthBarWidget()

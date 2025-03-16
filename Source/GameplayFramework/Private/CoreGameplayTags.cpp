@@ -23,6 +23,7 @@ namespace CoreGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_ID, "Character.ID", "Base Tag for Character ID, add a new component to identify different characters to the subsystem");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type, "Character.Type", "Base Tag for Character Type, add a new component to identify different character types to the subsystem");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_AI, "Character.Type.AI", "Base AI Character Type.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_AI_NPC, "Character.Type.AI.NPC", "NPC AI Character Type.");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_Player, "Character.Type.Player", "Base Player Character Type");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_Character_Type_Player_ThirdPerson, "Character.Type.Player.ThirdPerson", "Third person perspective player character type");
 
@@ -43,8 +44,11 @@ namespace CoreGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVitalMetaDamage, "Attributes.Vital.Meta.Damage", "Damage Meta Attribute");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesVitalMetaHealing, "Attributes.Vital.Meta.Healing", "healing Meta Attribute");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStats, "Attributes.Stats", "Game specific Stats defined in game code. Should have Primary and Secondary");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsPlayer, "Attributes.Stats.Player", "Player Attribute Stats Set Identifier");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsPrimary, "Attributes.Stats.Primary", "Primary attributes specific player stats/buff attributes that can be modified directly");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsPrimaryPlayer, "Attributes.Stats.Primary.Player", "Player specific Primary attributes specific player stats/buff attributes that can be modified directly");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsSecondary, "Attributes.Stats.Secondary", "Secondary Attributes adjust or modified via calculations or modifications based on primary attribute values");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AttributesStatsSecondaryPlayer, "Attributes.Stats.Secondary.Player", "Player specific Secondary Attributes adjust or modified via calculations or modifications based on primary attribute values");
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Inventory, "Inventory", "Base Inventory Tag");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Inventory_Master, "Inventory.Master", "Base Inventory Master Tag");

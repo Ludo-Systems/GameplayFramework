@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/DaAbilitySystemComponent.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/DaAbilitySet.h"
 #include "DaPawnData.h"
 #include "AbilitySystem/Attributes/DaBaseAttributeSet.h"
@@ -133,4 +134,18 @@ void UDaAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySyste
 
 	if (TagContainer.IsValid())
 		EffectAssetTags.Broadcast(TagContainer);
+}
+
+void UDaAbilitySystemComponent::UpgradeAttribute(const FGameplayTag& AttributeTag, int32 Amount)
+{
+	ServerUpgradeAttribute(AttributeTag, Amount);
+}
+
+void UDaAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FGameplayTag& AttributeTag, int32 Amount)
+{
+	FGameplayEventData Payload;
+	Payload.EventTag = AttributeTag;
+	Payload.EventMagnitude = Amount;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActor(), AttributeTag, Payload);
 }

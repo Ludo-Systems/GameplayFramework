@@ -5,14 +5,18 @@
 
 #include "Components/CapsuleComponent.h"
 #include "AbilitySystem/DaAbilitySystemComponent.h"
-#include "DaAttributeComponent.h"
 #include "DaPlayerState.h"
 #include "CoreGameplayTags.h"
+#include "DaGameInstanceBase.h"
+#include "DaGameModeBase.h"
 #include "DaInspectableComponent.h"
 #include "DaInspectableItem.h"
 #include "DaInteractionComponent.h"
 #include "DaPlayerController.h"
+#include "DaSaveGame.h"
+#include "DaSaveGameSubsystem.h"
 #include "GameplayFramework.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/DaHUD.h"
 
 // Sets default values
@@ -47,6 +51,51 @@ void ADaCharacter::InitAbilitySystem()
 		Super::InitAbilitySystem();
 
 	}
+}
+
+void ADaCharacter::LoadProgress()
+{
+	// If SaveData->First time load in, initialize, otherwise load saved values from disk
+	ADaGameModeBase* AuraGameMode = Cast<ADaGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (AuraGameMode)
+	{
+		UDaSaveGame* SaveData = AuraGameMode->RetrieveInGameSaveData();
+		if (SaveData == nullptr) return;
+		
+		if (SaveData->bFirstTimeLoadIn)
+		{
+			InitDefaultAttributes();
+			//AddCharacterAbilities();
+		}
+		else
+		{
+			// TODO: Load from save data (remove the InitDefaultAttributes below)
+			InitDefaultAttributes();
+		}
+	}
+}
+
+void ADaCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
+{
+	if (ADaGameModeBase* GameMode = Cast<ADaGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		GameMode->SaveInGameProgressData([this, CheckpointTag](UDaSaveGame* SaveData)
+		{
+			if (CheckpointTag.IsNone() == false)
+			{
+				// Allow not resetting Checkpoint or passing in null string to not have any impact on existing save data
+				SaveData->PlayerStartTag = CheckpointTag;
+
+				// Save the player start tag in the game instance so that it can be used to load the player start on the client
+				UDaGameInstanceBase* GameInstance = Cast<UDaGameInstanceBase>(GetGameInstance());
+				GameInstance->PlayerStartTag = CheckpointTag;
+			}
+
+			SaveData->bFirstTimeLoadIn = false;
+		});
+	}
+
+	Super::SaveProgress_Implementation(CheckpointTag);
 }
 
 void ADaCharacter::PrimaryInteraction() const

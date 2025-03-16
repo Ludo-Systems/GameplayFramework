@@ -4,7 +4,9 @@
 #include "DaCharacter.h"
 #include "DaGameInstanceBase.h"
 #include "DaPlayerState.h"
+#include "DaSaveGame.h"
 #include "DaSaveGameSubsystem.h"
+#include "GameplayFramework.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -21,19 +23,31 @@ ADaGameModeBase::ADaGameModeBase(const FObjectInitializer& ObjectInitializer)
 void ADaGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
+	LOG_WARNING("ADaGameModeBase::InitGame Options: %s", *Options);
 
-	if (UGameInstanceSubsystem* GIS = GetGameInstance()->GetSubsystemBase(SaveGameSubsystemClass))
+	if (UDaGameInstanceBase* GameInstance = Cast<UDaGameInstanceBase>(GetGameInstance()))
 	{
-		SaveGameSubsystem = Cast<UDaSaveGameSubsystem>(GIS);
-	}
+		SaveGameSubsystem = Cast<UDaSaveGameSubsystem>(GameInstance->GetSubsystemBase(SaveGameSubsystemClass));
+		if (SaveGameSubsystem)
+		{
+			FString SelectedSaveSlot = UGameplayStatics::ParseOption(Options, "SaveGame");
+			if (!SelectedSaveSlot.IsEmpty())
+			{
+				LogOnScreen(this, FString::Printf(TEXT("Loading SelectedSaveSlot from options: %s"), *SelectedSaveSlot));
+				SaveGameSubsystem->LoadSaveGame(SelectedSaveSlot);
+			}
+			else if (!GameInstance->LoadSlotName.IsEmpty())
+			{
+				LogOnScreen(this, FString::Printf(TEXT("Loading SaveData From GameInstance: %s"), *GameInstance->LoadSlotName));
+				SaveGameSubsystem->LoadSaveGame(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex);
+			}
+			SaveGameSubsystem->DebugLogCurrentSaveGameInfo(FString(TEXT(">>> ADaGameModeBase::InitGame")));
 
-	if (SaveGameSubsystem)
-	{
-		FString SelectedSaveSlot = UGameplayStatics::ParseOption(Options, "SaveGame");
-		SaveGameSubsystem->LoadSaveGame(SelectedSaveSlot);
-	} else
-	{
-		ErrorMessage = FString::Printf(TEXT("SaveGame Subsystem not found in GameInstance: %s"), *GetNameSafe(GetGameInstance()));
+		}
+		else
+		{
+			ErrorMessage = FString::Printf(TEXT("SaveGame Subsystem not found in GameInstance: %s"), *GetNameSafe(GetGameInstance()));
+		}
 	}
 }
 
@@ -42,6 +56,8 @@ inline void ADaGameModeBase::BeginPlay()
 	Super::BeginPlay();
 	
 	Maps.Add(DefaultMapName, DefaultMap);
+
+	SaveGameSubsystem->DebugLogCurrentSaveGameInfo(FString(TEXT(">>> ADaGameModeBase::BeginPlay")));
 }
 
 AActor* ADaGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
@@ -75,6 +91,11 @@ void ADaGameModeBase::TravelToMap(const FString& MapName)
 	UGameplayStatics::OpenLevelBySoftObjectPtr(this, Maps.FindChecked(MapName));
 }
 
+void ADaGameModeBase::TravelToMapWithOptions(const FString& MapName, bool bResetOptions, const FString& Options)
+{
+	UGameplayStatics::OpenLevelBySoftObjectPtr(this, Maps.FindChecked(MapName), bResetOptions, Options);
+}
+
 void ADaGameModeBase::OnActorKilled(AActor* VictimActor, AActor* KillerActor)
 {
 	//LogOnScreen(this, FString::Printf(TEXT("ADaGameModeBase::OnActorKilled VictimActor: (%s) KillerActor: (%s)"), *GetNameSafe(VictimActor), *GetNameSafe(KillerActor)));
@@ -100,8 +121,7 @@ void ADaGameModeBase::OnActorKilled(AActor* VictimActor, AActor* KillerActor)
 		}
 		
 		// AutoSave on Player Death
-		//UDaSaveGameSubsystem* SG = GetGameInstance()->GetSubsystem<UDaSaveGameSubsystem>();
-		SaveGameSubsystem->WriteSaveGame();
+		WriteSaveGame();
 	}
 }
 
@@ -119,9 +139,10 @@ void ADaGameModeBase::RespawnPlayerElapsed(AController* Controller)
 
 void ADaGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
-	//UDaSaveGameSubsystem* SG = GetGameInstance()->GetSubsystem<UDaSaveGameSubsystem>();
 	SaveGameSubsystem->HandleStartingNewPlayer(NewPlayer);
-	
+
+	SaveGameSubsystem->DebugLogCurrentSaveGameInfo(FString(TEXT(">>> ADaGameModeBase::HandleStartingNewPlayer_Implementation")));
+
 	// // Will call BeginPlaying State in Player Controller so make sure our data is setup before this calls super
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 	
@@ -134,11 +155,21 @@ void ADaGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* 
 
 UDaSaveGame* ADaGameModeBase::RetrieveInGameSaveData()
 {
+	SaveGameSubsystem->DebugLogCurrentSaveGameInfo(FString(TEXT(">>> ADaGameModeBase::RetrieveInGameSaveData")));
 	return SaveGameSubsystem->RetrieveInGameSaveData();
 }
 
-void ADaGameModeBase::SaveInGameProgressData(UDaSaveGame* SaveObject)
+void ADaGameModeBase::SaveInGameProgressData(TFunction<void(UDaSaveGame*)> SaveDataCallback)
 {
-	SaveGameSubsystem->SaveInGameProgressData(SaveObject);
+	SaveGameSubsystem->DebugLogCurrentSaveGameInfo(FString(TEXT(">>> ADaGameModeBase::SaveInGameProgressData")));
+	SaveGameSubsystem->SaveInGameProgressData(SaveDataCallback);
 }
 
+void ADaGameModeBase::WriteSaveGame()
+{
+	SaveGameSubsystem->DebugLogCurrentSaveGameInfo(FString(TEXT(">>> ADaGameModeBase::WriteSaveGame")));
+	SaveInGameProgressData([this](UDaSaveGame* SaveData)
+	{
+		SaveData->bFirstTimeLoadIn = false;
+	});
+}

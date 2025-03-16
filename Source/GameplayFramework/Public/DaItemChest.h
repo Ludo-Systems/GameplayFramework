@@ -5,12 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DaInteractableInterface.h"
+#include "DaSaveInterface.h"
 #include "DaItemChest.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLidOpenedStateChanged, bool, IsOpened);
 
 UCLASS()
-class GAMEPLAYFRAMEWORK_API ADaItemChest : public AActor, public IDaInteractableInterface
+class GAMEPLAYFRAMEWORK_API ADaItemChest : public AActor, public IDaInteractableInterface, public IDaSaveInterface
 {
 	GENERATED_BODY()
 	
@@ -22,10 +23,12 @@ public:
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 	virtual void SecondaryInteract_Implementation(APawn* InstigatorPawn) override;
 	virtual FText GetInteractText_Implementation(APawn* InstigatorPawn) override;
-	virtual void OnActorLoaded_Implementation() override;
 	virtual void HighlightActor_Implementation() override;
 	virtual void UnHighlightActor_Implementation() override;
 
+	virtual void LoadActor_Implementation() override;
+	virtual bool ShouldLoadTransform_Implementation() override;
+	
 	UPROPERTY(BlueprintAssignable, Category="ItemChest")
 	FOnLidOpenedStateChanged OnLidOpenedStateChanged;
 	
