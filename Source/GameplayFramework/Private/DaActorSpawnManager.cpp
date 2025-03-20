@@ -23,7 +23,8 @@ static TAutoConsoleVariable<bool> CVarDebugSpawnItems(TEXT("da.DrawDebugSpawnIte
 
 void UDaActorSpawnManager::StartSpawning(FString LevelName)
 {
-	// virtual only
+	// Store for later use.
+	CurrentLevelName = LevelName;
 }
 
 void UDaActorSpawnManager::OnSpawnQueryCompleted(TSharedPtr<FEnvQueryResult> Result)
@@ -36,6 +37,8 @@ void UDaActorSpawnManager::OnSpawnQueryCompleted(TSharedPtr<FEnvQueryResult> Res
 
 void UDaAISpawnManager::StartSpawning(FString LevelName)
 {
+	Super::StartSpawning(LevelName);
+	
 	if (TimerHandle_SpawnBots.IsValid())
 	{
 		// Already spawning bots.
@@ -153,6 +156,8 @@ void UDaAISpawnManager::KillAllBots()
 
 void UDaPickupItemSpawnManager::StartSpawning(FString LevelName)
 {
+	Super::StartSpawning(LevelName);
+
 	// Skip the Blueprint wrapper and use the direct C++ option which the Wrapper uses as well
 	FEnvQueryRequest Request(SpawnQuery, this);
 	Request.Execute(EEnvQueryRunMode::AllMatching, this, &UDaPickupItemSpawnManager::OnSpawnQueryCompleted);
