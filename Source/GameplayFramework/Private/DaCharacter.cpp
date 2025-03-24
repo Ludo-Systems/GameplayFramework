@@ -133,6 +133,14 @@ void ADaCharacter::OnDeathStarted(AActor* OwningActor, AActor* InstigatorActor)
 	if(APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
 		DisableInput(PC);
+
+		if (IsLocallyControlled())
+		{
+			if (ADaHUD* HUD = Cast<ADaHUD>(PC->GetHUD()))
+			{
+				HUD->RemoveOverlay();
+			}
+		}
 	}
 
 	// Call super to ragdoll

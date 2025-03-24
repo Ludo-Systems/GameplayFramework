@@ -46,6 +46,8 @@ void ADaItemActor::BeginPlay()
 void ADaItemActor::AddToInventory_Implementation(APawn* InstigatorPawn, bool bDestroyActor)
 {
 	checkf(TypeTags.IsValid(), TEXT("ItemActor: TypeTags is not valid!"));
+	if (!InstigatorPawn)
+		return;
 	
 	if (APlayerState* PS = InstigatorPawn->GetPlayerState())
 	{
@@ -81,7 +83,6 @@ ADaItemActor* ADaItemActor::CreateFromInventoryItem(const FDaInventoryItemData& 
 void ADaItemActor::Interact_Implementation(APawn* InstigatorPawn)
 {
 	// Derived classes to implement
-	Execute_AddToInventory(this, InstigatorPawn, true);
 }
 
 void ADaItemActor::SecondaryInteract_Implementation(APawn* InstigatorPawn)
