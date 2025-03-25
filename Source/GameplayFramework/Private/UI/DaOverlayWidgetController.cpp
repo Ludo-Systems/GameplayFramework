@@ -16,7 +16,7 @@ void UDaOverlayWidgetController::BindCallbacksToDependencies()
 {
 	Super::BindCallbacksToDependencies();
 	
-	Cast<UDaAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
+	Cast<UDaAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddWeakLambda(this,
 		[this](const FGameplayTagContainer& AssetTags)
 	{
 			for (const FGameplayTag& Tag: AssetTags)

@@ -74,7 +74,7 @@ void ADAAICharacter_NPC::InitDefaultAttributes() const
 		{
 			for (auto& Pair: AttributeSet->TagsToAttributes)
 			{
-				AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
+				AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddWeakLambda(this,
 					[this, Pair, AttributeSet](const FOnAttributeChangeData& Data)
 				{
 					BroadcastAttributeInfo(Pair.Key, Pair.Value(), AttributeSet);

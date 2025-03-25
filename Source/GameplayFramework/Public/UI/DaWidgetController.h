@@ -54,8 +54,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues();
 
+	UFUNCTION(BlueprintCallable)
 	virtual void BindCallbacksToDependencies();
-
+	
 	UPROPERTY(BlueprintAssignable, Category="Attributes")
 	FAttributeInfoSignature AttributeInfoDelegate;
 	
@@ -76,6 +77,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Attributes")
 	TObjectPtr<UDaAttributeInfo> AttributeInfo;
 
+	
 	virtual void BroadcastAttributeInfo(const FGameplayTag& AttributeTag, const FGameplayAttribute& Attribute, UDaBaseAttributeSet* AttributeSet) const;
 	
 };

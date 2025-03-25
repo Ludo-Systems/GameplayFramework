@@ -35,22 +35,36 @@ void UDaWidgetController::BroadcastInitialValues()
 
 void UDaWidgetController::BindCallbacksToDependencies()
 {
+	if (!IsValid(AbilitySystemComponent)) return;
+
 	for (auto It = AttributeSetTags.CreateConstIterator(); It; ++It)
 	{
 		if (!It->IsValid()) continue;
 		//LOG("Widget Controller Set Tag: %s", It->ToString());
 		
 		UDaBaseAttributeSet* AttributeSet = AbilitySystemComponent->GetAttributeSetForTag(*It);
-		if (AttributeSet)
+		if (!IsValid(AttributeSet)) continue;
+		
+		for (auto& Pair: AttributeSet->TagsToAttributes)
 		{
-			for (auto& Pair: AttributeSet->TagsToAttributes)
+			// Store delegate handle for cleanup
+			AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddWeakLambda(this,
+				[this, Pair, AttributeSetPtr = TWeakObjectPtr<UDaBaseAttributeSet>(AttributeSet)](const FOnAttributeChangeData& Data)
 			{
-				AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
-					[this, Pair, AttributeSet](const FOnAttributeChangeData& Data)
-				{
-					BroadcastAttributeInfo(Pair.Key, Pair.Value(), AttributeSet);
-				});
-			}
+					if (!IsValid(this))
+					{
+						// We are using AddWeakLambda with this, so it should never be invalid at this point, but adding 
+						LOG_WARNING("UDaWidgetController: Invalid Object");
+						return;
+					}
+					
+					if (!AttributeSetPtr.IsValid())
+					{
+						LOG_WARNING("UDaWidgetController: Invalid AttributeSet");
+						return;
+					}
+					BroadcastAttributeInfo(Pair.Key, Pair.Value(), AttributeSetPtr.Get());
+			});
 		}
 	}
 }
