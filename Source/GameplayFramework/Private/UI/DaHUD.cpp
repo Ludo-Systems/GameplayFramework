@@ -93,7 +93,7 @@ void ADaHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UDaAbilitySyst
 	}
 
 	// We didnt find any per-level data overrides so load default overlay and controller
-	if (!bFound && OverlayWidgetClass && OverlayWidgetControllerClass)
+	if (!bFound)
 	{
 		checkf(OverlayWidgetClass, TEXT("OverlayWidgetClass uninitialized, either fill out in DaUILevelData DataAsset class defaults set on HUD LevelWidgetData."));
 		checkf(OverlayWidgetControllerClass, TEXT("OverlayWidgetControllerClass uninitialized, either fill out in DaUILevelData DataAsset class defaults set on HUD LevelWidgetData."));

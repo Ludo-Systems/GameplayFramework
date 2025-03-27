@@ -34,6 +34,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PlayMontageAndSpawnProjectile();
 
+	// Convenience that calls GetTargetLocation_SphereTrace and SpawnProjectile. Skips playing montage. Only works for Sphere trace currently
+	UFUNCTION(BlueprintCallable)
+	void CalculateTargetLocationAndSpawnProjectile();
+
+	// Sphere trace to get hit targets
 	UFUNCTION(BlueprintCallable)
 	FVector GetTargetLocation_SphereTrace();
 
@@ -68,8 +73,6 @@ protected:
 	/* Sound Effect to play (Can be Wave or Cue) */
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TObjectPtr<USoundBase> CastingSound;
-
-	void CalculateTargetLocationAndSpawnProjectile();
 
 	UFUNCTION()
 	void OnCursorTargetLocationReceived(const FGameplayAbilityTargetDataHandle& DataHandle);
