@@ -43,6 +43,15 @@ The AICharacters predefined in the engine can run around, find a TargetActor usi
     3. PrimaryAssetType: PlayerPawnData, AssetBaseClass: DaPlayerPawnData, directory where these data assets can be found. Set rules to always cook.
 11. Developer tab can change SaveGame name.
 
+## Building the Plugin
+
+After adding the plugin to your Unreal Engine 5.5 project:
+
+1. Run Unreal's **GenerateProjectFiles** script for your project so the module is detected by your IDE.
+2. Open the generated project files (for example the `.sln` on Windows) and build the project. The GameplayFramework module will compile with the rest of your project.
+
+The repository does not contain automated tests.
+
 ## Configuration
 
 There are lots of ways to configure the project. UI, AI, Camera modes, various gameplay abilities, effects, etc. 
