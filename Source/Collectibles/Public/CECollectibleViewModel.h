@@ -34,6 +34,13 @@ public:
 	int32 GetPlayerSetYear() const { return PlayerSetYear; }
 	FGameplayTagContainer GetPlayerSetSpecialTags() const { return PlayerSetSpecialTags; }
 	int32 GetAppraisedValue() const { return AppraisedValue; }
+
+	// Fake data for user selection
+	int32 GetFakeYear_1() const { return FakeYear_1; }
+	int32 GetFakeYear_2() const { return FakeYear_2; }
+	int32 GetFakeYear_3() const { return FakeYear_3; }
+	int32 GetFakeYear_4() const { return FakeYear_4; }
+	int32 GetFakeYear_5() const { return FakeYear_5; }
 	
 	// Base Data
 	void SetCollectibleName(const FName& InCollectibleName);
@@ -50,6 +57,13 @@ public:
 	void SetPlayerSetSpecialTags(const FGameplayTagContainer& InSpecialTags);
 	void SetAppraisedValue(int32 InAppraisedValue);
 
+	// Fake data for user selection
+	void SetFakeYear_1(int32 InYear);
+	void SetFakeYear_2(int32 InYear);
+	void SetFakeYear_3(int32 InYear);
+	void SetFakeYear_4(int32 InYear);
+	void SetFakeYear_5(int32 InYear);
+	
 private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
@@ -84,5 +98,22 @@ private:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
 	FGameplayTagContainer PlayerSetSpecialTags = FGameplayTagContainer();
+
+	// Fake data for user selection
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
+	int32 FakeYear_1 = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
+	int32 FakeYear_2 = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
+	int32 FakeYear_3 = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
+	int32 FakeYear_4 = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
+	int32 FakeYear_5 = 0;
+
 	
 };

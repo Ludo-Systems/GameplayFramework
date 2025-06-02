@@ -66,3 +66,28 @@ void UCECollectibleViewModel::SetAppraisedValue(int32 InAppraisedValue)
 	
 }
 
+void UCECollectibleViewModel::SetFakeYear_1(int32 InYear)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(FakeYear_1, InYear);
+}
+
+void UCECollectibleViewModel::SetFakeYear_2(int32 InYear)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(FakeYear_2, InYear);
+}
+
+void UCECollectibleViewModel::SetFakeYear_3(int32 InYear)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(FakeYear_3, InYear);
+}
+
+void UCECollectibleViewModel::SetFakeYear_4(int32 InYear)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(FakeYear_4, InYear);
+}
+
+void UCECollectibleViewModel::SetFakeYear_5(int32 InYear)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(FakeYear_5, InYear);
+}
+
