@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Collectibles/Public/CEInventoryItemFactory.h"
+#include "CEInventoryItemFactory.h"
 
-#include "Collectibles/Public/CEInventoryItem.h"
-#include "../../../../../Source/CollectorsEdition/CEGameplayTags.h"
+#include "CEInventoryItem.h"
+#include "CollectiblesGameplayTags.h"
 #include "Inventory/DaInventoryItemInterface.h"
 
 TSubclassOf<UDaInventoryItemBase> UCEInventoryItemFactory::DetermineInventoryItemClassFromTags(
@@ -12,7 +12,7 @@ TSubclassOf<UDaInventoryItemBase> UCEInventoryItemFactory::DetermineInventoryIte
 {
 	if (Tags.IsValid())
 	{
-		if (Tags.HasTagExact(CEGameplayTags::TAG_InventoryTypeCollectibles))
+		if (Tags.HasTagExact(CollectiblesGameplayTags::TAG_InventoryTypeCollectibles))
 		{
 			return UCEInventoryItem::StaticClass();
 		}

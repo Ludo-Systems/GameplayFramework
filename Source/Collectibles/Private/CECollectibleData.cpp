@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Collectibles/Public/CECollectibleData.h"
-
-#include "../Public/CECollectibleViewModel.h"
+#include "CECollectibleData.h"
+#include "CECollectibleViewModel.h"
 
 
 UCECollectibleData::UCECollectibleData()

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Collectibles/Public/CECollectibleSpawnLocation.h"
+#include "CECollectibleSpawnLocation.h"
 
 ACECollectibleSpawnLocation::ACECollectibleSpawnLocation()
 {

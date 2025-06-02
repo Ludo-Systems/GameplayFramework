@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Collectibles/Public/CECollectibleViewModel.h"
+#include "CECollectibleViewModel.h"
 
-#include "Collectibles/Public/CECollectibleData.h"
+#include "CECollectibleData.h"
 
 
 void UCECollectibleViewModel::SetCollectibleName(const FName& InCollectibleName)

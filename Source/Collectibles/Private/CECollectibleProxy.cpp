@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Collectibles/Public/CECollectibleProxy.h"
+#include "CECollectibleProxy.h"
 
-#include "Collectibles/Public/CECollectibleData.h"
+#include "CECollectibleData.h"
 #include "DaPlayerState.h"
-#include "../../../../../Source/CollectorsEdition/CEGameplayTags.h"
+#include "CollectiblesGameplayTags.h"
 #include "Inventory/DaInventoryComponent.h"
 
 
@@ -25,7 +25,7 @@ UCECollectibleProxy* UCECollectibleProxy::CreateCollectibleProxyFromDataRef(cons
 
 int32 UCECollectibleProxy::GetItemTags_Implementation(FGameplayTagContainer& OutItemTags) const
 {
-	OutItemTags = FGameplayTagContainer(CEGameplayTags::TAG_InventoryTypeCollectibles);
+	OutItemTags = FGameplayTagContainer(CollectiblesGameplayTags::TAG_InventoryTypeCollectibles);
 	return 1;
 }
 

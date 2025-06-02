@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Collectibles/Public/CEInventoryItem.h"
-#include "Collectibles/Public/CECollectibleProxy.h"
+#include "CEInventoryItem.h"
+#include "CECollectibleProxy.h"
 
 int32 UCEInventoryItem::GetItemCoreTags_Implementation(FGameplayTagContainer& OutItemTags) const
 {
