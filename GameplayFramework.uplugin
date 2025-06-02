@@ -19,6 +19,11 @@
 			"Name": "GameplayFramework",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "Collectibles",
+			"Type": "Runtime",
+			"LoadingPhase": "PostDefault"
 		}
 	],
 	"Plugins": [
@@ -36,7 +41,7 @@
 		},
 		{
 			"Name": "ModelViewViewModel",
-			"Enabled":  true
+			"Enabled": true
 		}
 	]
 }
