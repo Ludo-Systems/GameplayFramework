@@ -20,7 +20,10 @@ public class Collectibles : ModuleRules
                 "Engine",
                 "Slate",
                 "SlateCore",
-                "GameplayFramework"
+                "GameplayFramework",
+                "GameplayAbilities",
+                "GameplayTags",
+                "ModelViewViewModel"
             }
         );
     }
