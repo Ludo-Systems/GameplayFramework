@@ -9,7 +9,7 @@ public class Collectibles : ModuleRules
         PublicDependencyModuleNames.AddRange(
             new string[]
             {
-                "Core",
+                "Core", "GameplayFramework",
             }
         );
 
@@ -20,7 +20,6 @@ public class Collectibles : ModuleRules
                 "Engine",
                 "Slate",
                 "SlateCore",
-                "GameplayFramework",
                 "GameplayAbilities",
                 "GameplayTags",
                 "ModelViewViewModel"

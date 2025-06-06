@@ -56,6 +56,8 @@ public:
 	FOnInspectStateChanged OnInspectStateChanged;
 	
 	FBoxSphereBounds GetHierarchyBounds(USceneComponent* RootComponent, bool bMeshLocalSpace);
+
+	bool IsInspecting() const { return bIsInspecting; }
 	
 protected:
 	
