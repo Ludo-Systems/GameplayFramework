@@ -22,6 +22,7 @@ public class Collectibles : ModuleRules
                 "SlateCore",
                 "GameplayAbilities",
                 "GameplayTags",
+                "CommonUI",
                 "ModelViewViewModel"
             }
         );

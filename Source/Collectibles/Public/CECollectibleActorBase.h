@@ -10,6 +10,7 @@
 #include "Inventory/DaInventoryItemInterface.h"
 #include "CECollectibleActorBase.generated.h"
 
+class UCommonActivatableWidget;
 class UDaInspectableComponent;
 class UDaActivatableWidget;
 
@@ -29,10 +30,10 @@ public:
 	bool bIsMoving = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collectible")
-	int CustomDepthStencilValue = 250;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collectible")
 	TObjectPtr<UMaterialInterface> RenderTargetMaterial;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Collectible")
+	UStaticMeshComponent* GetPhysicsMesh();
 	
 protected:
 
@@ -44,6 +45,21 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Components")
 	TObjectPtr<UDaInspectableComponent> InspectableComp;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Collectible")
+	TSubclassOf<UCommonActivatableWidget> AppraisalWidgetClass;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Collectible")
+	TObjectPtr<UCommonActivatableWidget> AppraisalWidget = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Collectible")
+	int32 DepthStencilValue_NotAppraised = 250;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Collectible")
+	int32 DepthStencilValue_NotAppraisedHover = 251;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Collectible")
+	int32 DepthStencilValue_AppraisedHover = 252;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -81,12 +97,9 @@ protected:
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 	virtual void SecondaryInteract_Implementation(APawn* InstigatorPawn) override;
 	virtual FText GetInteractText_Implementation(APawn* InstigatorPawn) override;
+	virtual void HighlightActor_Implementation() override;
+	virtual void UnHighlightActor_Implementation() override;
 	// IDaInteractableInterface End
 	
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Collectible")
-	TSubclassOf<UDaActivatableWidget> AppraisalWidgetClass;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Collectible")
-	TObjectPtr<UDaActivatableWidget> AppraisalWidget = nullptr;
 	
 };
