@@ -23,6 +23,7 @@ public class Collectibles : ModuleRules
                 "GameplayAbilities",
                 "GameplayTags",
                 "CommonUI",
+                "UMG",
                 "ModelViewViewModel"
             }
         );
