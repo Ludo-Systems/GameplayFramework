@@ -17,6 +17,9 @@ ACECollectibleActorBase::ACECollectibleActorBase()
 	// Set this actor to call Tick() every frame
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
+
+	RootSceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootSceneComp"));
+	RootComponent = RootSceneComp;
 	
 	PreviewMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PreviewMesh"));
 	PreviewMeshComp->SetupAttachment(RootComponent);

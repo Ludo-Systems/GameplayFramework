@@ -38,6 +38,9 @@ public:
 protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Components")
+	TObjectPtr<USceneComponent> RootSceneComp;
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Components")
 	TObjectPtr<UStaticMeshComponent> PreviewMeshComp;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Components")
