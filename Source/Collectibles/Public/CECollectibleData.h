@@ -37,7 +37,7 @@ struct FCECoinCoreDataRef : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Coin Template")
 	int Year = -1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Collectibles")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Coin Template")
 	TSoftObjectPtr<UTexture2D> Image = nullptr;
 	
 	// Unique CID for this coin template
@@ -54,8 +54,38 @@ struct FCECoinCoreDataRef : public FTableRowBase
 	FName Issuer = FName();
 	
 	// Any Special Tags for this coin template. Will be added to final instance Special Tags
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Collectibles", meta = (Categories = "Collectibles.Special"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Coin Template", meta = (Categories = "Collectibles.Special"))
 	FGameplayTagContainer SpecialTags = FGameplayTagContainer();
+};
+
+USTRUCT(BlueprintType)
+struct FCECardCoreDataRef : public FTableRowBase
+{
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Card Template")
+	FName Name = FName();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Card Template")
+	int Year = -1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Card Template")
+	FName Issuer = FName();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Card Template")
+	TSoftObjectPtr<UTexture2D> Image = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Card Template")
+	FPrimaryAssetId EditionAssetId = FPrimaryAssetId(FPrimaryAssetType("PrimaryDataAsset"), FName("EditionTemplate"));
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Card Template")
+	int Variation = -1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Card Template")
+	FPrimaryAssetId WearTemplateAssetId = FPrimaryAssetId(FPrimaryAssetType("PrimaryDataAsset"), FName("WearTemplate"));;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Card Template", meta = (Categories = "Collectibles.Special"))
+	FGameplayTagContainer SpecialTags = FGameplayTagContainer();
+	
+	GENERATED_BODY()
 };
 
 USTRUCT(BlueprintType)
