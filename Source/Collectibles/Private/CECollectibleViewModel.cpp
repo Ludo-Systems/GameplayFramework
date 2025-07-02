@@ -91,3 +91,18 @@ void UCECollectibleViewModel::SetFakeYear_5(int32 InYear)
 	UE_MVVM_SET_PROPERTY_VALUE(FakeYear_5, InYear);
 }
 
+void UCECollectibleViewModel::SetFinalMintMarkText(const FString& InMintMarkText)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(FinalMintMarkText, InMintMarkText);
+}
+
+void UCECollectibleViewModel::SetFinalYearText(const FString& InYearText)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(FinalYearText, InYearText);
+}
+
+void UCECollectibleViewModel::SetFinalGradeText(const FString& InGradeText)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(FinalGradeText, InGradeText);
+}
+
