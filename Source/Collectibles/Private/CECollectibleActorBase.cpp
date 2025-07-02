@@ -8,6 +8,7 @@
 #include "DaPlayerState.h"
 #include "Inventory/DaInventoryComponent.h"
 #include "UI/DaCommonUIExtensions.h"
+#include "CommonActivatableWidget.h"
 
 #define LOCTEXT_NAMESPACE "CollectibleItems"
 
@@ -42,7 +43,7 @@ void ACECollectibleActorBase::BeginPlay()
 // ICECollectibleItemInterface Implementation
 int32 ACECollectibleActorBase::GetItemCoreTags_Implementation(FGameplayTagContainer& OutItemTags) const
 {
-	if (CollectibleData->CollectibleDataRef.CoreTag.GetTagName().IsValid())
+	if (CollectibleData && CollectibleData->CollectibleDataRef.CoreTag.GetTagName().IsValid())
 	{
 		OutItemTags.AddTag(CollectibleData->CollectibleDataRef.CoreTag);
 	}

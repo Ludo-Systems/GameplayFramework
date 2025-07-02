@@ -19,6 +19,66 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsAppraised() const { return PlayerSetGrade > 0 && PlayerSetYear > 0; }
+
+	UFUNCTION(BlueprintCallable)
+	FString FinalName() const
+	{
+		if (IsAppraised())
+		{
+			return FString::Printf(TEXT("%s-%s %s [%s]"), *FinalYearText, *FinalMintMarkText, *CollectibleName.ToString(), *FinalGradeText);
+		}
+		else
+		{
+			return FString::Printf(TEXT("%s"), *CollectibleName.ToString());
+		}
+	}
+
+	
+	UFUNCTION(BlueprintCallable)
+	void SetFinalMintMark()
+	{
+		for (const FGameplayTag& Tag : PlayerSetSpecialTags)
+		{
+			FString TagString = Tag.ToString();
+			if (TagString.Contains(TEXT("Collectibles.Special.Mintmark")))
+			{
+				TArray<FString> Components;
+				TagString.ParseIntoArray(Components, TEXT("."));
+				if (Components.Num() > 0)
+				{
+					SetFinalMintMarkText(Components.Last());
+				}
+			}
+		}
+		
+		SetFinalMintMarkText(FString(TEXT("???")));
+	}
+
+	UFUNCTION(BlueprintCallable)
+	void SetFinalYear()
+	{
+		if (GetPlayerSetYear() > 0)
+		{
+			SetFinalYearText(FString::Printf(TEXT("%4i"), Year));
+		}
+		else
+		{
+			SetFinalYearText(FString(TEXT("???")));
+		}
+	}
+
+	UFUNCTION(BlueprintCallable)
+	void SetFinalGrade()
+	{
+		if (GetPlayerSetGrade() > 0)
+		{
+			SetFinalGradeText(FString::Printf(TEXT("%i"), Grade));
+		}
+		else
+		{
+			SetFinalGradeText(FString(TEXT("???")));
+		}
+	}
 	
 	// Base Data
 	int32 GetGrade() const { return Grade; }
@@ -41,6 +101,11 @@ public:
 	int32 GetFakeYear_3() const { return FakeYear_3; }
 	int32 GetFakeYear_4() const { return FakeYear_4; }
 	int32 GetFakeYear_5() const { return FakeYear_5; }
+
+	// Final text values for display
+	FString GetFinalMintMarkText() const { return FinalMintMarkText; }
+	FString GetFinalYearText() const { return FinalYearText; }
+	FString GetFinalGradeText() const { return FinalGradeText; }
 	
 	// Base Data
 	void SetCollectibleName(const FName& InCollectibleName);
@@ -63,6 +128,11 @@ public:
 	void SetFakeYear_3(int32 InYear);
 	void SetFakeYear_4(int32 InYear);
 	void SetFakeYear_5(int32 InYear);
+
+	// Final Text Values for Display
+	void SetFinalMintMarkText(const FString& InMintMarkText);
+	void SetFinalYearText(const FString& InYearText);
+	void SetFinalGradeText(const FString& InGradeText);
 	
 private:
 
@@ -115,5 +185,12 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
 	int32 FakeYear_5 = 0;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
+	FString FinalMintMarkText = FString(TEXT("???"));
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
+	FString FinalYearText = FString(TEXT("???"));
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
+	FString FinalGradeText = FString(TEXT("???"));
 };
