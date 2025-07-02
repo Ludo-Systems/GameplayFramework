@@ -74,13 +74,13 @@ struct FCECardCoreDataRef : public FTableRowBase
 	TSoftObjectPtr<UTexture2D> Image = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Card Template")
-	FPrimaryAssetId EditionAssetId = FPrimaryAssetId(FPrimaryAssetType("PrimaryDataAsset"), FName("EditionTemplate"));
+	FPrimaryAssetId EditionTemplateAssetId;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Card Template")
 	int Variation = -1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Card Template")
-	FPrimaryAssetId WearTemplateAssetId = FPrimaryAssetId(FPrimaryAssetType("PrimaryDataAsset"), FName("WearTemplate"));;
+	FPrimaryAssetId WearTemplateAssetId;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Card Template", meta = (Categories = "Collectibles.Special"))
 	FGameplayTagContainer SpecialTags = FGameplayTagContainer();
